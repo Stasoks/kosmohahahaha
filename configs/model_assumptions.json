@@ -1,0 +1,45 @@
+{
+  "status": "TEAM_ASSUMPTION",
+  "earth_new_project_lead_months": {
+    "value": 24,
+    "unit": "month",
+    "basis": "Conservative upper endpoint of the official 18-24 month CASE_INPUT range."
+  },
+  "earth_new_operational_delivery_lag_months": {
+    "value": 0,
+    "unit": "month",
+    "basis": "The official lead time is used for preparation and commissioning; no second post-commission transport lag is specified."
+  },
+  "lunar_isru_delivery_lead_months": {
+    "value": 2,
+    "unit": "month",
+    "basis": "Conservative upper endpoint of the official 1-2 month CASE_INPUT range after commissioning."
+  },
+  "real_discount_rate": {
+    "value": 0.05,
+    "unit": "share/year",
+    "basis": "Demonstration real rate; the team must justify it before final submission."
+  },
+  "discount_convention": {
+    "value": "end_of_calendar_year",
+    "unit": "convention",
+    "basis": "PV exponent is year minus 2035."
+  },
+  "monthly_demand_allocation": {
+    "value": "uniform",
+    "unit": "method",
+    "basis": "Annual demand is divided equally across twelve model months."
+  },
+  "storage_average_method": {
+    "value": "trapezoid",
+    "unit": "method",
+    "basis": "Monthly holding cost uses the mean of opening and closing physical inventory."
+  },
+  "week_to_model_month_conversion": {
+    "days_per_week": 7,
+    "days_per_model_year": 365,
+    "rounding": "ceil",
+    "basis": "Emergency six-week lead time is converted to ceil(42 / (365/12)) = 2 model months."
+  }
+}
+

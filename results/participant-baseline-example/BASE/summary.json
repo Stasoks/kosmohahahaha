@@ -1,0 +1,18 @@
+{
+  "case_input_root": "/home/stas/python_projects/kosmohack",
+  "critical_service_level": 1.0,
+  "critical_shortage_t": 0.0,
+  "discounted_cost_mln": 10434.879139082535,
+  "emergency_usage_t": 0,
+  "final_inventory_t": 45.456666665876085,
+  "hard_violation_count": 0,
+  "plan_id": "participant-baseline-example",
+  "scenario_id": "BASE",
+  "scenario_source": "/home/stas/python_projects/kosmohack/scenarios/base.yaml",
+  "total_losses_t": 18.7099999999904,
+  "total_service_level": 1.0,
+  "total_shortage_t": 0.0,
+  "undiscounted_cost_mln": 11521.824991996033,
+  "valid": true,
+  "violation_count": 0
+}

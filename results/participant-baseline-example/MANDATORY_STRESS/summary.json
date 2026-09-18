@@ -1,0 +1,18 @@
+{
+  "case_input_root": "/home/stas/python_projects/kosmohack",
+  "critical_service_level": 1.0,
+  "critical_shortage_t": 0.0,
+  "discounted_cost_mln": 10821.8505283165,
+  "emergency_usage_t": 0,
+  "final_inventory_t": 0.0,
+  "hard_violation_count": 2,
+  "plan_id": "participant-baseline-example",
+  "scenario_id": "MANDATORY_STRESS",
+  "scenario_source": "/home/stas/python_projects/kosmohack/scenarios/mandatory_stress.yaml",
+  "total_losses_t": 18.2357499999904,
+  "total_service_level": 0.9103064428504191,
+  "total_shortage_t": 137.5899166674571,
+  "undiscounted_cost_mln": 11978.26682139683,
+  "valid": false,
+  "violation_count": 5
+}
