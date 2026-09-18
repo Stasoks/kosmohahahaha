@@ -46,4 +46,4 @@ def test_order_from_unavailable_isru_is_rejected_physically(tmp_path, case_data,
     plan = _load_mutated(tmp_path, case_data, assumptions, mutate)
     result = simulate(plan, base_scenario, case_data, assumptions)
     assert any(item.code == "SOURCE_UNAVAILABLE" and item.source_id == "D" for item in result.violations)
-    assert all(row["actual_delivered_by_source"].get("D", 0) == 0 for row in result.monthly if row["month"].startswith("2037"))
+    assert all(row["gross_delivery_by_source"].get("D", 0) == 0 for row in result.monthly if row["month"].startswith("2037"))

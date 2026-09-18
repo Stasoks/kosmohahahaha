@@ -1,9 +1,9 @@
 [
   {
-    "actual": 0.9605434202884803,
+    "actual": 0.9605434202885134,
     "code": "STRESS_TOTAL_SERVICE_BENCHMARK",
     "constraint_id": "BASE_TOTAL_SERVICE",
-    "excess_or_gap": 0.009456579711519697,
+    "excess_or_gap": 0.009456579711486612,
     "human_message": "Total service is 96.05%; shortage is 11.344 t.",
     "limit": 0.97,
     "operator": ">=",

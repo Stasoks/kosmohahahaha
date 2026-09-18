@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from kosmohak.domain.case import CaseData
 from kosmohak.domain.plan import OperatorPlan
+from kosmohak.simulation.environment import SimulationEnvironment
 
 
 @dataclass(frozen=True)
@@ -14,7 +15,11 @@ class InvestmentEvent:
     capex_mln: float
 
 
-def investment_events(plan: OperatorPlan, case_data: CaseData) -> list[InvestmentEvent]:
+def investment_events(
+    plan: OperatorPlan,
+    case_data: CaseData,
+    environment: SimulationEnvironment | None = None,
+) -> list[InvestmentEvent]:
     events: list[InvestmentEvent] = []
     zbo = plan.investment("ZBO")
     if zbo.get("enabled"):
@@ -55,5 +60,14 @@ def investment_events(plan: OperatorPlan, case_data: CaseData) -> list[Investmen
                 case_data.investments["LUNAR_ISRU"].exercise_cost_mln,
             )
         )
+    if environment is not None:
+        events = [
+            InvestmentEvent(
+                item.investment_id,
+                item.event,
+                item.month,
+                environment.capex(item.investment_id, item.month, item.capex_mln),
+            )
+            for item in events
+        ]
     return sorted(events, key=lambda item: (item.month, item.investment_id, item.event))
-

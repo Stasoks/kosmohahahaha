@@ -1,0 +1,47 @@
+[
+  {
+    "actual": 0.9364765833321282,
+    "code": "BASE_TOTAL_SERVICE",
+    "constraint_id": "BASE_TOTAL_SERVICE",
+    "excess_or_gap": 0.03352341666787173,
+    "human_message": "Total service is 93.65%; shortage is 20.327 t.",
+    "limit": 0.97,
+    "operator": ">=",
+    "period": "2039",
+    "reason": "total demand service minimum",
+    "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+    "severity": "hard",
+    "source_id": null,
+    "unit": "share"
+  },
+  {
+    "actual": 22.762920832893446,
+    "code": "RESERVE_45D",
+    "constraint_id": "RESERVE_45D",
+    "excess_or_gap": 22.237079167106554,
+    "human_message": "Reserve equivalence is 22.763 days; required 45.000 days.",
+    "limit": 45.0,
+    "operator": ">=",
+    "period": "2039-01",
+    "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+    "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+    "severity": "hard",
+    "source_id": null,
+    "unit": "days"
+  },
+  {
+    "actual": 0.0,
+    "code": "RESERVE_45D",
+    "constraint_id": "RESERVE_45D",
+    "excess_or_gap": 45.0,
+    "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+    "limit": 45.0,
+    "operator": ">=",
+    "period": "2040-01",
+    "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+    "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+    "severity": "hard",
+    "source_id": null,
+    "unit": "days"
+  }
+]

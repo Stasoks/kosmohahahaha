@@ -33,6 +33,7 @@ class SimulationResult:
     violations: list[Violation]
     costs: list[dict[str, Any]]
     assumptions: dict[str, Any]
+    pre_horizon: dict[str, Any]
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -43,6 +44,7 @@ class SimulationResult:
             "violations": [item.to_dict() for item in self.violations],
             "costs": self.costs,
             "assumptions": self.assumptions,
+            "pre_horizon": self.pre_horizon,
         }
 
     def to_export_envelope(self) -> dict[str, Any]:
@@ -62,6 +64,6 @@ class SimulationResult:
             "financial_breakdown": self.costs,
             "constraint_checks": [item.to_dict() for item in self.violations],
             "risk_register": [],
+            "pre_horizon": self.pre_horizon,
             "summary": self.summary,
         }
-

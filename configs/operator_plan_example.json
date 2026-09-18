@@ -69,14 +69,18 @@
       },
       {"investment_id": "LUNAR_ISRU", "enabled": true, "funding_month": "2035-03"}
     ],
+    "initial_stock_acquisition": {
+      "source_id": "A",
+      "reserved_capacity_t_per_year": 63,
+      "ordered_volume_t": 62.8272251309,
+      "order_date": "2034-01",
+      "planned_delivery_date": "2035-01",
+      "contract_period_start": "2034-01",
+      "contract_period_end": "2034-12",
+      "notes": "Pre-horizon Earth-Core acquisition sized to yield 60 t after the official 4.5% throughput loss.",
+      "status": "TEAM_DECISION"
+    },
     "inventory_policy": {
-      "initial_inventory": {
-        "tons": 60,
-        "source_id": "A",
-        "order_month": "2034-01",
-        "delivery_month": "2035-01",
-        "financing_year": 2035
-      },
       "reserve_strategy_by_year": {
         "2035": "physical", "2036": "physical", "2037": "physical",
         "2038": "physical", "2039": "physical", "2040": "physical"
@@ -92,4 +96,3 @@
     "notes": "Manual non-optimized participant example. The same decisions are used unchanged for BASE and MANDATORY_STRESS."
   }
 }
-

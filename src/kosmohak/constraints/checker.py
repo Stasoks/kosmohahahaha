@@ -4,8 +4,8 @@ from kosmohak.domain.assumptions import ModelAssumptions
 from kosmohak.domain.case import CaseData, ConstraintDefinition
 from kosmohak.domain.plan import OperatorPlan
 from kosmohak.domain.result import Violation
-from kosmohak.domain.scenario import Scenario
 from kosmohak.economics.investments import InvestmentEvent
+from kosmohak.simulation.environment import SimulationEnvironment
 
 
 def capacity_excess(reserved_t_per_year: float, capacity_t_per_year: float) -> float:
@@ -23,7 +23,7 @@ def capacity_violation(
     excess = capacity_excess(reserved_t_per_year, capacity_t_per_year)
     if excess <= 1e-12:
         return None
-    return _violation(
+    return make_violation(
         code="CAPACITY_EXCEEDED",
         constraint_id="STRUCTURAL_SOURCE_CAPACITY",
         severity="hard",
@@ -34,12 +34,12 @@ def capacity_violation(
         operator="<=",
         limit=capacity_t_per_year,
         unit="t/year",
-        reason="Reserved capacity exceeds official source capacity.",
+        reason="Reserved capacity exceeds the active environment source capacity.",
         human_message=f"Source {source_id} reservation exceeds capacity by {excess:.3f} t/year.",
     )
 
 
-def _violation(
+def make_violation(
     *,
     code: str,
     constraint_id: str,
@@ -75,17 +75,20 @@ def _violation(
 
 
 class ConstraintChecker:
-    def __init__(self, case_data: CaseData, scenario: Scenario) -> None:
+    def __init__(self, case_data: CaseData, scenario: SimulationEnvironment) -> None:
         self.case_data = case_data
         self.scenario = scenario
         self.violations: list[Violation] = []
+
+    def extend(self, violations: list[Violation]) -> None:
+        self.violations.extend(violations)
 
     def storage_overflow(
         self, month: str, attempted_inventory_t: float, capacity_t: float, overflow_t: float
     ) -> None:
         if overflow_t > 1e-9:
             self.violations.append(
-                _violation(
+                make_violation(
                     code="STORAGE_CAPACITY_EXCEEDED",
                     constraint_id="STRUCTURAL_STORAGE_CAPACITY",
                     severity="hard",
@@ -107,7 +110,7 @@ class ConstraintChecker:
     def initial_storage(self, planned_t: float, accepted_t: float, capacity_t: float) -> None:
         if planned_t > capacity_t + 1e-9:
             self.violations.append(
-                _violation(
+                make_violation(
                     code="INITIAL_STORAGE_CAPACITY_EXCEEDED",
                     constraint_id="STRUCTURAL_STORAGE_CAPACITY",
                     severity="hard",
@@ -136,7 +139,7 @@ class ConstraintChecker:
     ) -> None:
         if not definition.is_satisfied(actual):
             self.violations.append(
-                _violation(
+                make_violation(
                     code=code or definition.constraint_id,
                     constraint_id=definition.constraint_id,
                     severity=severity or definition.severity,
@@ -166,19 +169,26 @@ class ConstraintChecker:
         for source_id, source in self.case_data.sources.items():
             for year in self.case_data.years:
                 reserved = plan.reservation(source_id, year)
+                info = eligibility[(source_id, year)]
+                active_fraction = info["active_fraction"]
+                effective_capacity = (
+                    info["physical_limit_t"] / active_fraction
+                    if active_fraction > 0
+                    else source.capacity_t_per_year
+                )
+                effective_capacity = round(effective_capacity, 12)
                 violation = capacity_violation(
                     reserved,
-                    source.capacity_t_per_year,
+                    effective_capacity,
                     source_id=source_id,
                     year=year,
                     scenario=self.scenario.scenario_id,
                 )
                 if violation:
                     self.violations.append(violation)
-                info = eligibility[(source_id, year)]
                 if info["ordered_t"] > info["contract_limit_t"] + 1e-9:
                     self.violations.append(
-                        _violation(
+                        make_violation(
                             code="ORDER_CAPACITY_EXCEEDED",
                             constraint_id="STRUCTURAL_ORDER_CAPACITY",
                             severity="hard",
@@ -199,7 +209,7 @@ class ConstraintChecker:
                 unavailable = info["ordered_t"] - info["available_ordered_t"]
                 if unavailable > 1e-9:
                     self.violations.append(
-                        _violation(
+                        make_violation(
                             code="SOURCE_UNAVAILABLE",
                             constraint_id="STRUCTURAL_SOURCE_AVAILABILITY",
                             severity="hard",
@@ -220,7 +230,7 @@ class ConstraintChecker:
         total_def = self.case_data.constraints["BASE_TOTAL_SERVICE"]
         for row in annual:
             year = str(row["year"])
-            severity = "hard" if self.scenario.scenario_id == "BASE" else "benchmark"
+            severity = "hard" if self.scenario.base_scenario_id == "BASE" else "benchmark"
             self._definition_violation(
                 critical_def,
                 year,
@@ -263,9 +273,9 @@ class ConstraintChecker:
                 for month_number in range(1, emergency_lead + 1):
                     state = monthly_by_month[f"{year:04d}-{month_number:02d}"]
                     bridge_demand += state["demand_total_t"]
-                    gross = state["gross_throughput_t"]
-                    emergency_gross = state["actual_delivered_by_source"].get("E", 0.0)
-                    bridge_supply += state["net_accepted_t"] * ((gross - emergency_gross) / gross) if gross else 0.0
+                    gross = state["gross_delivery_t"]
+                    emergency_gross = state["gross_delivery_by_source"].get("E", 0.0)
+                    bridge_supply += state["accepted_delivery_t"] * ((gross - emergency_gross) / gross) if gross else 0.0
                 contract_ok = reserved >= row["reserve_requirement_t"] - 1e-12 and role_ok and bridge_supply >= bridge_demand - 1e-12
                 actual_days = reserve_def.value if contract_ok else min(actual_days, reserved / row["demand_total_t"] * 365.0 if row["demand_total_t"] else reserve_def.value)
             self._definition_violation(

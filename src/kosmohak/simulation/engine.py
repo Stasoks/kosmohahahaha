@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from collections import defaultdict
 from typing import Any
 
@@ -14,70 +16,104 @@ from kosmohak.domain.time import month_range
 from kosmohak.economics.contracts import contract_cost
 from kosmohak.economics.finance import discount_end_of_year, holding_cost
 from kosmohak.economics.investments import investment_events
-from kosmohak.simulation.physics import accept_throughput, material_balance, reserve_tons, serve_demand
-from kosmohak.simulation.pipeline import (
-    build_shipments,
-    expand_orders,
-    source_commissioning_dates,
-)
+from kosmohak.simulation.environment import SimulationEnvironment, ensure_environment
+from kosmohak.simulation.physics import accept_throughput, reserve_tons, serve_demand
+from kosmohak.simulation.pipeline import build_shipments, expand_orders
+from kosmohak.simulation.pre_horizon import evaluate_preparatory_acquisition
+
+
+def _run_id(
+    plan: OperatorPlan,
+    environment: SimulationEnvironment,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> str:
+    case_files = [
+        "data/demand.csv",
+        "data/supply_sources.csv",
+        "data/storage_options.csv",
+        "data/investment_options.csv",
+        "data/constraints.csv",
+    ]
+    payload = {
+        "plan": plan.raw,
+        "base_scenario": environment.base_scenario.config,
+        "environment_id": environment.environment_id,
+        "overrides": environment.applied_overrides(),
+        "assumptions": assumptions.raw,
+        "case_input": {
+            path: (case_data.root / path).read_text(encoding="utf-8") for path in case_files
+        },
+    }
+    digest = hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return f"run-{digest[:16]}"
 
 
 def simulate(
     plan: OperatorPlan,
-    scenario: Scenario,
+    environment: Scenario | SimulationEnvironment,
     case_data: CaseData,
     assumptions: ModelAssumptions,
 ) -> SimulationResult:
-    """Execute one immutable participant plan in one official scenario."""
+    """Evaluate one immutable participant plan in one deterministic environment."""
+    env = ensure_environment(environment)
+    run_id = _run_id(plan, env, case_data, assumptions)
     months = month_range(case_data.start_month, case_data.end_month)
     orders = expand_orders(plan, case_data)
-    source_commissions = source_commissioning_dates(plan, case_data, assumptions)
-    investment_commissions = commissioning_dates(plan, case_data, assumptions)
-    shipments, eligibility = build_shipments(plan, case_data, assumptions, scenario, orders)
-    arrivals_by_month: dict[str, list] = defaultdict(list)
+    investment_commissions = commissioning_dates(plan, case_data, assumptions, env)
+    shipments, eligibility = build_shipments(plan, case_data, assumptions, env, orders)
+    actual_arrivals_by_month: dict[str, list] = defaultdict(list)
+    planned_arrivals_by_month: dict[str, list] = defaultdict(list)
     for shipment in shipments:
-        arrivals_by_month[shipment.actual_arrival_month].append(shipment)
+        actual_arrivals_by_month[shipment.actual_arrival_month].append(shipment)
+        planned_arrivals_by_month[shipment.planned_arrival_month].append(shipment)
 
-    checker = ConstraintChecker(case_data, scenario)
-    initial_planned = float(plan.initial_inventory.get("tons", 0.0))
-    base_storage = case_data.storage["BASE"]
-    inventory = min(initial_planned, base_storage.capacity_t)
-    checker.initial_storage(initial_planned, inventory, base_storage.capacity_t)
+    checker = ConstraintChecker(case_data, env)
+    preparatory = evaluate_preparatory_acquisition(plan, env, case_data, assumptions)
+    checker.extend(preparatory.violations)
+    inventory = preparatory.opening_inventory_t
     monthly_rows: list[dict[str, Any]] = []
 
     for month in months:
         year = int(month[:4])
-        zbo_active = investment_commissions["ZBO"] is not None and month >= str(investment_commissions["ZBO"])
+        zbo_active = (
+            investment_commissions["ZBO"] is not None
+            and month >= str(investment_commissions["ZBO"])
+        )
         storage = case_data.storage["ZBO" if zbo_active else "BASE"]
+        storage_capacity = env.storage_capacity(storage.storage_id, month, storage.capacity_t)
+        loss_rate = env.storage_loss_rate(storage.storage_id, month, storage.loss_rate_on_throughput)
         opening = inventory
 
-        arriving = arrivals_by_month.get(month, [])
         planned_arrival: dict[str, float] = defaultdict(float)
-        actual_delivered: dict[str, float] = defaultdict(float)
+        for shipment in planned_arrivals_by_month.get(month, []):
+            planned_arrival[shipment.source_id] += shipment.feasible_t
+        gross_delivery_by_source: dict[str, float] = defaultdict(float)
+        arriving = actual_arrivals_by_month.get(month, [])
         for shipment in arriving:
-            planned_arrival[shipment.source_id] += shipment.eligible_t
-            actual_delivered[shipment.source_id] += shipment.actual_delivered_t
-        gross = sum(actual_delivered.values())
-        flow = accept_throughput(opening, gross, storage.loss_rate_on_throughput, storage.capacity_t)
+            gross_delivery_by_source[shipment.source_id] += shipment.gross_delivery_t
+        gross_delivery = sum(gross_delivery_by_source.values())
+        flow = accept_throughput(opening, gross_delivery, loss_rate, storage_capacity)
         checker.storage_overflow(
             month,
-            opening + gross - flow.losses_t,
-            storage.capacity_t,
+            opening + flow.net_delivery_t,
+            storage_capacity,
             flow.overflow_t,
         )
-        available = opening + flow.net_accepted_t
+        available = opening + flow.accepted_delivery_t
 
         demand_row = case_data.demand[year]
-        demand_total = demand_row.base_total_t * scenario.demand_multiplier(year) / 12.0
-        demand_critical = demand_row.base_critical_t * scenario.demand_multiplier(year, critical=True) / 12.0
+        demand_total = demand_row.base_total_t * env.demand_multiplier_for_month(month) / 12.0
+        demand_critical = (
+            demand_row.base_critical_t
+            * env.demand_multiplier_for_month(month, critical=True)
+            / 12.0
+        )
         service = serve_demand(available, demand_total, demand_critical)
         served_total = service.served_critical_t + service.served_noncritical_t
-        calculated_closing = material_balance(
-            opening,
-            flow.delivered_for_balance_t,
-            flow.losses_t,
-            served_total,
-        )
+        calculated_closing = available - served_total
         if abs(calculated_closing - service.closing_inventory_t) > 1e-8:
             raise RuntimeError(f"Internal material-balance error in {month}")
         inventory = max(0.0, service.closing_inventory_t)
@@ -86,12 +122,26 @@ def simulate(
         fixed_opex = 0.0
         if zbo_active:
             active_investments.append("ZBO")
-            fixed_opex += case_data.investments["ZBO"].fixed_opex_mln_per_year / 12.0
-        if investment_commissions["EARTH_NEW"] is not None and month >= str(investment_commissions["EARTH_NEW"]):
+            fixed_opex += env.fixed_opex(
+                "ZBO",
+                month,
+                case_data.investments["ZBO"].fixed_opex_mln_per_year,
+            ) / 12.0
+        if (
+            investment_commissions["EARTH_NEW"] is not None
+            and month >= str(investment_commissions["EARTH_NEW"])
+        ):
             active_investments.append("EARTH_NEW")
-        if investment_commissions["LUNAR_ISRU"] is not None and month >= str(investment_commissions["LUNAR_ISRU"]):
+        if (
+            investment_commissions["LUNAR_ISRU"] is not None
+            and month >= str(investment_commissions["LUNAR_ISRU"])
+        ):
             active_investments.append("LUNAR_ISRU")
-            fixed_opex += case_data.investments["LUNAR_ISRU"].fixed_opex_mln_per_year / 12.0
+            fixed_opex += env.fixed_opex(
+                "LUNAR_ISRU",
+                month,
+                case_data.investments["LUNAR_ISRU"].fixed_opex_mln_per_year,
+            ) / 12.0
 
         month_orders = {
             source_id: values.get(month, 0.0)
@@ -99,13 +149,12 @@ def simulate(
             if values.get(month, 0.0) != 0
         }
         reservations = {
-            source_id: plan.reservation(source_id, year)
-            for source_id in case_data.sources
+            source_id: plan.reservation(source_id, year) for source_id in case_data.sources
         }
         pipeline = [
             shipment.to_dict()
             for shipment in shipments
-            if shipment.eligible_t > 0
+            if shipment.feasible_t > 0
             and shipment.order_month <= month < shipment.actual_arrival_month
         ]
         monthly_rows.append(
@@ -115,23 +164,24 @@ def simulate(
                 "demand_total_t": demand_total,
                 "demand_critical_t": demand_critical,
                 "reserved_by_source": reservations,
-                "ordered_by_source": month_orders,
+                "requested_order_by_source": month_orders,
                 "pipeline": pipeline,
                 "planned_arrival_by_source": dict(sorted(planned_arrival.items())),
-                "actual_delivered_by_source": dict(sorted(actual_delivered.items())),
-                "gross_throughput_t": flow.gross_throughput_t,
-                "delivered_for_balance_t": flow.delivered_for_balance_t,
+                "gross_delivery_by_source": dict(sorted(gross_delivery_by_source.items())),
+                "gross_delivery_t": flow.gross_delivery_t,
                 "losses_t": flow.losses_t,
-                "net_accepted_t": flow.net_accepted_t,
+                "net_delivery_t": flow.net_delivery_t,
+                "accepted_delivery_t": flow.accepted_delivery_t,
                 "overflow_t": flow.overflow_t,
+                "available_inventory_t": available,
                 "served_critical_t": service.served_critical_t,
                 "served_noncritical_t": service.served_noncritical_t,
                 "shortage_critical_t": service.shortage_critical_t,
                 "shortage_noncritical_t": service.shortage_noncritical_t,
                 "closing_inventory_t": inventory,
                 "active_storage_id": storage.storage_id,
-                "active_storage_capacity_t": storage.capacity_t,
-                "active_loss_rate": storage.loss_rate_on_throughput,
+                "active_storage_capacity_t": storage_capacity,
+                "active_loss_rate": loss_rate,
                 "active_investments": active_investments,
                 "holding_cost_mln": holding_cost(
                     opening,
@@ -144,9 +194,7 @@ def simulate(
             }
         )
 
-    events = investment_events(plan, case_data)
-    initial_source_id = plan.initial_inventory.get("source_id")
-    initial_tons = float(plan.initial_inventory.get("tons", 0.0))
+    events = investment_events(plan, case_data, env)
     source_rows: list[dict[str, Any]] = []
     for source_id, source in case_data.sources.items():
         for year in case_data.years:
@@ -154,32 +202,58 @@ def simulate(
             ordered = info["ordered_t"]
             active_fraction = info["active_fraction"]
             reserved = plan.reservation(source_id, year)
-            price = source.variable_cost_mln_per_t * scenario.variable_price_multiplier(source.name, year)
+            price = env.variable_price(
+                source_id,
+                source.name,
+                year,
+                source.variable_cost_mln_per_t,
+            )
+            reservation_rate = env.reservation_price(
+                source_id,
+                year,
+                source.reservation_rate_mln_per_t_year_capacity,
+            )
             contract = contract_cost(
                 ordered_volume_t=ordered,
                 reserved_capacity_period_t=reserved * active_fraction,
                 take_or_pay_share=source.take_or_pay_share,
                 variable_price_mln_per_t=price,
                 annual_reserved_capacity_t=reserved,
-                reservation_rate_mln_per_t_year_capacity=source.reservation_rate_mln_per_t_year_capacity,
+                reservation_rate_mln_per_t_year_capacity=reservation_rate,
                 period_fraction=active_fraction,
             )
-            initial_for_row = initial_tons if source_id == initial_source_id and year == case_data.years[0] else 0.0
             planned_delivery = sum(
-                shipment.eligible_t
+                shipment.feasible_t
                 for shipment in shipments
                 if shipment.source_id == source_id
                 and int(shipment.planned_arrival_month[:4]) == year
                 and case_data.start_month <= shipment.planned_arrival_month <= case_data.end_month
             )
-            actual_delivery = sum(
-                shipment.actual_delivered_t
+            gross_delivery = sum(
+                shipment.gross_delivery_t
                 for shipment in shipments
                 if shipment.source_id == source_id
                 and int(shipment.actual_arrival_month[:4]) == year
                 and case_data.start_month <= shipment.actual_arrival_month <= case_data.end_month
             )
-            physical_capacity = source.capacity_t_per_year * active_fraction
+            delayed_delivery = sum(
+                shipment.gross_delivery_t
+                for shipment in shipments
+                if shipment.source_id == source_id
+                and shipment.actual_arrival_month > shipment.planned_arrival_month
+                and int(shipment.actual_arrival_month[:4]) == year
+            )
+            risk_underdelivery = sum(
+                shipment.feasible_t - shipment.gross_delivery_t
+                for shipment in shipments
+                if shipment.source_id == source_id
+                and int(shipment.order_month[:4]) == year
+            )
+            physical_capacity = info["physical_limit_t"]
+            is_preparatory_row = year == case_data.years[0] and preparatory.source_id == source_id
+            prep_procurement = preparatory.procurement_cost_mln if is_preparatory_row else 0.0
+            prep_reservation = preparatory.reservation_cost_mln if is_preparatory_row else 0.0
+            prep_top = preparatory.take_or_pay_effect_mln if is_preparatory_row else 0.0
             source_rows.append(
                 {
                     "source_id": source_id,
@@ -187,19 +261,28 @@ def simulate(
                     "year": year,
                     "reserved_capacity_t_per_year": reserved,
                     "active_fraction": active_fraction,
-                    "ordered_t": ordered,
-                    "eligible_ordered_t": info["eligible_t"],
-                    "rejected_ordered_t": ordered - info["eligible_t"],
-                    "planned_delivered_t": planned_delivery,
-                    "actual_delivered_t": actual_delivery,
-                    "initial_inventory_procured_t": initial_for_row,
-                    "payable_volume_t": contract.payable_volume_t + initial_for_row,
-                    "utilization": actual_delivery / physical_capacity if physical_capacity else 0.0,
+                    "requested_order_t": ordered,
+                    "feasible_order_t": info["eligible_t"],
+                    "unfulfilled_request_t": ordered - info["eligible_t"],
+                    "planned_delivery_t": planned_delivery,
+                    "gross_delivery_t": gross_delivery,
+                    "risk_underdelivery_t": risk_underdelivery,
+                    "delayed_delivery_t": delayed_delivery,
+                    "initial_stock_requested_t": preparatory.requested_order_t if is_preparatory_row else 0.0,
+                    "initial_stock_feasible_t": preparatory.feasible_order_t if is_preparatory_row else 0.0,
+                    "initial_stock_gross_delivery_t": preparatory.gross_delivery_t if is_preparatory_row else 0.0,
+                    "initial_stock_losses_t": preparatory.losses_t if is_preparatory_row else 0.0,
+                    "initial_stock_opening_inventory_t": preparatory.opening_inventory_t if is_preparatory_row else 0.0,
+                    "payable_volume_t": contract.payable_volume_t + (preparatory.payable_volume_t if is_preparatory_row else 0.0),
+                    "utilization": gross_delivery / physical_capacity if physical_capacity else 0.0,
                     "active_variable_price_mln_per_t": price,
-                    "procurement_cost_mln": contract.variable_payment_mln + initial_for_row * price,
-                    "reservation_cost_mln": contract.reservation_payment_mln,
-                    "take_or_pay_effect_mln": contract.take_or_pay_effect_mln,
+                    "procurement_cost_mln": contract.variable_payment_mln + prep_procurement,
+                    "reservation_cost_mln": contract.reservation_payment_mln + prep_reservation,
+                    "take_or_pay_effect_mln": contract.take_or_pay_effect_mln + prep_top,
+                    "initial_stock_procurement_cost_mln": prep_procurement,
+                    "initial_stock_reservation_cost_mln": prep_reservation,
                     "reliability_profile": source.reliability_profile,
+                    "reliability_semantics": "METADATA_ONLY",
                     "violations": [],
                 }
             )
@@ -216,7 +299,7 @@ def simulate(
         served_critical = sum(row["served_critical_t"] for row in states)
         served_noncritical = sum(row["served_noncritical_t"] for row in states)
         served_total = served_critical + served_noncritical
-        gross = sum(row["gross_throughput_t"] for row in states)
+        gross = sum(row["gross_delivery_t"] for row in states)
         losses = sum(row["losses_t"] for row in states)
         capex = sum(event.capex_mln for event in events if int(event.month[:4]) == year)
         fixed_opex = sum(row["fixed_opex_mln"] for row in states)
@@ -244,7 +327,9 @@ def simulate(
                 "losses_divided_by_throughput": losses / gross if gross else 0.0,
                 "overflow_t": sum(row["overflow_t"] for row in states),
                 "closing_inventory_t": states[-1]["closing_inventory_t"],
-                "shortage_t": sum(row["shortage_critical_t"] + row["shortage_noncritical_t"] for row in states),
+                "shortage_t": sum(
+                    row["shortage_critical_t"] + row["shortage_noncritical_t"] for row in states
+                ),
                 "critical_shortage_t": sum(row["shortage_critical_t"] for row in states),
                 "reserve_requirement_t": requirement,
                 "reserve_actual_t": opening,
@@ -255,6 +340,7 @@ def simulate(
                 "reservation_mln": reservation,
                 "take_or_pay_effect_mln": top_effect,
                 "holding_mln": holding,
+                "initial_stock_cost_mln": preparatory.total_cost_mln if year == base_year else 0.0,
                 "total_cost_mln": total_cost,
                 "discounted_cost_mln": discounted,
                 "violations": [],
@@ -269,6 +355,8 @@ def simulate(
                 "reservation_mln": reservation,
                 "take_or_pay_effect_in_procurement_mln": top_effect,
                 "holding_mln": holding,
+                "initial_stock_procurement_mln": preparatory.procurement_cost_mln if year == base_year else 0.0,
+                "initial_stock_reservation_mln": preparatory.reservation_cost_mln if year == base_year else 0.0,
                 "total_cost_mln": total_cost,
                 "discounted_cost_mln": discounted,
             }
@@ -298,8 +386,20 @@ def simulate(
     total_served = sum(row["served_total_t"] for row in annual_rows)
     critical_served = sum(row["served_critical_t"] for row in annual_rows)
     hard_count = sum(item.severity == "hard" for item in violations)
+    delayed_shipments = [item for item in shipments if item.actual_arrival_month > item.planned_arrival_month]
+    unavailable_requested = (
+        preparatory.unfulfilled_request_t
+        + preparatory.scenario_underdelivery_t
+        + sum(item.unfulfilled_request_t for item in shipments)
+        + sum(item.feasible_t - item.gross_delivery_t for item in shipments)
+    )
     summary = {
-        "scenario_id": scenario.scenario_id,
+        "run_id": run_id,
+        "scenario_id": env.scenario_id,
+        "base_scenario_id": env.base_scenario_id,
+        "environment_id": env.environment_id,
+        "risk_ids": list(env.risk_ids),
+        "applied_overrides": env.applied_overrides(),
         "plan_id": plan.plan_id,
         "valid": hard_count == 0,
         "undiscounted_cost_mln": sum(row["total_cost_mln"] for row in annual_rows),
@@ -309,12 +409,23 @@ def simulate(
         "total_shortage_t": sum(row["shortage_t"] for row in annual_rows),
         "critical_shortage_t": sum(row["critical_shortage_t"] for row in annual_rows),
         "total_losses_t": sum(row["losses_t"] for row in annual_rows),
-        "emergency_usage_t": sum(row["actual_delivered_t"] for row in source_rows if row["source_id"] == "E"),
+        "emergency_usage_t": sum(row["gross_delivery_t"] for row in source_rows if row["source_id"] == "E"),
         "final_inventory_t": monthly_rows[-1]["closing_inventory_t"],
+        "minimum_inventory_t": min(row["closing_inventory_t"] for row in monthly_rows),
+        "total_overflow_t": sum(row["overflow_t"] for row in monthly_rows),
+        "unavailable_requested_supply_t": unavailable_requested,
+        "delayed_delivery_count": len(delayed_shipments),
+        "delayed_delivery_t": sum(item.gross_delivery_t for item in delayed_shipments),
+        "months_with_shortage": sum(
+            row["shortage_critical_t"] + row["shortage_noncritical_t"] > 1e-12
+            for row in monthly_rows
+        ),
+        "opening_inventory_t": preparatory.opening_inventory_t,
+        "initial_stock_total_cost_mln": preparatory.total_cost_mln,
         "violation_count": len(violations),
         "hard_violation_count": hard_count,
         "case_input_root": str(case_data.root),
-        "scenario_source": str(scenario.source_path),
+        "scenario_source": str(env.source_path),
     }
     return SimulationResult(
         summary=summary,
@@ -323,6 +434,14 @@ def simulate(
         sources=source_rows,
         violations=violations,
         costs=cost_rows,
-        assumptions=assumptions.raw,
+        assumptions={
+            **assumptions.raw,
+            "environment": {
+                "base_scenario_id": env.base_scenario_id,
+                "environment_id": env.environment_id,
+                "risk_ids": list(env.risk_ids),
+                "applied_overrides": env.applied_overrides(),
+            },
+        },
+        pre_horizon=preparatory.to_dict(),
     )
-

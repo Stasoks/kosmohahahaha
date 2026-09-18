@@ -853,3 +853,44 @@ tools/       static integrity checks
 
 
 GitHub Actions запускает ту же проверку на push и pull request.
+
+---
+
+## 35. Реализованный evaluator команды
+
+Поверх starter repository добавлен deterministic monthly evaluator стратегии без
+optimizer и автоматического изменения плана. Реализация включает preparatory
+initial-stock acquisition, BASE/MANDATORY_STRESS, TEAM risks, consequence comparison,
+risk register/matrix, explicit mitigation rerun, sensitivity и reverse stress.
+
+Установка и тесты:
+
+```bash
+python3 -m pip install '.[dev]'
+python3 -m pytest
+```
+
+Запуски:
+
+```bash
+python3 scripts/evaluate_plan.py \
+  --plan configs/operator_plan_example.json --scenario both
+
+python3 scripts/evaluate_risks.py \
+  --plan configs/operator_plan_example.json \
+  --risks configs/risks/team_risks.json \
+  --scenario BASE
+
+python3 scripts/run_sensitivity.py \
+  --plan configs/operator_plan_example.json \
+  --parameter demand_multiplier --values 1.0,1.05,1.10
+
+python3 scripts/run_reverse_stress.py \
+  --plan configs/operator_plan_example.json \
+  --parameter demand_multiplier \
+  --start 1.0 --stop 1.5 --step 0.01 \
+  --target-constraint BASE_TOTAL_SERVICE
+```
+
+Подробная архитектура, provenance и ограничения описаны в
+[`docs/TEAM_IMPLEMENTATION.md`](docs/TEAM_IMPLEMENTATION.md).

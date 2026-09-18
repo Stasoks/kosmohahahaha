@@ -52,3 +52,26 @@ The official validator at commit `cec6de1` passes syntax, data, scenario, schema
 ## Migration decision
 
 Reusable calculation ideas are retained, but the public data model is rebuilt around official CSV/YAML/schema contracts. Backward compatibility with the old JSON dataset and old plan shape is intentionally not provided.
+
+## Strategy-evaluator audit (2026-09-18)
+
+The second implementation stage kept all official inputs and V01–V10 unchanged and
+corrected two participant-layer weaknesses:
+
+1. `inventory_policy.initial_inventory` created physical stock from a scalar and used
+   simplified costing. It is now rejected when positive. Opening stock is produced by a
+   traceable pre-horizon source contract and passes lead-time, availability, capacity,
+   TOP, reservation, loss and storage checks.
+2. Monthly export exposed `delivered_for_balance_t`, whose bookkeeping definition used
+   an artificial `+ losses - losses` identity. Public flow now follows only
+   `gross -> losses -> net -> accepted -> available -> served -> closing`.
+
+The deterministic core was then wrapped in a data-driven environment/risk layer. The
+layer reruns the same immutable plan, derives consequences from `SimulationResult`, and
+adds scoring, matrix/register, explicit mitigation reruns, sensitivity and reverse
+stress without optimizer, random failures, Monte Carlo or inferred probabilities.
+
+No conflict with official starter semantics was found. The preparatory-acquisition rule
+is a stricter participant decision contract inside the official schema's intentionally
+extensible `decisions` object; no official CSV, YAML, schema or validation vector was
+changed.

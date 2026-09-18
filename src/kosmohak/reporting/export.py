@@ -97,9 +97,9 @@ def build_comparison(base: SimulationResult, stress: SimulationResult) -> dict[s
             {
                 "source_id": row["source_id"],
                 "year": row["year"],
-                "base_actual_delivered_t": row["actual_delivered_t"],
-                "stress_actual_delivered_t": other["actual_delivered_t"],
-                "difference_t": other["actual_delivered_t"] - row["actual_delivered_t"],
+                    "base_gross_delivery_t": row["gross_delivery_t"],
+                    "stress_gross_delivery_t": other["gross_delivery_t"],
+                    "difference_t": other["gross_delivery_t"] - row["gross_delivery_t"],
             }
         )
     return {
@@ -136,4 +136,3 @@ def export_comparison(base: SimulationResult, stress: SimulationResult, output_d
     )
     _write_csv(directory / "comparison.csv", rows)
     return comparison
-

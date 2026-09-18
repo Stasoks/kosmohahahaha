@@ -9,7 +9,7 @@ from jsonschema import Draft202012Validator
 from kosmohak.domain.assumptions import ModelAssumptions
 from kosmohak.domain.case import CaseData
 from kosmohak.domain.plan import OperatorPlan
-from kosmohak.domain.time import add_months, parse_month
+from kosmohak.domain.time import parse_month
 
 
 class PlanValidationError(ValueError):
@@ -131,23 +131,45 @@ class PlanLoader:
             if funding < case_data.start_month:
                 raise PlanValidationError("Lunar-ISRU funding is outside the official horizon")
 
-        initial = plan.initial_inventory
-        tons = float(initial.get("tons", 0))
-        if tons < 0:
+        legacy_initial = plan.initial_inventory
+        legacy_tons = float(legacy_initial.get("tons", 0))
+        if legacy_tons < 0:
             raise PlanValidationError("Initial inventory cannot be negative")
-        if tons:
-            source_id = str(initial.get("source_id", ""))
-            if source_id not in case_data.sources:
-                raise PlanValidationError("Positive initial inventory requires a valid source_id")
-            order_month = _month(initial.get("order_month"), "initial_inventory.order_month")
-            delivery_month = _month(initial.get("delivery_month"), "initial_inventory.delivery_month")
-            lead = assumptions.source_delivery_lead_months(case_data.sources[source_id])
-            if add_months(order_month, lead) > delivery_month:
-                raise PlanValidationError("Initial inventory violates source lead time")
-            if delivery_month > case_data.start_month:
-                raise PlanValidationError("Initial inventory must be delivered by simulation start")
-            if int(initial.get("financing_year", 0)) != case_data.years[0]:
-                raise PlanValidationError("Initial inventory must be financed in the first model year")
+        if legacy_tons > 0:
+            raise PlanValidationError(
+                "Positive initial_inventory is not allowed; use decisions.initial_stock_acquisition"
+            )
+
+        acquisition = plan.initial_stock_acquisition
+        if acquisition is not None:
+            if acquisition.status != "TEAM_DECISION":
+                raise PlanValidationError("initial_stock_acquisition.status must be TEAM_DECISION")
+            if acquisition.source_id not in case_data.sources:
+                raise PlanValidationError("Initial stock acquisition requires a valid source_id")
+            if acquisition.ordered_volume_t < 0:
+                raise PlanValidationError("Initial stock ordered volume cannot be negative")
+            if acquisition.reserved_capacity_t_per_year < 0:
+                raise PlanValidationError("Initial stock reservation cannot be negative")
+            order_month = _month(acquisition.order_date, "initial_stock_acquisition.order_date")
+            _month(
+                acquisition.planned_delivery_date,
+                "initial_stock_acquisition.planned_delivery_date",
+            )
+            contract_start = _month(
+                acquisition.contract_period_start,
+                "initial_stock_acquisition.contract_period_start",
+            )
+            contract_end = _month(
+                acquisition.contract_period_end,
+                "initial_stock_acquisition.contract_period_end",
+            )
+            if contract_end < contract_start:
+                raise PlanValidationError("Initial stock contract period end precedes its start")
+            if not contract_start <= order_month <= contract_end:
+                raise PlanValidationError("Initial stock order_date must be inside its contract period")
+            # Physical lead time, availability, capacity and arrival feasibility are
+            # deliberately checked by the simulator so an impossible request remains
+            # visible as an immutable plan plus structured violations.
 
         strategies = plan.inventory_policy.get("reserve_strategy_by_year", {})
         for year in case_data.years:
@@ -157,4 +179,3 @@ class PlanLoader:
         for year, role in plan.emergency_role_by_year.items():
             if year not in years or role not in {"reserve_only", "planned_supply"}:
                 raise PlanValidationError(f"Invalid Emergency role for {year}")
-

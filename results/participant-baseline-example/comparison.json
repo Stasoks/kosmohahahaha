@@ -1,12 +1,12 @@
 {
   "annual": [
     {
-      "base_closing_inventory_t": 17.300000000000004,
+      "base_closing_inventory_t": 17.300000000009504,
       "base_critical_service": 1.0,
       "base_losses_t": 2.6999999999999997,
       "base_shortage_t": 0.0,
       "base_total_service": 1.0000000000000002,
-      "stress_closing_inventory_t": 17.300000000000004,
+      "stress_closing_inventory_t": 17.300000000009504,
       "stress_critical_service": 1.0,
       "stress_losses_t": 2.6999999999999997,
       "stress_shortage_t": 0.0,
@@ -14,12 +14,12 @@
       "year": 2035
     },
     {
-      "base_closing_inventory_t": 28.793333333333344,
+      "base_closing_inventory_t": 28.793333333342844,
       "base_critical_service": 1.0,
       "base_losses_t": 1.8399999999999999,
       "base_shortage_t": 0.0,
       "base_total_service": 1.0,
-      "stress_closing_inventory_t": 28.793333333333344,
+      "stress_closing_inventory_t": 28.793333333342844,
       "stress_critical_service": 1.0,
       "stress_losses_t": 1.8399999999999999,
       "stress_shortage_t": 0.0,
@@ -27,12 +27,12 @@
       "year": 2036
     },
     {
-      "base_closing_inventory_t": 36.063999999604754,
+      "base_closing_inventory_t": 36.06399999961426,
       "base_critical_service": 1.0,
       "base_losses_t": 2.3959999999952,
       "base_shortage_t": 0.0,
       "base_total_service": 1.0,
-      "stress_closing_inventory_t": 36.063999999604754,
+      "stress_closing_inventory_t": 36.06399999961426,
       "stress_critical_service": 1.0,
       "stress_losses_t": 2.3959999999952,
       "stress_shortage_t": 0.0,
@@ -40,7 +40,7 @@
       "year": 2037
     },
     {
-      "base_closing_inventory_t": 44.75533333293812,
+      "base_closing_inventory_t": 44.75533333294763,
       "base_critical_service": 1.0,
       "base_losses_t": 3.142,
       "base_shortage_t": 0.0,
@@ -48,12 +48,12 @@
       "stress_closing_inventory_t": 0.0,
       "stress_critical_service": 1.0,
       "stress_losses_t": 2.9161,
-      "stress_shortage_t": 11.343766667061889,
-      "stress_total_service": 0.9605434202884803,
+      "stress_shortage_t": 11.343766667052382,
+      "stress_total_service": 0.9605434202885134,
       "year": 2038
     },
     {
-      "base_closing_inventory_t": 53.54526666627136,
+      "base_closing_inventory_t": 53.54526666628087,
       "base_critical_service": 1.0,
       "base_losses_t": 3.9934000000000007,
       "base_shortage_t": 0.0,
@@ -66,7 +66,7 @@
       "year": 2039
     },
     {
-      "base_closing_inventory_t": 45.456666665876085,
+      "base_closing_inventory_t": 45.45666666588559,
       "base_critical_service": 1.0,
       "base_losses_t": 4.6385999999952,
       "base_shortage_t": 0.0,
@@ -86,213 +86,213 @@
   ],
   "source_deliveries": [
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "A",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2035
     },
     {
-      "base_actual_delivered_t": 120.0,
+      "base_gross_delivery_t": 120.0,
       "difference_t": 0.0,
       "source_id": "A",
-      "stress_actual_delivered_t": 120.0,
+      "stress_gross_delivery_t": 120.0,
       "year": 2036
     },
     {
-      "base_actual_delivered_t": 150.0,
+      "base_gross_delivery_t": 150.0,
       "difference_t": 0.0,
       "source_id": "A",
-      "stress_actual_delivered_t": 150.0,
+      "stress_gross_delivery_t": 150.0,
       "year": 2037
     },
     {
-      "base_actual_delivered_t": 160.0,
+      "base_gross_delivery_t": 160.0,
       "difference_t": 0.0,
       "source_id": "A",
-      "stress_actual_delivered_t": 160.0,
+      "stress_gross_delivery_t": 160.0,
       "year": 2038
     },
     {
-      "base_actual_delivered_t": 170.0,
+      "base_gross_delivery_t": 170.0,
       "difference_t": 0.0,
       "source_id": "A",
-      "stress_actual_delivered_t": 170.0,
+      "stress_gross_delivery_t": 170.0,
       "year": 2039
     },
     {
-      "base_actual_delivered_t": 180.0,
+      "base_gross_delivery_t": 180.0,
       "difference_t": 0.0,
       "source_id": "A",
-      "stress_actual_delivered_t": 180.0,
+      "stress_gross_delivery_t": 180.0,
       "year": 2040
     },
     {
-      "base_actual_delivered_t": 60.0,
+      "base_gross_delivery_t": 60.0,
       "difference_t": 0.0,
       "source_id": "B",
-      "stress_actual_delivered_t": 60.0,
+      "stress_gross_delivery_t": 60.0,
       "year": 2035
     },
     {
-      "base_actual_delivered_t": 33.33333333333333,
+      "base_gross_delivery_t": 33.33333333333333,
       "difference_t": 0.0,
       "source_id": "B",
-      "stress_actual_delivered_t": 33.33333333333333,
+      "stress_gross_delivery_t": 33.33333333333333,
       "year": 2036
     },
     {
-      "base_actual_delivered_t": 1.6666666666666667,
+      "base_gross_delivery_t": 1.6666666666666667,
       "difference_t": 0.0,
       "source_id": "B",
-      "stress_actual_delivered_t": 1.6666666666666667,
+      "stress_gross_delivery_t": 1.6666666666666667,
       "year": 2037
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "B",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2038
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "B",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2039
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "B",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2040
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "C",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2035
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "C",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2036
     },
     {
-      "base_actual_delivered_t": 47.99999999960001,
+      "base_gross_delivery_t": 47.99999999960001,
       "difference_t": 0.0,
       "source_id": "C",
-      "stress_actual_delivered_t": 47.99999999960001,
+      "stress_gross_delivery_t": 47.99999999960001,
       "year": 2037
     },
     {
-      "base_actual_delivered_t": 60.0,
+      "base_gross_delivery_t": 60.0,
       "difference_t": 0.0,
       "source_id": "C",
-      "stress_actual_delivered_t": 60.0,
+      "stress_gross_delivery_t": 60.0,
       "year": 2038
     },
     {
-      "base_actual_delivered_t": 80.0,
+      "base_gross_delivery_t": 80.0,
       "difference_t": 0.0,
       "source_id": "C",
-      "stress_actual_delivered_t": 80.0,
+      "stress_gross_delivery_t": 80.0,
       "year": 2039
     },
     {
-      "base_actual_delivered_t": 99.99999999960004,
+      "base_gross_delivery_t": 99.99999999960004,
       "difference_t": 0.0,
       "source_id": "C",
-      "stress_actual_delivered_t": 99.99999999960004,
+      "stress_gross_delivery_t": 99.99999999960004,
       "year": 2040
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "D",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2035
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "D",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2036
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "D",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2037
     },
     {
-      "base_actual_delivered_t": 41.83333333333331,
+      "base_gross_delivery_t": 41.83333333333331,
       "difference_t": -18.824999999999978,
       "source_id": "D",
-      "stress_actual_delivered_t": 23.00833333333333,
+      "stress_gross_delivery_t": 23.00833333333333,
       "year": 2038
     },
     {
-      "base_actual_delivered_t": 82.7833333333333,
+      "base_gross_delivery_t": 82.7833333333333,
       "difference_t": -20.69583333333332,
       "source_id": "D",
-      "stress_actual_delivered_t": 62.087499999999984,
+      "stress_gross_delivery_t": 62.087499999999984,
       "year": 2039
     },
     {
-      "base_actual_delivered_t": 106.54999999999995,
+      "base_gross_delivery_t": 106.54999999999995,
       "difference_t": 0.0,
       "source_id": "D",
-      "stress_actual_delivered_t": 106.54999999999995,
+      "stress_gross_delivery_t": 106.54999999999995,
       "year": 2040
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "E",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2035
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "E",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2036
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "E",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2037
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "E",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2038
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "E",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2039
     },
     {
-      "base_actual_delivered_t": 0,
+      "base_gross_delivery_t": 0,
       "difference_t": 0,
       "source_id": "E",
-      "stress_actual_delivered_t": 0,
+      "stress_gross_delivery_t": 0,
       "year": 2040
     }
   ],
@@ -308,9 +308,9 @@
       "difference": 0.0
     },
     "discounted_cost_mln": {
-      "BASE": 10434.879139082535,
-      "MANDATORY_STRESS": 10821.8505283165,
-      "difference": 386.97138923396415
+      "BASE": 10480.757934894153,
+      "MANDATORY_STRESS": 10867.7293241281,
+      "difference": 386.9713892339478
     },
     "emergency_usage_t": {
       "BASE": 0,
@@ -318,9 +318,9 @@
       "difference": 0
     },
     "final_inventory_t": {
-      "BASE": 45.456666665876085,
+      "BASE": 45.45666666588559,
       "MANDATORY_STRESS": 0.0,
-      "difference": -45.456666665876085
+      "difference": -45.45666666588559
     },
     "hard_violation_count": {
       "BASE": 0,
@@ -334,18 +334,18 @@
     },
     "total_service_level": {
       "BASE": 1.0,
-      "MANDATORY_STRESS": 0.9103064428504191,
-      "difference": -0.08969355714958094
+      "MANDATORY_STRESS": 0.9103064428504253,
+      "difference": -0.08969355714957472
     },
     "total_shortage_t": {
       "BASE": 0.0,
-      "MANDATORY_STRESS": 137.5899166674571,
-      "difference": 137.5899166674571
+      "MANDATORY_STRESS": 137.58991666744757,
+      "difference": 137.58991666744757
     },
     "undiscounted_cost_mln": {
-      "BASE": 11521.824991996033,
-      "MANDATORY_STRESS": 11978.26682139683,
-      "difference": 456.44182940079736
+      "BASE": 11567.703787807655,
+      "MANDATORY_STRESS": 12024.145617208434,
+      "difference": 456.44182940077917
     },
     "violation_count": {
       "BASE": 0,
@@ -357,10 +357,10 @@
     "BASE": [],
     "MANDATORY_STRESS": [
       {
-        "actual": 0.9605434202884803,
+        "actual": 0.9605434202885134,
         "code": "STRESS_TOTAL_SERVICE_BENCHMARK",
         "constraint_id": "BASE_TOTAL_SERVICE",
-        "excess_or_gap": 0.009456579711519697,
+        "excess_or_gap": 0.009456579711486612,
         "human_message": "Total service is 96.05%; shortage is 11.344 t.",
         "limit": 0.97,
         "operator": ">=",

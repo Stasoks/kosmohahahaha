@@ -1,0 +1,47 @@
+{
+  "applied_overrides": [
+    {
+      "application_order": 1,
+      "basis": "Deterministic outage used to evaluate consequences.",
+      "factor": "availability_share",
+      "factor_order": 1,
+      "period_end": "2038-12",
+      "period_start": "2038-01",
+      "risk_id": "R-CORE-OUTAGE",
+      "risk_order": 1,
+      "source_id": "A",
+      "status": "TEAM_ASSUMPTION",
+      "value": 0.0
+    }
+  ],
+  "base_scenario_id": "BASE",
+  "case_input_root": "/home/stas/python_projects/kosmohack",
+  "critical_service_level": 0.9508863157890676,
+  "critical_shortage_t": 46.65800000038574,
+  "delayed_delivery_count": 0,
+  "delayed_delivery_t": 0,
+  "discounted_cost_mln": 10412.52794312916,
+  "emergency_usage_t": 0,
+  "environment_id": "BASE+R-CORE-OUTAGE",
+  "final_inventory_t": 4.601733332937997,
+  "hard_violation_count": 4,
+  "initial_stock_total_cost_mln": 417.8787958115801,
+  "minimum_inventory_t": 0.0,
+  "months_with_shortage": 12,
+  "opening_inventory_t": 60.0000000000095,
+  "plan_id": "participant-baseline-example",
+  "risk_ids": [
+    "R-CORE-OUTAGE"
+  ],
+  "run_id": "run-964e9491bbcb724f",
+  "scenario_id": "BASE+R-CORE-OUTAGE",
+  "scenario_source": "/home/stas/python_projects/kosmohack/scenarios/base.yaml",
+  "total_losses_t": 16.7899999999904,
+  "total_overflow_t": 0.0,
+  "total_service_level": 0.9156654196639912,
+  "total_shortage_t": 117.2250666670524,
+  "unavailable_requested_supply_t": 160.00000000040006,
+  "undiscounted_cost_mln": 11484.572379808433,
+  "valid": false,
+  "violation_count": 4
+}

@@ -9,14 +9,14 @@ class Shipment:
     source_id: str
     source_name: str
     order_month: str
-    ordered_t: float
-    eligible_t: float
-    rejected_t: float
+    requested_t: float
+    feasible_t: float
+    unfulfilled_request_t: float
     planned_arrival_month: str
     actual_arrival_month: str
     actual_delivery_share: float
-    actual_delivered_t: float
+    availability_share: float
+    gross_delivery_t: float
 
     def to_dict(self) -> dict:
         return asdict(self)
-

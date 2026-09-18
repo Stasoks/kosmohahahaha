@@ -1,0 +1,47 @@
+{
+  "applied_overrides": [
+    {
+      "application_order": 1,
+      "basis": "Illustrative deterministic consequence scenario; not a claimed probability.",
+      "factor": "actual_delivery_share",
+      "factor_order": 1,
+      "period_end": "2039-12",
+      "period_start": "2038-01",
+      "risk_id": "R-ISRU-UNDERDELIVERY",
+      "risk_order": 1,
+      "source_id": "D",
+      "status": "TEAM_ASSUMPTION",
+      "value": 0.4
+    }
+  ],
+  "base_scenario_id": "BASE",
+  "case_input_root": "/home/stas/python_projects/kosmohack",
+  "critical_service_level": 1.0,
+  "critical_shortage_t": 0.0,
+  "delayed_delivery_count": 0,
+  "delayed_delivery_t": 0,
+  "discounted_cost_mln": 10422.201445624629,
+  "emergency_usage_t": 0,
+  "environment_id": "BASE+R-ISRU-UNDERDELIVERY",
+  "final_inventory_t": 0.0,
+  "hard_violation_count": 3,
+  "initial_stock_total_cost_mln": 417.8787958115801,
+  "minimum_inventory_t": 0.0,
+  "months_with_shortage": 19,
+  "opening_inventory_t": 60.0000000000095,
+  "plan_id": "participant-baseline-example",
+  "risk_ids": [
+    "R-ISRU-UNDERDELIVERY"
+  ],
+  "run_id": "run-1c656c49443cfa27",
+  "scenario_id": "BASE+R-ISRU-UNDERDELIVERY",
+  "scenario_source": "/home/stas/python_projects/kosmohack/scenarios/base.yaml",
+  "total_losses_t": 17.812759999990398,
+  "total_overflow_t": 0.0,
+  "total_service_level": 0.9795567673855294,
+  "total_shortage_t": 28.416093334114315,
+  "unavailable_requested_supply_t": 74.77000000040006,
+  "undiscounted_cost_mln": 11495.251509408228,
+  "valid": false,
+  "violation_count": 3
+}

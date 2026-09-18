@@ -14,10 +14,10 @@ class DemandService:
 
 @dataclass(frozen=True)
 class ThroughputFlow:
-    gross_throughput_t: float
-    delivered_for_balance_t: float
+    gross_delivery_t: float
     losses_t: float
-    net_accepted_t: float
+    net_delivery_t: float
+    accepted_delivery_t: float
     overflow_t: float
 
 
@@ -69,15 +69,12 @@ def accept_throughput(
     post_loss = gross_inflow_t - losses
     free = max(0.0, storage_capacity_t - opening_inventory_t)
     accepted_net = min(post_loss, free)
-    overflow = post_loss - accepted_net
-    # The balance-basis delivered quantity contains the accepted net amount
-    # plus losses incurred before the capacity check.
-    delivered_for_balance = accepted_net + losses
+    overflow = max(0.0, post_loss - accepted_net)
     return ThroughputFlow(
-        gross_throughput_t=gross_inflow_t,
-        delivered_for_balance_t=delivered_for_balance,
+        gross_delivery_t=gross_inflow_t,
         losses_t=losses,
-        net_accepted_t=accepted_net,
+        net_delivery_t=post_loss,
+        accepted_delivery_t=accepted_net,
         overflow_t=overflow,
     )
 

@@ -1,0 +1,106 @@
+{
+  "status": "TEAM_ASSUMPTION",
+  "risks": [
+    {
+      "risk_id": "R-ISRU-UNDERDELIVERY",
+      "name": "Lunar-ISRU underdelivery",
+      "description": "Deterministic research shock applied to the same operator plan on top of BASE.",
+      "event": "Lunar-ISRU supplies only 40% of feasible volume",
+      "cause": "Research assumption for immature production and transfer operations",
+      "period_start": "2038-01",
+      "period_end": "2039-12",
+      "affected_parameters": ["actual_delivery_share"],
+      "factor_changes": [
+        {
+          "factor": "actual_delivery_share",
+          "source_id": "D",
+          "value": 0.4,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Illustrative deterministic consequence scenario; not a claimed probability."
+        }
+      ],
+      "dependencies": ["Lunar-ISRU commissioned"],
+      "owner": "Supply strategy lead",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
+      "likelihood_status": "UNKNOWN",
+      "source_references": ["data/supply_sources.csv reliability_profile shown as metadata only"],
+      "combination_policy": "apply_after_base",
+      "metadata": {
+        "status": "TEAM_ASSUMPTION",
+        "reliability_profile_semantics": "METADATA_ONLY"
+      }
+    },
+    {
+      "risk_id": "R-EARTH-PRICE",
+      "name": "Earth channel price shock",
+      "description": "Deterministic price-only research scenario.",
+      "event": "Earth-Core variable price rises by 20%",
+      "cause": "Team commercial sensitivity assumption",
+      "period_start": "2038-01",
+      "period_end": "2039-12",
+      "affected_parameters": ["variable_price_multiplier"],
+      "factor_changes": [
+        {
+          "factor": "variable_price_multiplier",
+          "source_id": "A",
+          "value": 1.2,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Illustrative deterministic price sensitivity."
+        }
+      ],
+      "dependencies": [],
+      "owner": "Commercial lead",
+      "likelihood": {
+        "likelihood_type": "qualitative",
+        "score": 2,
+        "label": "unlikely",
+        "basis": "Team workshop judgement; not organizer data.",
+        "source": "TEAM_RATIONALE:price-workshop-v1"
+      },
+      "likelihood_status": "TEAM_ASSUMPTION",
+      "source_references": ["TEAM_RATIONALE:price-workshop-v1"],
+      "combination_policy": "apply_after_base",
+      "metadata": {"status": "TEAM_ASSUMPTION"}
+    },
+    {
+      "risk_id": "R-CORE-OUTAGE",
+      "name": "Earth-Core temporary unavailability",
+      "description": "A deterministic outage with an explicitly supplied operator mitigation patch.",
+      "event": "Earth-Core availability falls to zero",
+      "cause": "Illustrative launch-channel interruption",
+      "period_start": "2038-01",
+      "period_end": "2038-12",
+      "affected_parameters": ["availability_share"],
+      "factor_changes": [
+        {
+          "factor": "availability_share",
+          "source_id": "A",
+          "value": 0.0,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Deterministic outage used to evaluate consequences."
+        }
+      ],
+      "dependencies": [],
+      "owner": "Operations lead",
+      "likelihood": {"likelihood_type": "unknown"},
+      "likelihood_status": "UNKNOWN",
+      "source_references": [],
+      "combination_policy": "apply_after_base",
+      "mitigation": {
+        "mitigation_id": "M-FLEX-2038",
+        "description": "Operator-specified additional Earth-Flex reservation and orders.",
+        "plan_patch": {
+          "capacity_reservations": [
+            {"source_id": "B", "year": 2038, "reserved_capacity_t": 110}
+          ],
+          "supply_orders": [
+            {"source_id": "B", "mode": "annual_even", "values": {"2038": 110}}
+          ]
+        }
+      },
+      "metadata": {"status": "TEAM_ASSUMPTION"}
+    }
+  ]
+}
