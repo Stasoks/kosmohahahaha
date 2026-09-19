@@ -318,14 +318,16 @@ def build_stress_specific(
     beam_width: int = 10,
     max_iterations: int = 4,
     seed: int = 17,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Run the explicit bounded Builder workflow for a stress-specific plan."""
 
     ctx = application_context()
+    case_data = _case_data_with_source_overrides(source_overrides)
     result = synthesize_strategy(
         ctx.base_scenario,
         ctx.stress_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
         config=StrategyBuilderConfig(
             planning_mode="STRESS_ADAPTATION",
@@ -343,10 +345,11 @@ def build_stress_specific(
 def abc_results(
     base_plan_raw: dict[str, Any],
     stress_plan_raw: dict[str, Any] | None = None,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Return A=current plan/BASE, B=same plan/STRESS, C=stress plan/STRESS."""
 
-    pair = evaluate(base_plan_raw)
+    pair = evaluate(base_plan_raw, source_overrides)
     stress_raw = stress_plan_raw or stress_reference_raw()
     if stress_raw is None:
         return {
@@ -357,7 +360,7 @@ def abc_results(
             "stress_plan": None,
             "plan_hash": pair["plan_hash"],
         }
-    stress_pair = evaluate(stress_raw)
+    stress_pair = evaluate(stress_raw, source_overrides)
     return {
         "A": pair["BASE"],
         "B": pair["MANDATORY_STRESS"],
@@ -369,17 +372,21 @@ def abc_results(
     }
 
 
-def compare_available_plans(current_raw: dict[str, Any] | None = None) -> dict[str, Any]:
+def compare_available_plans(
+    current_raw: dict[str, Any] | None = None,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
+    case_data = _case_data_with_source_overrides(source_overrides)
     paths = [
         CORE_ROOT / "plans" / "final_base.json",
         CORE_ROOT / "plans" / "cost_focused.json",
         CORE_ROOT / "plans" / "diversified.json",
         CORE_ROOT / "plans" / "resilient.json",
     ]
-    plans = [load_plan(path, ctx.case_data, ctx.assumptions) for path in paths if path.is_file()]
+    plans = [load_plan(path, case_data, ctx.assumptions) for path in paths if path.is_file()]
     if current_raw is not None:
-        current = _validated_plan(current_raw)
+        current = _validated_plan_for_case(current_raw, case_data)
         exact_duplicate = any(
             item.plan_id == current.plan_id
             and item.raw.get("decisions") == current.raw.get("decisions")
@@ -388,14 +395,14 @@ def compare_available_plans(current_raw: dict[str, Any] | None = None) -> dict[s
         if not exact_duplicate and any(item.plan_id == current.plan_id for item in plans):
             renamed = copy.deepcopy(current.raw)
             renamed["plan_id"] = f"{current.plan_id}--current-{plan_hash(current_raw)[:6]}"
-            current = _validated_plan(renamed)
+            current = _validated_plan_for_case(renamed, case_data)
         if not exact_duplicate:
             plans.append(current)
     comparison = compare_plans(
         plans,
         ctx.base_scenario,
         ctx.stress_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
     )
     return {
@@ -405,12 +412,17 @@ def compare_available_plans(current_raw: dict[str, Any] | None = None) -> dict[s
     }
 
 
-def risks(raw: dict[str, Any]) -> dict[str, Any]:
+def risks(
+    raw: dict[str, Any],
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
-    result = evaluate_risks(plan, ctx.base_scenario, ctx.risks, ctx.case_data, ctx.assumptions)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
+    result = evaluate_risks(plan, ctx.base_scenario, ctx.risks, case_data, ctx.assumptions)
     value = result.to_dict()
     value["plan_hash"] = plan_hash(raw)
+    value["input_hash"] = input_hash(source_overrides)
     return value
 
 
@@ -418,15 +430,21 @@ def risk_catalog() -> list[dict[str, Any]]:
     return [item.to_dict() for item in application_context().risks]
 
 
-def risk_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
+def risk_detail(
+    raw: dict[str, Any],
+    risk_id: str,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     risk = next((item for item in ctx.risks if item.risk_id == risk_id), None)
     if risk is None:
         raise BridgeError("RISK_NOT_FOUND", f"Риск {risk_id!r} не найден.", field="risk_id")
-    result = evaluate_single_risk(plan, ctx.base_scenario, risk, ctx.case_data, ctx.assumptions)
+    result = evaluate_single_risk(plan, ctx.base_scenario, risk, case_data, ctx.assumptions)
     return {
         "plan_hash": plan_hash(raw),
+        "input_hash": input_hash(source_overrides),
         "risk": risk.to_dict(),
         "register": result.to_register_entry(),
         "applied_overrides": copy.deepcopy(result.applied_overrides),
@@ -437,9 +455,14 @@ def risk_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
     }
 
 
-def mitigation_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
+def mitigation_detail(
+    raw: dict[str, Any],
+    risk_id: str,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     risk = next((item for item in ctx.risks if item.risk_id == risk_id), None)
     if risk is None:
         raise BridgeError("RISK_NOT_FOUND", f"Риск {risk_id!r} не найден.", field="risk_id")
@@ -450,13 +473,13 @@ def mitigation_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
             "Мера описана качественно, количественный plan_patch не задан.",
             field="mitigation",
         )
-    original = evaluate_single_risk(plan, ctx.base_scenario, risk, ctx.case_data, ctx.assumptions)
+    original = evaluate_single_risk(plan, ctx.base_scenario, risk, case_data, ctx.assumptions)
     result = evaluate_risk_mitigation(
         plan,
         ctx.base_scenario,
         risk,
         mitigation,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
         original_evaluation=original,
     )
@@ -464,6 +487,7 @@ def mitigation_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
     value.update(
         {
             "plan_hash": plan_hash(raw),
+            "input_hash": input_hash(source_overrides),
             "risk_id": risk_id,
             "mitigated_plan": copy.deepcopy(result.mitigated_plan),
             "risk_result": result.risk_result.to_dict(),
@@ -477,28 +501,36 @@ def sensitivity(
     raw: dict[str, Any],
     values: Iterable[Any],
     parameter: str | dict[str, Any] = "demand_multiplier",
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     result = run_sensitivity(
         plan,
         parameter,
         list(values),
         ctx.base_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
     ).to_dict()
     result["plan_hash"] = plan_hash(raw)
+    result["input_hash"] = input_hash(source_overrides)
     return result
 
 
-def official_demand_sensitivity(raw: dict[str, Any]) -> dict[str, Any]:
+def official_demand_sensitivity(
+    raw: dict[str, Any],
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     result = run_official_demand_sensitivity(
-        plan, ctx.base_scenario, ctx.case_data, ctx.assumptions
+        plan, ctx.base_scenario, case_data, ctx.assumptions
     ).to_dict()
     result["plan_hash"] = plan_hash(raw)
+    result["input_hash"] = input_hash(source_overrides)
     return result
 
 
@@ -510,19 +542,22 @@ def reverse_stress(
     *,
     parameter: str | dict[str, Any] = "demand_multiplier",
     target: str | dict[str, Any] = "ANY_HARD",
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     result = run_reverse_stress(
         plan,
         parameter,
         {"start": start, "stop": stop, "step": step},
         target,
         ctx.base_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
     ).to_dict()
     result["plan_hash"] = plan_hash(raw)
+    result["input_hash"] = input_hash(source_overrides)
     return result
 
 
