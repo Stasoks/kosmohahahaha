@@ -8,7 +8,7 @@ from app import charts, runtime
 from app.components import render_chart, render_error
 from app.kernel_bridge import risk_catalog, stakeholder_data
 from app.state import analysis_is_stale, is_dirty
-from app.view_models import minimum_annual_metrics, stakeholder_scenario_rows, violations_view
+from app.view_models import (\n    minimum_annual_metrics,\n    risk_stakeholder_impact_rows,\n    stakeholder_detail_rows,\n    violations_view,\n)
 
 
 RISK_TEXT = {
@@ -198,6 +198,37 @@ def _risk_tab() -> None:
     else:
         st.info("Для этой меры количественный пересчёт не задан.")
 
+    if detail and detail.get("risk", {}).get("risk_id") == selected:
+        st.subheader("Кто несёт последствия выбранного риска")
+        mitigation_value = st.session_state.get("mitigation_result")
+        residual_result = None
+        if mitigation_value and mitigation_value.get("risk_id") == selected:
+            residual_result = mitigation_value.get("risk_result")
+        stakeholder_rows = risk_stakeholder_impact_rows(
+            stakeholder_data(),
+            selected,
+            detail["baseline"],
+            detail["risk_result"],
+            residual_result,
+        )
+        if stakeholder_rows:
+            frame = pd.DataFrame(stakeholder_rows)
+            names_by_id = {
+                item["name"]: STAKEHOLDER_TEXT.get(
+                    item["stakeholder_id"], (item["name"], "")
+                )[0]
+                for item in stakeholder_data().get("participants", [])
+            }
+            frame["Сторона"] = frame["Сторона"].map(
+                lambda value: names_by_id.get(value, value)
+            )
+            st.dataframe(frame, hide_index=True, width="stretch")
+            st.caption(
+                "Денежный ущерб потребителей не монетизируется без входных данных. "
+                "Таблица показывает только рассчитанные расходы, физический дефицит, "
+                "сервис и явно заданное распределение рисков."
+            )
+
 
 def _sensitivity_tab() -> None:
     if st.button("Проверить нижний, базовый и верхний спрос", type="primary"):
@@ -338,7 +369,7 @@ def _stakeholders_tab() -> None:
             st.session_state.get("source_overrides", {}),
         )
         st.session_state.abc_result = abc_payload
-        rows = stakeholder_scenario_rows(config, abc_payload)
+        rows = stakeholder_detail_rows(config, abc_payload)
     except Exception as exc:
         render_error(exc, "Не удалось собрать последствия для сторон")
         return
@@ -346,14 +377,29 @@ def _stakeholders_tab() -> None:
         name, interests = STAKEHOLDER_TEXT.get(item["stakeholder_id"], (item["name"], ""))
         with st.expander(name):
             st.write("**Интересы:**", interests)
-    st.subheader("Рассчитанные последствия A/B/C")
+            st.write("**KPI:**", ", ".join(item.get("kpis", [])) or "не заданы")
+            st.write("**Обязательства:**", "; ".join(item.get("obligations", [])) or "не заданы")
+            st.write(
+                "**Кто несёт затраты:**",
+                "; ".join(item.get("cost_bearer", []))
+                or "нет отдельной денежной аллокации в кейсе",
+            )
+            st.write(
+                "**Какой риск несёт:**",
+                "; ".join(item.get("risk_bearer", [])) or "не задан",
+            )
+    st.subheader("Рассчитанные последствия A/B/C и распределение ответственности")
     scenario_rows = pd.DataFrame(rows)
     if not scenario_rows.empty:
         scenario_rows["Сторона"] = [
             STAKEHOLDER_TEXT.get(item["stakeholder_id"], (item["name"], ""))[0]
             for item in config.get("participants", [])
         ]
-        st.dataframe(scenario_rows[["Сторона", "A", "B", "C"]], hide_index=True, width="stretch")
+        st.dataframe(scenario_rows, hide_index=True, width="stretch")
+        st.caption(
+            "Показатели сторон не меняют физические ограничения модели. "
+            "Недопоставка не превращается в денежный ущерб без отдельного явного допущения."
+        )
     mitigation = st.session_state.get("mitigation_result")
     if mitigation:
         st.subheader("Выбранный риск: до и после меры")
