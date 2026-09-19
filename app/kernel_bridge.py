@@ -667,7 +667,13 @@ def case_metadata(
         "official_years": [int(year) for year in case_data.official_years],
         "research_years": [int(year) for year in case_data.research_years],
         "sources": {
-            source_id: copy.deepcopy(vars(source)) for source_id, source in case_data.sources.items()
+            source_id: {
+                **copy.deepcopy(vars(source)),
+                "effective_lead_time_months": int(
+                    application_context().assumptions.source_delivery_lead_months(source)
+                ),
+            }
+            for source_id, source in case_data.sources.items()
         },
         "research_source_ids": list(case_data.research_source_ids),
         "demand": [copy.deepcopy(vars(case_data.demand[year])) for year in case_data.years],
