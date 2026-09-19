@@ -6,9 +6,11 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
+from app import runtime
 from app.components import render_error
 from app.kernel_bridge import case_metadata, plan_hash, validate
-from app.state import apply_plan, is_dirty
+from app.research_plan import annual_order_total, set_annual_total_preserving_schedule
+from app.state import accept_calculation, apply_plan, is_dirty
 from app.view_models import contract_rows, investment_timeline, source_names
 
 
@@ -27,7 +29,6 @@ def _annual_orders(raw: dict[str, Any], metadata: dict[str, Any]) -> pd.DataFram
             "Источник": source_id,
             "Название": source["name"],
             "Распределение": MODE_LABELS.get(schedule.get("mode", "annual_even"), "Равномерно по году"),
-            "Применить годовые итоги": False,
         }
         for year in metadata["years"]:
             row[str(year)] = sum(
@@ -72,6 +73,8 @@ def _apply_orders(
     monthly: pd.DataFrame,
     years: list[int],
 ) -> None:
+    """Apply visible edits without requiring a hidden confirmation checkbox."""
+
     existing = {
         str(item["source_id"]): copy.deepcopy(item)
         for item in raw["decisions"]["supply_orders"]
@@ -87,26 +90,74 @@ def _apply_orders(
     output = []
     for _, row in annual.iterrows():
         source_id = str(row["Источник"])
-        previous = existing.get(source_id, {"source_id": source_id, "mode": "annual_even", "values": {}})
-        if source_id in monthly_values and previous.get("mode") == "monthly" and not bool(row["Применить годовые итоги"]):
-            output.append({"source_id": source_id, "mode": "monthly", "values": monthly_values[source_id]})
-            continue
-        if not bool(row["Применить годовые итоги"]):
-            output.append(previous)
-            continue
-        mode = MODE_VALUES.get(str(row["Распределение"]), "annual_even")
-        if mode == "monthly":
-            values = {
-                f"{year}-{month:02d}": float(row[str(year)]) / 12.0
-                for year in years
-                for month in range(1, 13)
-                if float(row[str(year)]) > 0
-            }
-        else:
-            values = {str(year): float(row[str(year)]) for year in years}
-        output.append({"source_id": source_id, "mode": mode, "values": values})
-    raw["decisions"]["supply_orders"] = output
+        previous = existing.get(
+            source_id,
+            {"source_id": source_id, "mode": "annual_even", "values": {}},
+        )
+        previous_mode = str(previous.get("mode", "annual_even"))
+        desired_mode = MODE_VALUES.get(
+            str(row["Распределение"]),
+            previous_mode,
+        )
 
+        annual_changed = any(
+            abs(float(row[str(year)]) - annual_order_total(previous, year)) > 1e-9
+            for year in years
+        )
+        mode_changed = desired_mode != previous_mode
+
+        if mode_changed:
+            if desired_mode == "annual_even":
+                values = {
+                    str(year): float(row[str(year)])
+                    for year in years
+                    if float(row[str(year)]) > 0
+                }
+                output.append(
+                    {"source_id": source_id, "mode": "annual_even", "values": values}
+                )
+            else:
+                values = {
+                    f"{year}-{month:02d}": float(row[str(year)]) / 12.0
+                    for year in years
+                    for month in range(1, 13)
+                    if float(row[str(year)]) > 0
+                }
+                output.append(
+                    {"source_id": source_id, "mode": "monthly", "values": values}
+                )
+            continue
+
+        if annual_changed:
+            changed = copy.deepcopy(previous)
+            for year in years:
+                set_annual_total_preserving_schedule(
+                    changed,
+                    year,
+                    float(row[str(year)]),
+                )
+            output.append(changed)
+            continue
+
+        if previous_mode == "monthly" and source_id in monthly_values:
+            previous_values = {
+                str(period): float(value)
+                for period, value in previous.get("values", {}).items()
+            }
+            edited_values = monthly_values[source_id]
+            if edited_values != previous_values:
+                output.append(
+                    {
+                        "source_id": source_id,
+                        "mode": "monthly",
+                        "values": edited_values,
+                    }
+                )
+                continue
+
+        output.append(previous)
+
+    raw["decisions"]["supply_orders"] = output
 
 def _source_cards(metadata: dict[str, Any]) -> None:
     rows = []
@@ -129,7 +180,10 @@ def _source_cards(metadata: dict[str, Any]) -> None:
 
 def render() -> None:
     st.title("Стратегия")
-    st.caption("Изменения вступают в силу только после нажатия «Применить», а результаты обновляются после пересчёта.")
+    st.caption(
+        "Измените решения и нажмите «Применить и пересчитать». "
+        "Изменённые годовые объёмы определяются автоматически."
+    )
     raw = st.session_state.plan
     metadata = case_metadata(source_overrides=st.session_state.get("source_overrides", {}))
     years = metadata["years"]
@@ -142,8 +196,8 @@ def render() -> None:
         notes = second.text_input("Комментарий оператора", raw.get("metadata", {}).get("notes", ""))
         st.caption(
             "Заказы — сколько топлива оператор просит поставить из каждого канала. "
-            "Изменение таблицы само по себе не применяется: отметьте строку в последнем "
-            "столбце и затем нажмите «Применить решения»."
+            "Любое изменённое значение будет применено автоматически при отправке формы. "
+            "Для помесячных планов годовой объём меняется без скрытого переключения режима поставок."
         )
         annual = st.data_editor(
             _annual_orders(raw, metadata),
@@ -152,8 +206,10 @@ def render() -> None:
             column_config={
                 "Источник": st.column_config.TextColumn(disabled=True),
                 "Название": st.column_config.TextColumn(disabled=True),
-                "Распределение": st.column_config.SelectboxColumn(options=list(MODE_VALUES)),
-                "Применить годовые итоги": st.column_config.CheckboxColumn(help="Явно преобразовать значения в выбранный режим."),
+                "Распределение": st.column_config.SelectboxColumn(
+                    options=list(MODE_VALUES),
+                    help="Меняйте режим только если хотите явно изменить временную структуру поставок.",
+                ),
                 **{
                     str(year): st.column_config.NumberColumn(f"{year}, т", min_value=0.0, step=1.0)
                     for year in years
@@ -301,7 +357,11 @@ def render() -> None:
                     format_func=ROLE_LABELS.get,
                     key=f"emergency-role-{key}-{year}",
                 )
-        submitted = st.form_submit_button("Применить решения", type="primary", width="stretch")
+        submitted = st.form_submit_button(
+            "Применить и пересчитать",
+            type="primary",
+            width="stretch",
+        )
 
     if submitted:
         try:
@@ -333,8 +393,15 @@ def render() -> None:
             }
             updated["decisions"].setdefault("inventory_policy", {})["reserve_strategy_by_year"] = policy_values
             updated["decisions"]["emergency_role_by_year"] = role_values
+
+            result = runtime.evaluate(
+                updated,
+                st.session_state.get("source_overrides", {}),
+                st.session_state.get("custom_scenario"),
+            )
             apply_plan(updated)
-            st.success("Решения применены. Теперь проверьте и пересчитайте план.")
+            accept_calculation(result)
+            st.success("Стратегия применена и пересчитана.")
             st.rerun()
         except Exception as exc:
             render_error(exc, "Не удалось применить решения")
@@ -349,7 +416,7 @@ def render() -> None:
         else:
             for error in validation["errors"]:
                 render_error(error, "План не прошёл структурную проверку")
-    c2.caption("После проверки нажмите «Пересчитать» слева.")
+    c2.caption("Основная кнопка выше уже применяет стратегию и запускает расчёт.")
 
     with st.expander("Справочник источников и детали контрактов"):
         st.subheader("Источники")
