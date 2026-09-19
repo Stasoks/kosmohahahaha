@@ -33,6 +33,10 @@ CONSTRAINT_LABELS = {
     "RESERVE_45D": "Резерв на 45 дней",
     "EMERGENCY_BASE_STREAK": "Ограничение постоянного использования аварийного канала",
     "STRESS_LOSS_LIMIT": "Предел потерь в стрессовом сценарии",
+    "STRUCTURAL_STORAGE_CAPACITY": "Превышение вместимости хранилища",
+    "STRUCTURAL_ORDER_CAPACITY": "Превышение доступной мощности поставки",
+    "STRUCTURAL_SOURCE_AVAILABILITY": "Поставка из недоступного источника",
+    "INITIAL_STORAGE_CAPACITY": "Превышение вместимости начального хранилища",
 }
 
 SEVERITY_LABELS = {"hard": "Критическое", "benchmark": "Ориентир", "warning": "Предупреждение"}
