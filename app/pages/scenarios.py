@@ -18,10 +18,10 @@ from app.view_models import (
 )
 
 
-def _delta_cards(value: dict | None) -> None:
+def _delta_cards(value: dict | None, heading: str) -> None:
     if not value:
         return
-    st.markdown(f"**{value['label']}**")
+    st.markdown(f"**{heading}**")
     columns = st.columns(3)
     columns[0].metric("Мин. сервис", percentage_points(value["total_service_pp"]))
     columns[1].metric("Мин. критический", percentage_points(value["critical_service_pp"]))
@@ -32,10 +32,11 @@ def _delta_cards(value: dict | None) -> None:
 
 
 def render() -> None:
-    st.title("Сценарная лаборатория")
+    st.title("Сценарии и адаптация")
     st.caption(
-        "A — текущий план в обычных условиях; B — тот же план в стрессе; "
-        "C — заранее адаптированный план в стрессе."
+        "Здесь сравнивается один и тот же текущий план в обычных и стрессовых условиях, "
+        "а затем отдельная стратегия, заранее подготовленная под стресс. "
+        "Буквы A/B/C используются только как технические обозначения."
     )
     if is_dirty():
         st.warning("Есть несчитанные изменения. Сравнение относится к последней рассчитанной версии плана.")
@@ -62,12 +63,15 @@ def render() -> None:
                 if built["solutions"]:
                     st.session_state.stress_plan = built["solutions"][0]["plan"]
                     st.session_state.abc_result = None
-                    st.success("Вариант C построен и выбран для сравнения. Текущий план не изменён.")
+                    st.success(
+                        "Стратегия, адаптированная под стресс, построена и выбрана для сравнения. "
+                        "Ваш текущий план не изменён."
+                    )
                 else:
                     st.warning("Подходящий вариант не найден в заданных пределах поиска.")
             except Exception as exc:
                 render_error(exc, "Поиск не завершён")
-        if st.button("Вернуть исходный вариант C", width="stretch"):
+        if st.button("Вернуть исходную стресс-адаптацию", width="stretch"):
             st.session_state.stress_plan = stress_reference_raw()
             st.session_state.abc_result = None
 
@@ -93,7 +97,7 @@ def render() -> None:
         ]
     ].rename(
         columns={
-            "case": "Вариант", "label": "План и условия", "valid": "Исполним",
+            "case": "Код", "label": "Что сравниваем", "valid": "Исполним",
             "minimum_annual_total_service": "Мин. годовой сервис",
             "minimum_annual_critical_service": "Мин. критический сервис",
             "total_shortage_t": "Дефицит, т", "critical_shortage_t": "Крит. дефицит, т",
@@ -111,13 +115,17 @@ def render() -> None:
             "Мин. критический сервис": st.column_config.NumberColumn(format="percent"),
         },
     )
-    _delta_cards(view["stress_effect"])
-    _delta_cards(view["adaptation_effect"])
-
-    st.subheader("Кто несёт последствия стресса")
     st.caption(
-        "Критический спрос входит в общий. Поэтому коммерческий дефицит здесь "
-        "рассчитывается как общий дефицит минус критический дефицит."
+        "Сначала смотрите B − A: что делает стресс с вашим планом без изменения решений. "
+        "Затем C − B: что возвращает или ухудшает адаптация."
+    )
+    _delta_cards(view["stress_effect"], "Что изменил стресс в вашем текущем плане")
+    _delta_cards(view["adaptation_effect"], "Что дала стресс-адаптация")
+
+    st.subheader("Кто и что теряет при стрессе")
+    st.caption(
+        "Критический спрос входит в общий, поэтому коммерческий дефицит = "
+        "общий дефицит − критический. Денежный ущерб потребителей не придумывается."
     )
     annual_impacts = annual_stress_impact_rows(abc_payload)
     impact_frame = pd.DataFrame(annual_impacts)
@@ -128,7 +136,7 @@ def render() -> None:
             if int(year) >= 2038
         ]
         selected_year = st.selectbox(
-            "Год для распределения последствий",
+            "Год для разбора последствий",
             stress_years or impact_frame["year"].tolist(),
             index=0,
             key="stakeholder-stress-year",
@@ -136,104 +144,102 @@ def render() -> None:
         selected_impact = next(
             row for row in annual_impacts if int(row["year"]) == int(selected_year)
         )
+
+        st.markdown(
+            "**Рост спроса / недопоставка → дефицит топлива → последствия для потребителей "
+            "и оператора → изменение стратегии снабжения**"
+        )
         cols = st.columns(4)
         cols[0].metric(
-            "Коммерческий дефицит",
-            mass(selected_impact["stress_commercial_shortage_t"]),
-            delta=signed(
-                selected_impact["stress_commercial_shortage_t"]
-                - selected_impact["base_commercial_shortage_t"],
-                "т",
-            ),
-        )
-        cols[1].metric(
-            "Критический дефицит",
+            "Критические потребители",
             mass(selected_impact["stress_critical_shortage_t"]),
             delta=signed(
                 selected_impact["stress_critical_shortage_t"]
                 - selected_impact["base_critical_shortage_t"],
-                "т",
+                "т дефицита",
             ),
+            delta_color="inverse",
+            help="Необслуженный критический спрос в выбранном году.",
+        )
+        cols[1].metric(
+            "Коммерческие потребители",
+            mass(selected_impact["stress_commercial_shortage_t"]),
+            delta=signed(
+                selected_impact["stress_commercial_shortage_t"]
+                - selected_impact["base_commercial_shortage_t"],
+                "т дефицита",
+            ),
+            delta_color="inverse",
+            help="Необслуженный некритический спрос в выбранном году.",
         )
         cols[2].metric(
             "Расходы оператора",
             money(selected_impact["stress_cost_mln"]),
-            delta=signed(selected_impact["stress_cost_delta_mln"], "млн у.е."),
+            delta=signed(
+                selected_impact["stress_cost_delta_mln"],
+                "млн к BASE",
+            ),
+            delta_color="inverse",
+            help="Расчётные расходы этого года, не денежная оценка ущерба потребителей.",
         )
         cols[3].metric(
-            "После адаптации: общий дефицит",
+            "После адаптации",
             mass(selected_impact["adapted_shortage_t"]),
             delta=signed(
                 selected_impact["adapted_shortage_t"]
                 - selected_impact["stress_shortage_t"],
-                "т",
+                "т общего дефицита",
             ),
+            delta_color="inverse",
+            help="Как меняется общий дефицит после перехода к стресс-адаптированной стратегии.",
         )
-
-        annual_display = impact_frame[
-            [
-                "year",
-                "base_total_demand_t",
-                "stress_total_demand_t",
-                "stress_commercial_shortage_t",
-                "stress_critical_shortage_t",
-                "stress_cost_delta_mln",
-                "adapted_commercial_shortage_t",
-                "adapted_critical_shortage_t",
-                "adaptation_cost_delta_mln",
-            ]
-        ].rename(
-            columns={
-                "year": "Год",
-                "base_total_demand_t": "Спрос BASE, т",
-                "stress_total_demand_t": "Спрос STRESS, т",
-                "stress_commercial_shortage_t": "Коммерческий дефицит STRESS, т",
-                "stress_critical_shortage_t": "Критический дефицит STRESS, т",
-                "stress_cost_delta_mln": "Δ стоимости STRESS − BASE, млн",
-                "adapted_commercial_shortage_t": "Коммерческий дефицит после адаптации, т",
-                "adapted_critical_shortage_t": "Критический дефицит после адаптации, т",
-                "adaptation_cost_delta_mln": "Δ стоимости адаптации, млн",
-            }
-        )
-        st.dataframe(annual_display, hide_index=True, width="stretch")
 
         st.info(
-            f"{selected_year}: коммерческий спрос недообслужен на "
-            f"{selected_impact['stress_commercial_shortage_t']:.2f} т, "
-            f"критический — на {selected_impact['stress_critical_shortage_t']:.2f} т. "
-            f"Расчётные расходы оператора относительно BASE изменились на "
-            f"{selected_impact['stress_cost_delta_mln']:+.2f} млн у.е. "
-            "Денежная стоимость ущерба от необслуженного спроса не рассчитывается: "
-            "такого входного параметра в кейсе нет."
+            f"{selected_year}: без адаптации стресс даёт "
+            f"{selected_impact['stress_critical_shortage_t']:.2f} т критического и "
+            f"{selected_impact['stress_commercial_shortage_t']:.2f} т коммерческого дефицита. "
+            f"После адаптации общий дефицит становится "
+            f"{selected_impact['adapted_shortage_t']:.2f} т."
         )
-        st.warning(
-            "Для обязательного стресса недопоставка Lunar-ISRU не создаёт "
-            "автоматический возврат платежей. Контур сохраняет рассчитанные "
-            "контрактные расходы; отдельные компенсации допустимы только как "
-            "явный исследовательский договорный сценарий."
+        st.caption(
+            "Недопоставка Lunar-ISRU в обязательном стрессе не создаёт автоматический "
+            "возврат платежей. Компенсации можно вводить только отдельным явным допущением."
         )
 
-    st.subheader("Интересы, обязательства и распределение риска")
-    stakeholders = pd.DataFrame(
-        stakeholder_detail_rows(stakeholder_data(), abc_payload)
-    )
-    if not stakeholders.empty:
-        stakeholder_names = {
-            "Orbital fuel-node operator": "Оператор топливного узла",
-            "Critical consumers": "Критические потребители",
-            "Commercial consumers": "Коммерческие потребители",
-            "Fuel suppliers": "Поставщики топлива",
-            "Launch and logistics suppliers": "Пусковые и логистические подрядчики",
-            "Financing and investor side": "Финансирующая сторона / инвесторы",
-        }
-        stakeholders["Сторона"] = stakeholders["Сторона"].map(
-            lambda value: stakeholder_names.get(value, value)
-        )
-        st.dataframe(stakeholders, hide_index=True, width="stretch")
+        with st.expander("Годовая таблица последствий"):
+            annual_display = impact_frame[
+                [
+                    "year",
+                    "stress_commercial_shortage_t",
+                    "stress_critical_shortage_t",
+                    "stress_cost_delta_mln",
+                    "adapted_commercial_shortage_t",
+                    "adapted_critical_shortage_t",
+                    "adaptation_cost_delta_mln",
+                ]
+            ].rename(
+                columns={
+                    "year": "Год",
+                    "stress_commercial_shortage_t": "Коммерческий дефицит без адаптации, т",
+                    "stress_critical_shortage_t": "Критический дефицит без адаптации, т",
+                    "stress_cost_delta_mln": "Δ стоимости к BASE, млн",
+                    "adapted_commercial_shortage_t": "Коммерческий дефицит после адаптации, т",
+                    "adapted_critical_shortage_t": "Критический дефицит после адаптации, т",
+                    "adaptation_cost_delta_mln": "Δ стоимости адаптации, млн",
+                }
+            )
+            st.dataframe(annual_display, hide_index=True, width="stretch")
+
+    with st.expander("Карта участников: интересы, обязательства и кто несёт риск"):
         st.caption(
-            "Столбцы «Кто несёт затраты» и «Какой риск несёт» взяты из явной "
-            "карты сторон. Они не превращают недопоставку в выдуманный денежный ущерб."
+            "Это справочный слой для критерия заинтересованных сторон. Основные последствия "
+            "показаны выше в физических и денежных метриках."
         )
+        stakeholders = pd.DataFrame(
+            stakeholder_detail_rows(stakeholder_data(), abc_payload)
+        )
+        if not stakeholders.empty:
+            st.dataframe(stakeholders, hide_index=True, width="stretch")
 
     if "CUSTOM" in st.session_state.result:
         st.subheader("Текущий план в пользовательском сценарии")
@@ -277,7 +283,12 @@ def render() -> None:
     else:
         st.info("Адаптированный план пока не выбран.")
 
-    st.subheader("Сравнение общих альтернатив")
+    st.subheader("Какой ценой разные стратегии переживают стресс?")
+    st.caption(
+        "По горизонтали — стоимость стратегии в обычных условиях. По вертикали — "
+        "дефицит, который тот же неизменный план получает в обязательном стрессе. "
+        "Левее дешевле, ниже устойчивее к стрессу."
+    )
     try:
         alternatives = runtime.alternatives(
             calculated_plan,
@@ -302,6 +313,15 @@ def render() -> None:
             hide_index=True,
             width="stretch",
         )
-        st.caption("Выбор зависит от компромисса между стоимостью и устойчивостью.")
+        if not alt.empty:
+            cheapest = alt.loc[alt["base_cost_mln"].idxmin()]
+            least_shortage = alt.loc[alt["stress_shortage_t"].idxmin()]
+            st.info(
+                f"Как читать сравнение: минимальная стоимость среди показанных вариантов — "
+                f"{cheapest['plan_id']} ({cheapest['base_cost_mln']:.1f} млн у.е.); "
+                f"минимальный дефицит в стрессе — {least_shortage['plan_id']} "
+                f"({least_shortage['stress_shortage_t']:.1f} т). "
+                "Это две разные характеристики, поэтому оператор видит компромисс, а не скрытый «победитель»."
+            )
     except Exception as exc:
         render_error(exc, "Не удалось сравнить альтернативы")
