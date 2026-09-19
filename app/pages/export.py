@@ -98,8 +98,13 @@ def _exports() -> None:
     files = st.session_state.get("export_files")
     if files:
         for name, payload in files.items():
+            media_type = "application/json" if name.endswith(".json") else "text/csv"
             st.download_button(
-                f"Скачать {name}", payload, name.replace("/", "-"), "text/csv", width="stretch"
+                f"Скачать {name}",
+                payload,
+                name.replace("/", "-"),
+                media_type,
+                width="stretch",
             )
     if st.button("Подготовить полный ZIP", type="primary"):
         try:
