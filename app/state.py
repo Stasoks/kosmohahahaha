@@ -6,7 +6,7 @@ from typing import Any, Callable
 
 import streamlit as st
 
-from app.kernel_bridge import default_plan_raw, new_workspace, plan_hash, stress_reference_raw
+from app.kernel_bridge import default_plan_raw, input_hash, new_workspace, plan_hash, scenario_hash, stress_reference_raw
 
 
 ANALYSIS_KEYS = (
@@ -35,16 +35,35 @@ def initialize(evaluator: Callable[[dict[str, Any]], dict[str, Any]]) -> None:
     st.session_state.setdefault("research_result", None)
     st.session_state.setdefault("snapshots", {})
     st.session_state.setdefault("validation_result", None)
+    st.session_state.setdefault("source_overrides", {})
+    st.session_state.setdefault("custom_scenario", None)
     for key in ANALYSIS_KEYS:
         st.session_state.setdefault(key, None)
 
 
 def is_dirty() -> bool:
-    return plan_hash(st.session_state.plan) != st.session_state.result.get("plan_hash")
+    result = st.session_state.result
+    if plan_hash(st.session_state.plan) != result.get("plan_hash"):
+        return True
+    if input_hash(st.session_state.get("source_overrides", {})) != result.get("input_hash", input_hash({})):
+        return True
+    custom = st.session_state.get("custom_scenario")
+    calculated_custom = result.get("custom_scenario")
+    if bool(custom) != bool(calculated_custom):
+        return True
+    if custom and calculated_custom:
+        return scenario_hash(custom) != calculated_custom.get("scenario_hash")
+    return False
 
 
 def analysis_is_stale(value: dict[str, Any] | None) -> bool:
-    return bool(value) and value.get("plan_hash") != plan_hash(st.session_state.plan)
+    if not value:
+        return False
+    return (
+        value.get("plan_hash") != plan_hash(st.session_state.plan)
+        or value.get("input_hash", input_hash({}))
+        != input_hash(st.session_state.get("source_overrides", {}))
+    )
 
 
 def apply_plan(raw: dict[str, Any]) -> None:

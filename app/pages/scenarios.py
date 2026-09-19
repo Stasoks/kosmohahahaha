@@ -8,9 +8,14 @@ import streamlit as st
 from app import charts, runtime
 from app.components import render_chart, render_error
 from app.formatting import mass, money, percentage_points, signed
-from app.kernel_bridge import plan_hash, stress_reference_raw
+from app.kernel_bridge import plan_hash, stakeholder_data, stress_reference_raw
 from app.state import is_dirty
-from app.view_models import abc_comparison, decision_diff
+from app.view_models import (
+    abc_comparison,
+    annual_stress_impact_rows,
+    decision_diff,
+    stakeholder_detail_rows,
+)
 
 
 def _delta_cards(value: dict | None) -> None:
@@ -46,7 +51,13 @@ def render() -> None:
         if st.button("Подобрать вариант", type="primary", width="stretch"):
             try:
                 with st.spinner("Идёт поиск подходящего варианта…"):
-                    built = runtime.builder(int(max_candidates), int(beam_width), int(iterations), int(seed))
+                    built = runtime.builder(
+                        int(max_candidates),
+                        int(beam_width),
+                        int(iterations),
+                        int(seed),
+                        st.session_state.get("source_overrides", {}),
+                    )
                 st.session_state.builder_result = built
                 if built["solutions"]:
                     st.session_state.stress_plan = built["solutions"][0]["plan"]
@@ -62,7 +73,11 @@ def render() -> None:
 
     try:
         calculated_plan = st.session_state.calculated_plan
-        abc_payload = runtime.abc(calculated_plan, st.session_state.stress_plan)
+        abc_payload = runtime.abc(
+            calculated_plan,
+            st.session_state.stress_plan,
+            st.session_state.get("source_overrides", {}),
+        )
         st.session_state.abc_result = abc_payload
     except Exception as exc:
         render_error(exc, "Не удалось собрать A/B/C")
@@ -99,6 +114,147 @@ def render() -> None:
     _delta_cards(view["stress_effect"])
     _delta_cards(view["adaptation_effect"])
 
+    st.subheader("Кто несёт последствия стресса")
+    st.caption(
+        "Критический спрос входит в общий. Поэтому коммерческий дефицит здесь "
+        "рассчитывается как общий дефицит минус критический дефицит."
+    )
+    annual_impacts = annual_stress_impact_rows(abc_payload)
+    impact_frame = pd.DataFrame(annual_impacts)
+    if not impact_frame.empty:
+        stress_years = [
+            int(year)
+            for year in impact_frame["year"].tolist()
+            if int(year) >= 2038
+        ]
+        selected_year = st.selectbox(
+            "Год для распределения последствий",
+            stress_years or impact_frame["year"].tolist(),
+            index=0,
+            key="stakeholder-stress-year",
+        )
+        selected_impact = next(
+            row for row in annual_impacts if int(row["year"]) == int(selected_year)
+        )
+        cols = st.columns(4)
+        cols[0].metric(
+            "Коммерческий дефицит",
+            mass(selected_impact["stress_commercial_shortage_t"]),
+            delta=signed(
+                selected_impact["stress_commercial_shortage_t"]
+                - selected_impact["base_commercial_shortage_t"],
+                "т",
+            ),
+        )
+        cols[1].metric(
+            "Критический дефицит",
+            mass(selected_impact["stress_critical_shortage_t"]),
+            delta=signed(
+                selected_impact["stress_critical_shortage_t"]
+                - selected_impact["base_critical_shortage_t"],
+                "т",
+            ),
+        )
+        cols[2].metric(
+            "Расходы оператора",
+            money(selected_impact["stress_cost_mln"]),
+            delta=signed(selected_impact["stress_cost_delta_mln"], "млн у.е."),
+        )
+        cols[3].metric(
+            "После адаптации: общий дефицит",
+            mass(selected_impact["adapted_shortage_t"]),
+            delta=signed(
+                selected_impact["adapted_shortage_t"]
+                - selected_impact["stress_shortage_t"],
+                "т",
+            ),
+        )
+
+        annual_display = impact_frame[
+            [
+                "year",
+                "base_total_demand_t",
+                "stress_total_demand_t",
+                "stress_commercial_shortage_t",
+                "stress_critical_shortage_t",
+                "stress_cost_delta_mln",
+                "adapted_commercial_shortage_t",
+                "adapted_critical_shortage_t",
+                "adaptation_cost_delta_mln",
+            ]
+        ].rename(
+            columns={
+                "year": "Год",
+                "base_total_demand_t": "Спрос BASE, т",
+                "stress_total_demand_t": "Спрос STRESS, т",
+                "stress_commercial_shortage_t": "Коммерческий дефицит STRESS, т",
+                "stress_critical_shortage_t": "Критический дефицит STRESS, т",
+                "stress_cost_delta_mln": "Δ стоимости STRESS − BASE, млн",
+                "adapted_commercial_shortage_t": "Коммерческий дефицит после адаптации, т",
+                "adapted_critical_shortage_t": "Критический дефицит после адаптации, т",
+                "adaptation_cost_delta_mln": "Δ стоимости адаптации, млн",
+            }
+        )
+        st.dataframe(annual_display, hide_index=True, width="stretch")
+
+        st.info(
+            f"{selected_year}: коммерческий спрос недообслужен на "
+            f"{selected_impact['stress_commercial_shortage_t']:.2f} т, "
+            f"критический — на {selected_impact['stress_critical_shortage_t']:.2f} т. "
+            f"Расчётные расходы оператора относительно BASE изменились на "
+            f"{selected_impact['stress_cost_delta_mln']:+.2f} млн у.е. "
+            "Денежная стоимость ущерба от необслуженного спроса не рассчитывается: "
+            "такого входного параметра в кейсе нет."
+        )
+        st.warning(
+            "Для обязательного стресса недопоставка Lunar-ISRU не создаёт "
+            "автоматический возврат платежей. Контур сохраняет рассчитанные "
+            "контрактные расходы; отдельные компенсации допустимы только как "
+            "явный исследовательский договорный сценарий."
+        )
+
+    st.subheader("Интересы, обязательства и распределение риска")
+    stakeholders = pd.DataFrame(
+        stakeholder_detail_rows(stakeholder_data(), abc_payload)
+    )
+    if not stakeholders.empty:
+        stakeholder_names = {
+            "Orbital fuel-node operator": "Оператор топливного узла",
+            "Critical consumers": "Критические потребители",
+            "Commercial consumers": "Коммерческие потребители",
+            "Fuel suppliers": "Поставщики топлива",
+            "Launch and logistics suppliers": "Пусковые и логистические подрядчики",
+            "Financing and investor side": "Финансирующая сторона / инвесторы",
+        }
+        stakeholders["Сторона"] = stakeholders["Сторона"].map(
+            lambda value: stakeholder_names.get(value, value)
+        )
+        st.dataframe(stakeholders, hide_index=True, width="stretch")
+        st.caption(
+            "Столбцы «Кто несёт затраты» и «Какой риск несёт» взяты из явной "
+            "карты сторон. Они не превращают недопоставку в выдуманный денежный ущерб."
+        )
+
+    if "CUSTOM" in st.session_state.result:
+        st.subheader("Текущий план в пользовательском сценарии")
+        custom = st.session_state.result["CUSTOM"]
+        custom_name = st.session_state.result.get("custom_scenario", {}).get("name", "Пользовательский сценарий")
+        base_key = st.session_state.result.get("custom_scenario", {}).get("base_scenario", "BASE")
+        baseline = st.session_state.result[base_key]
+        from app.view_models import minimum_annual_metrics
+        before = minimum_annual_metrics(baseline)
+        after = minimum_annual_metrics(custom)
+        cols = st.columns(4)
+        cols[0].metric("Сценарий", custom_name)
+        cols[1].metric("Мин. сервис", f"{after['minimum_annual_total_service']:.1%}")
+        cols[2].metric("Дефицит", f"{after['total_shortage_t']:.2f} т")
+        cols[3].metric("Стоимость", f"{after['undiscounted_cost_mln']:.1f} млн")
+        st.caption(
+            f"Относительно основы: Δ сервиса {(after['minimum_annual_total_service']-before['minimum_annual_total_service'])*100:+.2f} п.п. · "
+            f"Δ дефицита {after['total_shortage_t']-before['total_shortage_t']:+.2f} т · "
+            f"Δ стоимости {after['undiscounted_cost_mln']-before['undiscounted_cost_mln']:+.1f} млн."
+        )
+
     chart_rows = copy.deepcopy(view["rows"])
     for item in chart_rows:
         item["service_pct"] = 100 * item["minimum_annual_total_service"]
@@ -123,7 +279,10 @@ def render() -> None:
 
     st.subheader("Сравнение общих альтернатив")
     try:
-        alternatives = runtime.alternatives(calculated_plan)
+        alternatives = runtime.alternatives(
+            calculated_plan,
+            st.session_state.get("source_overrides", {}),
+        )
         render_chart(charts.alternatives(alternatives["plans"]))
         alt = pd.DataFrame(alternatives["plans"])
         st.dataframe(

@@ -49,7 +49,7 @@ def _plans() -> None:
 
 
 def _case_data() -> None:
-    tables = case_tables()
+    tables = case_tables(source_overrides=st.session_state.get("source_overrides", {}))
     st.subheader("Спрос")
     demand_columns = {
         "year": "Год", "base_total_t": "Общий спрос, т", "base_critical_t": "Критический спрос, т",
@@ -85,22 +85,34 @@ def _case_data() -> None:
 
 
 def _exports() -> None:
-    if st.button("Подготовить CSV-файлы", type="primary"):
+    if st.button("Подготовить выгрузки", type="primary"):
         try:
-            with st.spinner("Формируются таблицы обычного и стрессового расчётов…"):
-                st.session_state.export_files = runtime.csv_files(st.session_state.calculated_plan)
+            with st.spinner("Формируются таблицы обычного, стрессового и пользовательского расчётов…"):
+                st.session_state.export_files = runtime.csv_files(
+                    st.session_state.calculated_plan,
+                    st.session_state.get("source_overrides", {}),
+                    st.session_state.get("custom_scenario"),
+                )
         except Exception as exc:
-            render_error(exc, "CSV не подготовлены")
+            render_error(exc, "Выгрузки не подготовлены")
     files = st.session_state.get("export_files")
     if files:
         for name, payload in files.items():
+            media_type = "application/json" if name.endswith(".json") else "text/csv"
             st.download_button(
-                f"Скачать {name}", payload, name.replace("/", "-"), "text/csv", width="stretch"
+                f"Скачать {name}",
+                payload,
+                name.replace("/", "-"),
+                media_type,
+                width="stretch",
             )
     if st.button("Подготовить полный ZIP", type="primary"):
         try:
             with st.spinner("Собираются план, результаты и риски…"):
-                st.session_state.bundle = runtime.bundle(st.session_state.calculated_plan)
+                st.session_state.bundle = runtime.bundle(
+                    st.session_state.calculated_plan,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "ZIP не подготовлен")
     if st.session_state.get("bundle"):

@@ -8,6 +8,7 @@ from app.kernel_bridge import (
     case_metadata,
     default_plan_path,
     default_plan_raw,
+    evaluate,
     mitigation_detail,
     official_demand_sensitivity,
     research_plan_template,
@@ -148,3 +149,51 @@ def test_backend_csv_exports_are_created_for_both_scenarios():
     }
     assert expected <= set(files)
     assert all(files[name] for name in expected)
+
+
+def test_bridge_evaluates_custom_scenario_on_edited_source_copy():
+    raw = default_plan_raw()
+    result = evaluate(
+        raw,
+        {"B": {"variable_cost_mln_per_t": 9.5, "selected_lead_time_months": 5}},
+        {
+            "name": "Проверочный сценарий",
+            "base_scenario": "BASE",
+            "period_start": "2038-01",
+            "period_end": "2040-12",
+            "factor_changes": [
+                {
+                    "factor": "total_demand_multiplier",
+                    "value": 1.05,
+                    "status": "TEAM_ASSUMPTION",
+                }
+            ],
+        },
+    )
+    assert set(("BASE", "MANDATORY_STRESS", "CUSTOM")) <= set(result)
+    assert result["source_overrides"]["B"]["variable_cost_mln_per_t"] == 9.5
+    assert result["custom_scenario"]["name"] == "Проверочный сценарий"
+    assert result["CUSTOM"]["summary"]["scenario_id"] == "BASE+CUSTOM-SCENARIO"
+
+
+def test_backend_exports_include_custom_scenario_and_input_overrides():
+    files = result_csv_bytes(
+        default_plan_raw(),
+        {"B": {"variable_cost_mln_per_t": 9.5}},
+        {
+            "name": "Export custom",
+            "base_scenario": "BASE",
+            "period_start": "2038-01",
+            "period_end": "2040-12",
+            "factor_changes": [
+                {
+                    "factor": "total_demand_multiplier",
+                    "value": 1.02,
+                    "status": "TEAM_ASSUMPTION",
+                }
+            ],
+        },
+    )
+    assert "CUSTOM/annual.csv" in files
+    assert "CUSTOM/scenario.json" in files
+    assert "source-overrides.json" in files

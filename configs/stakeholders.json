@@ -4,11 +4,11 @@
   "participants": [
     {
       "stakeholder_id": "operator",
-      "name": "Orbital fuel-node operator",
+      "name": "Оператор топливного узла",
       "interests": [
-        "continuous service",
-        "feasible contracts",
-        "transparent cost"
+        "непрерывность сервиса",
+        "исполнимые контракты",
+        "прозрачная стоимость"
       ],
       "kpis": [
         "total_service_level",
@@ -17,19 +17,19 @@
         "reserve_actual_days"
       ],
       "obligations": [
-        "operate within case constraints"
+        "работать в пределах ограничений кейса"
       ],
       "cost_bearer": [
-        "procurement",
-        "reservation",
-        "holding",
+        "закупка топлива",
+        "резервирование мощности",
+        "хранение",
         "OPEX",
         "CAPEX"
       ],
       "risk_bearer": [
-        "service shortage",
-        "storage loss",
-        "contract underuse"
+        "дефицит сервиса",
+        "потери хранения",
+        "неиспользованный оплаченный резерв"
       ],
       "relevant_risks": [
         "R-CORE-OUTAGE",
@@ -39,22 +39,22 @@
     },
     {
       "stakeholder_id": "critical_consumers",
-      "name": "Critical consumers",
+      "name": "Критические потребители",
       "interests": [
-        "priority service",
-        "45-day resilience"
+        "приоритетное обслуживание",
+        "45-дневная устойчивость"
       ],
       "kpis": [
         "critical_service_level",
         "critical_shortage_t"
       ],
       "obligations": [
-        "provide demand requirements"
+        "предоставлять требования по спросу"
       ],
       "cost_bearer": [],
       "risk_bearer": [
-        "critical shortage",
-        "delayed service"
+        "критический дефицит",
+        "задержка обслуживания"
       ],
       "relevant_risks": [
         "R-CORE-OUTAGE",
@@ -65,21 +65,21 @@
     },
     {
       "stakeholder_id": "commercial_consumers",
-      "name": "Commercial consumers",
+      "name": "Коммерческие потребители",
       "interests": [
-        "predictable available fuel",
-        "transparent curtailment"
+        "предсказуемая доступность топлива",
+        "прозрачное ограничение обслуживания"
       ],
       "kpis": [
         "total_service_level",
         "total_shortage_t"
       ],
       "obligations": [
-        "provide demand plans"
+        "предоставлять планы спроса"
       ],
       "cost_bearer": [],
       "risk_bearer": [
-        "noncritical curtailment"
+        "некритический дефицит / ограничение обслуживания"
       ],
       "relevant_risks": [
         "R-CORE-OUTAGE",
@@ -88,10 +88,10 @@
     },
     {
       "stakeholder_id": "fuel_suppliers",
-      "name": "Fuel suppliers",
+      "name": "Поставщики топлива",
       "interests": [
-        "contract utilization",
-        "credible reservations"
+        "загрузка контрактов",
+        "достоверное резервирование"
       ],
       "kpis": [
         "payable_volume_t",
@@ -99,13 +99,13 @@
         "gross_delivery_t"
       ],
       "obligations": [
-        "deliver feasible contracted supply"
+        "поставлять исполнимый законтрактованный объём"
       ],
       "cost_bearer": [
-        "supplier-side costs outside case"
+        "затраты поставщика вне границ модели кейса"
       ],
       "risk_bearer": [
-        "underdelivery consequences"
+        "последствия собственной недопоставки в пределах заданных контрактных правил"
       ],
       "relevant_risks": [
         "R-ISRU-UNDERDELIVERY",
@@ -115,23 +115,23 @@
     },
     {
       "stakeholder_id": "launch_logistics",
-      "name": "Launch and logistics suppliers",
+      "name": "Пусковые и логистические подрядчики",
       "interests": [
-        "stable schedule",
-        "capacity visibility"
+        "стабильный график",
+        "видимость требуемой мощности"
       ],
       "kpis": [
         "delayed_delivery_count",
         "delayed_delivery_t"
       ],
       "obligations": [
-        "execute declared lead times"
+        "соблюдать заявленные сроки поставки"
       ],
       "cost_bearer": [
-        "no separate allocation in case"
+        "отдельная денежная аллокация в кейсе не задана"
       ],
       "risk_bearer": [
-        "schedule delay"
+        "задержка графика"
       ],
       "relevant_risks": [
         "R-CORE-OUTAGE",
@@ -141,11 +141,11 @@
     },
     {
       "stakeholder_id": "financing",
-      "name": "Financing and investor side",
+      "name": "Финансирующая сторона / инвесторы",
       "interests": [
-        "CAPEX discipline",
-        "cost transparency",
-        "investment resilience"
+        "дисциплина CAPEX",
+        "прозрачность стоимости",
+        "устойчивость инвестиций"
       ],
       "kpis": [
         "capex_mln",
@@ -153,14 +153,14 @@
         "cost_per_served_ton_mln"
       ],
       "obligations": [
-        "fund approved investments"
+        "финансировать утверждённые инвестиции"
       ],
       "cost_bearer": [
-        "CAPEX according to plan"
+        "CAPEX согласно выбранному плану"
       ],
       "risk_bearer": [
-        "CAPEX overrun",
-        "stranded investment"
+        "перерасход CAPEX",
+        "невозвратные / неэффективные инвестиционные обязательства"
       ],
       "relevant_risks": [
         "R-CAPEX-OVERRUN",
@@ -169,5 +169,5 @@
       ]
     }
   ],
-  "disclaimer": "No revenue, penalty, or stakeholder-specific monetary transfer is invented without case data."
+  "disclaimer": "Денежный ущерб, выручка, штрафы и компенсации не придумываются без явных данных кейса или отдельно помеченного TEAM_ASSUMPTION."
 }

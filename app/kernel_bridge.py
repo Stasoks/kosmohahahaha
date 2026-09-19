@@ -25,6 +25,8 @@ if str(CORE_SRC) not in sys.path:
 from kosmohak.service import (  # noqa: E402
     StrategyBuilderConfig,
     add_workspace_source,
+    build_case_with_source_overrides,
+    build_custom_environment,
     build_download_bundle,
     build_effective_case,
     build_future_year_spec,
@@ -83,6 +85,16 @@ def plan_hash(raw: dict[str, Any]) -> str:
     return hashlib.sha256(canonical_json(raw).encode("utf-8")).hexdigest()[:12]
 
 
+def input_hash(source_overrides: dict[str, Any] | None = None) -> str:
+    payload = canonical_json(source_overrides or {})
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
+
+
+def scenario_hash(spec: dict[str, Any] | None = None) -> str:
+    payload = canonical_json(spec or {})
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
+
+
 def _workspace(value: dict[str, Any] | CaseWorkspace | None) -> CaseWorkspace | None:
     if value is None:
         return None
@@ -96,6 +108,26 @@ def _workspace(value: dict[str, Any] | CaseWorkspace | None) -> CaseWorkspace | 
 def _case_data(workspace: dict[str, Any] | CaseWorkspace | None = None):
     overlay = _workspace(workspace)
     return build_effective_case(overlay) if overlay is not None else application_context().case_data
+
+
+def _case_data_with_source_overrides(
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+):
+    return build_case_with_source_overrides(
+        application_context().case_data,
+        copy.deepcopy(source_overrides or {}),
+    )
+
+
+def _validated_plan_for_case(raw: dict[str, Any], case_data):
+    ctx = application_context()
+    result = validate_plan(raw, case_data, ctx.assumptions)
+    if result.valid and result.plan is not None:
+        return result.plan
+    error = result.errors[0] if result.errors else None
+    if error is None:
+        raise BridgeError("PLAN_VALIDATION_ERROR", "План не прошёл структурную проверку.")
+    raise BridgeError(error.code, error.message, field=error.field, details=error.details)
 
 
 def _error_dict(error: Any) -> dict[str, Any]:
@@ -238,22 +270,46 @@ def _validated_plan(
     raise BridgeError(error.code, error.message, field=error.field, details=error.details)
 
 
-def evaluate(raw: dict[str, Any]) -> dict[str, Any]:
+def evaluate(
+    raw: dict[str, Any],
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+    custom_scenario: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     pair = evaluate_both_scenarios(
         plan,
         ctx.base_scenario,
         ctx.stress_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
     )
-    return {
+    value = {
         "BASE": pair["BASE"].to_dict(),
         "MANDATORY_STRESS": pair["MANDATORY_STRESS"].to_dict(),
         "comparison": copy.deepcopy(pair["comparison"]),
         "plan_hash": plan_hash(raw),
+        "input_hash": input_hash(source_overrides),
+        "source_overrides": copy.deepcopy(source_overrides or {}),
     }
+    if custom_scenario:
+        base_key = str(custom_scenario.get("base_scenario", "BASE"))
+        base_environment = (
+            ctx.stress_scenario if base_key == "MANDATORY_STRESS" else ctx.base_scenario
+        )
+        environment = build_custom_environment(base_environment, custom_scenario)
+        custom = evaluate_plan(plan, environment, case_data, ctx.assumptions)
+        value["CUSTOM"] = custom.to_dict()
+        value["custom_scenario"] = {
+            "name": str(custom_scenario.get("name", "Пользовательский сценарий")),
+            "base_scenario": base_key,
+            "period_start": custom_scenario.get("period_start"),
+            "period_end": custom_scenario.get("period_end"),
+            "factor_changes": copy.deepcopy(custom_scenario.get("factor_changes", [])),
+            "scenario_hash": scenario_hash(custom_scenario),
+        }
+    return value
 
 
 def build_stress_specific(
@@ -262,14 +318,16 @@ def build_stress_specific(
     beam_width: int = 10,
     max_iterations: int = 4,
     seed: int = 17,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Run the explicit bounded Builder workflow for a stress-specific plan."""
 
     ctx = application_context()
+    case_data = _case_data_with_source_overrides(source_overrides)
     result = synthesize_strategy(
         ctx.base_scenario,
         ctx.stress_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
         config=StrategyBuilderConfig(
             planning_mode="STRESS_ADAPTATION",
@@ -287,10 +345,11 @@ def build_stress_specific(
 def abc_results(
     base_plan_raw: dict[str, Any],
     stress_plan_raw: dict[str, Any] | None = None,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Return A=current plan/BASE, B=same plan/STRESS, C=stress plan/STRESS."""
 
-    pair = evaluate(base_plan_raw)
+    pair = evaluate(base_plan_raw, source_overrides)
     stress_raw = stress_plan_raw or stress_reference_raw()
     if stress_raw is None:
         return {
@@ -301,7 +360,7 @@ def abc_results(
             "stress_plan": None,
             "plan_hash": pair["plan_hash"],
         }
-    stress_pair = evaluate(stress_raw)
+    stress_pair = evaluate(stress_raw, source_overrides)
     return {
         "A": pair["BASE"],
         "B": pair["MANDATORY_STRESS"],
@@ -313,17 +372,21 @@ def abc_results(
     }
 
 
-def compare_available_plans(current_raw: dict[str, Any] | None = None) -> dict[str, Any]:
+def compare_available_plans(
+    current_raw: dict[str, Any] | None = None,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
+    case_data = _case_data_with_source_overrides(source_overrides)
     paths = [
         CORE_ROOT / "plans" / "final_base.json",
         CORE_ROOT / "plans" / "cost_focused.json",
         CORE_ROOT / "plans" / "diversified.json",
         CORE_ROOT / "plans" / "resilient.json",
     ]
-    plans = [load_plan(path, ctx.case_data, ctx.assumptions) for path in paths if path.is_file()]
+    plans = [load_plan(path, case_data, ctx.assumptions) for path in paths if path.is_file()]
     if current_raw is not None:
-        current = _validated_plan(current_raw)
+        current = _validated_plan_for_case(current_raw, case_data)
         exact_duplicate = any(
             item.plan_id == current.plan_id
             and item.raw.get("decisions") == current.raw.get("decisions")
@@ -332,14 +395,14 @@ def compare_available_plans(current_raw: dict[str, Any] | None = None) -> dict[s
         if not exact_duplicate and any(item.plan_id == current.plan_id for item in plans):
             renamed = copy.deepcopy(current.raw)
             renamed["plan_id"] = f"{current.plan_id}--current-{plan_hash(current_raw)[:6]}"
-            current = _validated_plan(renamed)
+            current = _validated_plan_for_case(renamed, case_data)
         if not exact_duplicate:
             plans.append(current)
     comparison = compare_plans(
         plans,
         ctx.base_scenario,
         ctx.stress_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
     )
     return {
@@ -349,12 +412,17 @@ def compare_available_plans(current_raw: dict[str, Any] | None = None) -> dict[s
     }
 
 
-def risks(raw: dict[str, Any]) -> dict[str, Any]:
+def risks(
+    raw: dict[str, Any],
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
-    result = evaluate_risks(plan, ctx.base_scenario, ctx.risks, ctx.case_data, ctx.assumptions)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
+    result = evaluate_risks(plan, ctx.base_scenario, ctx.risks, case_data, ctx.assumptions)
     value = result.to_dict()
     value["plan_hash"] = plan_hash(raw)
+    value["input_hash"] = input_hash(source_overrides)
     return value
 
 
@@ -362,15 +430,21 @@ def risk_catalog() -> list[dict[str, Any]]:
     return [item.to_dict() for item in application_context().risks]
 
 
-def risk_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
+def risk_detail(
+    raw: dict[str, Any],
+    risk_id: str,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     risk = next((item for item in ctx.risks if item.risk_id == risk_id), None)
     if risk is None:
         raise BridgeError("RISK_NOT_FOUND", f"Риск {risk_id!r} не найден.", field="risk_id")
-    result = evaluate_single_risk(plan, ctx.base_scenario, risk, ctx.case_data, ctx.assumptions)
+    result = evaluate_single_risk(plan, ctx.base_scenario, risk, case_data, ctx.assumptions)
     return {
         "plan_hash": plan_hash(raw),
+        "input_hash": input_hash(source_overrides),
         "risk": risk.to_dict(),
         "register": result.to_register_entry(),
         "applied_overrides": copy.deepcopy(result.applied_overrides),
@@ -381,9 +455,14 @@ def risk_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
     }
 
 
-def mitigation_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
+def mitigation_detail(
+    raw: dict[str, Any],
+    risk_id: str,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     risk = next((item for item in ctx.risks if item.risk_id == risk_id), None)
     if risk is None:
         raise BridgeError("RISK_NOT_FOUND", f"Риск {risk_id!r} не найден.", field="risk_id")
@@ -394,13 +473,13 @@ def mitigation_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
             "Мера описана качественно, количественный plan_patch не задан.",
             field="mitigation",
         )
-    original = evaluate_single_risk(plan, ctx.base_scenario, risk, ctx.case_data, ctx.assumptions)
+    original = evaluate_single_risk(plan, ctx.base_scenario, risk, case_data, ctx.assumptions)
     result = evaluate_risk_mitigation(
         plan,
         ctx.base_scenario,
         risk,
         mitigation,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
         original_evaluation=original,
     )
@@ -408,6 +487,7 @@ def mitigation_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
     value.update(
         {
             "plan_hash": plan_hash(raw),
+            "input_hash": input_hash(source_overrides),
             "risk_id": risk_id,
             "mitigated_plan": copy.deepcopy(result.mitigated_plan),
             "risk_result": result.risk_result.to_dict(),
@@ -421,28 +501,36 @@ def sensitivity(
     raw: dict[str, Any],
     values: Iterable[Any],
     parameter: str | dict[str, Any] = "demand_multiplier",
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     result = run_sensitivity(
         plan,
         parameter,
         list(values),
         ctx.base_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
     ).to_dict()
     result["plan_hash"] = plan_hash(raw)
+    result["input_hash"] = input_hash(source_overrides)
     return result
 
 
-def official_demand_sensitivity(raw: dict[str, Any]) -> dict[str, Any]:
+def official_demand_sensitivity(
+    raw: dict[str, Any],
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     result = run_official_demand_sensitivity(
-        plan, ctx.base_scenario, ctx.case_data, ctx.assumptions
+        plan, ctx.base_scenario, case_data, ctx.assumptions
     ).to_dict()
     result["plan_hash"] = plan_hash(raw)
+    result["input_hash"] = input_hash(source_overrides)
     return result
 
 
@@ -454,19 +542,22 @@ def reverse_stress(
     *,
     parameter: str | dict[str, Any] = "demand_multiplier",
     target: str | dict[str, Any] = "ANY_HARD",
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     result = run_reverse_stress(
         plan,
         parameter,
         {"start": start, "stop": stop, "step": step},
         target,
         ctx.base_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
     ).to_dict()
     result["plan_hash"] = plan_hash(raw)
+    result["input_hash"] = input_hash(source_overrides)
     return result
 
 
@@ -558,14 +649,31 @@ def evaluate_workspace(raw: dict[str, Any], workspace: dict[str, Any]) -> dict[s
 
 def case_metadata(
     workspace: dict[str, Any] | CaseWorkspace | None = None,
+    *,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    case_data = _case_data(workspace)
+    if workspace is not None and source_overrides:
+        raise BridgeError(
+            "CASE_OVERLAY_CONFLICT",
+            "Research workspace and source editor cannot be applied in one case_metadata call.",
+        )
+    case_data = (
+        _case_data(workspace)
+        if workspace is not None
+        else _case_data_with_source_overrides(source_overrides)
+    )
     return {
         "years": [int(year) for year in case_data.years],
         "official_years": [int(year) for year in case_data.official_years],
         "research_years": [int(year) for year in case_data.research_years],
         "sources": {
-            source_id: copy.deepcopy(vars(source)) for source_id, source in case_data.sources.items()
+            source_id: {
+                **copy.deepcopy(vars(source)),
+                "effective_lead_time_months": int(
+                    application_context().assumptions.source_delivery_lead_months(source)
+                ),
+            }
+            for source_id, source in case_data.sources.items()
         },
         "research_source_ids": list(case_data.research_source_ids),
         "demand": [copy.deepcopy(vars(case_data.demand[year])) for year in case_data.years],
@@ -584,8 +692,10 @@ def case_metadata(
 
 def case_tables(
     workspace: dict[str, Any] | CaseWorkspace | None = None,
+    *,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
-    metadata = case_metadata(workspace)
+    metadata = case_metadata(workspace, source_overrides=source_overrides)
     return {
         "demand": metadata["demand"],
         "sources": list(metadata["sources"].values()),
@@ -616,34 +726,74 @@ def plan_from_bytes(payload: bytes) -> dict[str, Any]:
     return copy.deepcopy(checked["plan"])
 
 
-def result_csv_bytes(raw: dict[str, Any]) -> dict[str, bytes]:
+def result_csv_bytes(
+    raw: dict[str, Any],
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+    custom_scenario: dict[str, Any] | None = None,
+) -> dict[str, bytes]:
     """Use backend exporters and return portable CSV payloads for download buttons."""
 
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     pair = evaluate_both_scenarios(
-        plan, ctx.base_scenario, ctx.stress_scenario, ctx.case_data, ctx.assumptions
+        plan, ctx.base_scenario, ctx.stress_scenario, case_data, ctx.assumptions
     )
     files: dict[str, bytes] = {}
     with tempfile.TemporaryDirectory(prefix="kosmohak-ui-csv-") as temporary:
         root = Path(temporary)
         for scenario in ("BASE", "MANDATORY_STRESS"):
-            export_plan_results(pair[scenario], root / scenario, ctx.case_data.root)
+            export_plan_results(pair[scenario], root / scenario, case_data.root)
         export_scenario_comparison(
             pair["BASE"], pair["MANDATORY_STRESS"], root / "comparison"
         )
-        for path in sorted(root.rglob("*.csv")):
-            files[path.relative_to(root).as_posix()] = path.read_bytes()
+        if custom_scenario:
+            base_key = str(custom_scenario.get("base_scenario", "BASE"))
+            base_environment = (
+                ctx.stress_scenario
+                if base_key == "MANDATORY_STRESS"
+                else ctx.base_scenario
+            )
+            environment = build_custom_environment(base_environment, custom_scenario)
+            custom_result = evaluate_plan(plan, environment, case_data, ctx.assumptions)
+            export_plan_results(custom_result, root / "CUSTOM", case_data.root)
+            (root / "CUSTOM" / "scenario.json").write_text(
+                json.dumps(custom_scenario, ensure_ascii=False, indent=2, sort_keys=True),
+                encoding="utf-8",
+            )
+        if source_overrides:
+            (root / "source-overrides.json").write_text(
+                json.dumps(source_overrides, ensure_ascii=False, indent=2, sort_keys=True),
+                encoding="utf-8",
+            )
+        for path in sorted(root.rglob("*")):
+            if path.is_file() and path.suffix in {".csv", ".json"}:
+                files[path.relative_to(root).as_posix()] = path.read_bytes()
     return files
 
 
 def bundle_bytes(
-    raw: dict[str, Any], workspace: dict[str, Any] | None = None
+    raw: dict[str, Any],
+    workspace: dict[str, Any] | None = None,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> bytes:
     ctx = application_context()
     overlay = _workspace(workspace)
-    case_data = build_effective_case(overlay) if overlay is not None else ctx.case_data
-    plan = _validated_plan(raw, overlay)
+    if overlay is not None and source_overrides:
+        raise BridgeError(
+            "CASE_OVERLAY_CONFLICT",
+            "Research workspace and source editor cannot be bundled together.",
+        )
+    case_data = (
+        build_effective_case(overlay)
+        if overlay is not None
+        else _case_data_with_source_overrides(source_overrides)
+    )
+    plan = (
+        _validated_plan(raw, overlay)
+        if overlay is not None
+        else _validated_plan_for_case(raw, case_data)
+    )
     base_result = evaluate_plan(plan, ctx.base_scenario, case_data, ctx.assumptions)
     stress_result = evaluate_plan(plan, ctx.stress_scenario, case_data, ctx.assumptions)
     risk_result = None

@@ -105,3 +105,28 @@ Evidence:
 Stakeholder interests influence how calculated alternatives are discussed. They do not
 change official service constraints, fabricate revenue or convert qualitative
 preferences into money without an explicit method.
+
+## UI presentation
+
+The Streamlit dashboard exposes this allocation directly instead of leaving it only in
+configuration files:
+
+- **Сценарии → Кто несёт последствия стресса** shows annual BASE/STRESS/adapted
+  demand, critical and commercial shortage, cost deltas and the selected-year impact.
+  Commercial shortage is computed as total shortage minus critical shortage because
+  critical demand is included in total demand.
+- The same section states explicitly that unmet demand is not monetised without an
+  input value for lost service and that mandatory-stress Lunar-ISRU underdelivery does
+  not create an automatic refund.
+- **Сценарии → Интересы, обязательства и распределение риска** exposes interests/KPI,
+  obligations, cost bearers, risk bearers and calculated A/B/C outcomes for every
+  stakeholder.
+- **Риски и чувствительность → Реестр рисков** shows the stakeholders affected by the
+  selected team risk before the risk, in the risk state and, when a quantitative
+  mitigation exists, after mitigation.
+- **Риски и чувствительность → Участники** repeats the full responsibility map so the
+  jury does not need to infer cost/risk allocation from configuration JSON.
+
+These UI statements remain descriptive consequences of the digital-twin calculation.
+They do not introduce revenue, mission-loss valuation, penalties or compensation
+terms absent from CASE_INPUT.

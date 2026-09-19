@@ -122,9 +122,15 @@ def render_error(exc: Exception | dict[str, Any], title: str = "Не удало�
             st.json(value["details"])
 
 
-def results_status(result: dict[str, Any], current_hash: str, calculated_hash: str) -> None:
+def results_status(
+    result: dict[str, Any],
+    current_hash: str,
+    calculated_hash: str,
+    *,
+    dirty_override: bool | None = None,
+) -> None:
     summary = result["summary"]
-    dirty = current_hash != calculated_hash
+    dirty = current_hash != calculated_hash if dirty_override is None else dirty_override
     st.markdown(
         '<div class="statusbar">'
         f'<span class="pill {"warn" if dirty else "ok"}">{"● ЕСТЬ НЕСЧИТАННЫЕ ИЗМЕНЕНИЯ" if dirty else "✓ РЕЗУЛЬТАТЫ АКТУАЛЬНЫ"}</span>'

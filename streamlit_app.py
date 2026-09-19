@@ -6,7 +6,7 @@ import streamlit as st
 from app import runtime
 from app.components import inject_styles, render_error
 from app.kernel_bridge import plan_bytes, plan_hash, plan_preset_key, plan_preset_raw, plan_presets
-from app.pages import export, overview, research, results, risks, scenarios, strategy
+from app.pages import conditions, export, overview, research, results, risks, scenarios, strategy
 from app.state import accept_calculation, apply_plan, initialize, is_dirty, save_snapshot
 
 
@@ -28,8 +28,12 @@ except Exception as exc:
 
 def recalculate() -> None:
     try:
-        with st.spinner("Расчёт обычного и стрессового сценариев…"):
-            result = runtime.evaluate(st.session_state.plan)
+        with st.spinner("Пересчитываются выбранные условия…"):
+            result = runtime.evaluate(
+                st.session_state.plan,
+                st.session_state.get("source_overrides", {}),
+                st.session_state.get("custom_scenario"),
+            )
         accept_calculation(result)
         st.toast("Оба сценария пересчитаны", icon="✅")
     except Exception as exc:
@@ -38,6 +42,7 @@ def recalculate() -> None:
 
 PAGES = {
     "Обзор": overview.render,
+    "Исходные условия": conditions.render,
     "Стратегия": strategy.render,
     "Результаты": results.render,
     "Сценарии": scenarios.render,
@@ -100,6 +105,10 @@ with st.sidebar:
         else "Пользовательский план"
     )
     st.markdown(f"**Текущая стратегия:** {current_label}")
+    if st.session_state.get("source_overrides"):
+        st.caption(f"Изменены характеристики источников: {len(st.session_state.source_overrides)}")
+    if st.session_state.get("custom_scenario"):
+        st.caption(f"Свой сценарий: {st.session_state.custom_scenario.get('name', 'Пользовательский')}")
     if is_dirty():
         st.warning("● Есть несчитанные изменения")
     else:

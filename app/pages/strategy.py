@@ -131,7 +131,7 @@ def render() -> None:
     st.title("Стратегия")
     st.caption("Изменения вступают в силу только после нажатия «Применить», а результаты обновляются после пересчёта.")
     raw = st.session_state.plan
-    metadata = case_metadata()
+    metadata = case_metadata(source_overrides=st.session_state.get("source_overrides", {}))
     years = metadata["years"]
     names = source_names(metadata)
     key = plan_hash(raw)
@@ -293,6 +293,8 @@ def render() -> None:
 
     with st.expander("Справочник источников и детали контрактов"):
         st.subheader("Источники")
+        if st.session_state.get("source_overrides"):
+            st.caption("Показана активная рабочая копия характеристик источников.")
         _source_cards(metadata)
         st.subheader("Контракты")
         if is_dirty():

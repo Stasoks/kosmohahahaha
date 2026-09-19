@@ -8,7 +8,12 @@ from app import charts, runtime
 from app.components import render_chart, render_error
 from app.kernel_bridge import risk_catalog, stakeholder_data
 from app.state import analysis_is_stale, is_dirty
-from app.view_models import minimum_annual_metrics, stakeholder_scenario_rows, violations_view
+from app.view_models import (
+    minimum_annual_metrics,
+    risk_stakeholder_impact_rows,
+    stakeholder_detail_rows,
+    violations_view,
+)
 
 
 RISK_TEXT = {
@@ -64,7 +69,10 @@ def _risk_tab() -> None:
     if st.button("Рассчитать портфель рисков", type="primary"):
         try:
             with st.spinner("Каждый риск рассчитывается отдельным прогоном цифрового двойника…"):
-                st.session_state.risk_result = runtime.risks(st.session_state.calculated_plan)
+                st.session_state.risk_result = runtime.risks(
+                    st.session_state.calculated_plan,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Не удалось рассчитать портфель")
     data = st.session_state.get("risk_result")
@@ -125,7 +133,11 @@ def _risk_tab() -> None:
     if st.button("Рассчитать выбранный риск", width="stretch"):
         try:
             with st.spinner("Рассчитываются исходное состояние и последствия риска…"):
-                st.session_state.risk_detail = runtime.risk_detail(st.session_state.calculated_plan, selected)
+                st.session_state.risk_detail = runtime.risk_detail(
+                    st.session_state.calculated_plan,
+                    selected,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Не удалось рассчитать риск")
     detail = st.session_state.get("risk_detail")
@@ -166,7 +178,11 @@ def _risk_tab() -> None:
         if st.button("Рассчитать меру", type="primary"):
             try:
                 with st.spinner("Мера проверяется в тех же условиях риска…"):
-                    st.session_state.mitigation_result = runtime.mitigation(st.session_state.calculated_plan, selected)
+                    st.session_state.mitigation_result = runtime.mitigation(
+                        st.session_state.calculated_plan,
+                        selected,
+                        st.session_state.get("source_overrides", {}),
+                    )
             except Exception as exc:
                 render_error(exc, "Не удалось рассчитать меру")
         value = st.session_state.get("mitigation_result")
@@ -187,12 +203,46 @@ def _risk_tab() -> None:
     else:
         st.info("Для этой меры количественный пересчёт не задан.")
 
+    if detail and detail.get("risk", {}).get("risk_id") == selected:
+        st.subheader("Кто несёт последствия выбранного риска")
+        mitigation_value = st.session_state.get("mitigation_result")
+        residual_result = None
+        if mitigation_value and mitigation_value.get("risk_id") == selected:
+            residual_result = mitigation_value.get("risk_result")
+        stakeholder_rows = risk_stakeholder_impact_rows(
+            stakeholder_data(),
+            selected,
+            detail["baseline"],
+            detail["risk_result"],
+            residual_result,
+        )
+        if stakeholder_rows:
+            frame = pd.DataFrame(stakeholder_rows)
+            names_by_id = {
+                item["name"]: STAKEHOLDER_TEXT.get(
+                    item["stakeholder_id"], (item["name"], "")
+                )[0]
+                for item in stakeholder_data().get("participants", [])
+            }
+            frame["Сторона"] = frame["Сторона"].map(
+                lambda value: names_by_id.get(value, value)
+            )
+            st.dataframe(frame, hide_index=True, width="stretch")
+            st.caption(
+                "Денежный ущерб потребителей не монетизируется без входных данных. "
+                "Таблица показывает только рассчитанные расходы, физический дефицит, "
+                "сервис и явно заданное распределение рисков."
+            )
+
 
 def _sensitivity_tab() -> None:
     if st.button("Проверить нижний, базовый и верхний спрос", type="primary"):
         try:
             with st.spinner("Три официальные точки спроса…"):
-                st.session_state.sensitivity_result = runtime.official_sensitivity(st.session_state.calculated_plan)
+                st.session_state.sensitivity_result = runtime.official_sensitivity(
+                    st.session_state.calculated_plan,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Не удалось выполнить проверку")
     preset = st.selectbox(
@@ -236,7 +286,12 @@ def _sensitivity_tab() -> None:
         try:
             values = [float(item.strip()) for item in values_text.split(",") if item.strip()]
             with st.spinner("Рассчитываются точки чувствительности…"):
-                st.session_state.sensitivity_result = runtime.sensitivity(st.session_state.calculated_plan, parameter, values)
+                st.session_state.sensitivity_result = runtime.sensitivity(
+                    st.session_state.calculated_plan,
+                    parameter,
+                    values,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Не удалось выполнить проверку")
     result = st.session_state.get("sensitivity_result")
@@ -281,7 +336,14 @@ def _reverse_tab() -> None:
     if st.button("Найти первый отказ", type="primary"):
         try:
             with st.spinner("Проверяется упорядоченная сетка…"):
-                st.session_state.reverse_result = runtime.reverse(st.session_state.calculated_plan, parameter, start, stop, step)
+                st.session_state.reverse_result = runtime.reverse(
+                    st.session_state.calculated_plan,
+                    parameter,
+                    start,
+                    stop,
+                    step,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Поиск предела не выполнен")
     result = st.session_state.get("reverse_result")
@@ -307,10 +369,12 @@ def _stakeholders_tab() -> None:
     config = stakeholder_data()
     try:
         abc_payload = st.session_state.get("abc_result") or runtime.abc(
-            st.session_state.calculated_plan, st.session_state.stress_plan
+            st.session_state.calculated_plan,
+            st.session_state.stress_plan,
+            st.session_state.get("source_overrides", {}),
         )
         st.session_state.abc_result = abc_payload
-        rows = stakeholder_scenario_rows(config, abc_payload)
+        rows = stakeholder_detail_rows(config, abc_payload)
     except Exception as exc:
         render_error(exc, "Не удалось собрать последствия для сторон")
         return
@@ -318,14 +382,29 @@ def _stakeholders_tab() -> None:
         name, interests = STAKEHOLDER_TEXT.get(item["stakeholder_id"], (item["name"], ""))
         with st.expander(name):
             st.write("**Интересы:**", interests)
-    st.subheader("Рассчитанные последствия A/B/C")
+            st.write("**KPI:**", ", ".join(item.get("kpis", [])) or "не заданы")
+            st.write("**Обязательства:**", "; ".join(item.get("obligations", [])) or "не заданы")
+            st.write(
+                "**Кто несёт затраты:**",
+                "; ".join(item.get("cost_bearer", []))
+                or "нет отдельной денежной аллокации в кейсе",
+            )
+            st.write(
+                "**Какой риск несёт:**",
+                "; ".join(item.get("risk_bearer", [])) or "не задан",
+            )
+    st.subheader("Рассчитанные последствия A/B/C и распределение ответственности")
     scenario_rows = pd.DataFrame(rows)
     if not scenario_rows.empty:
         scenario_rows["Сторона"] = [
             STAKEHOLDER_TEXT.get(item["stakeholder_id"], (item["name"], ""))[0]
             for item in config.get("participants", [])
         ]
-        st.dataframe(scenario_rows[["Сторона", "A", "B", "C"]], hide_index=True, width="stretch")
+        st.dataframe(scenario_rows, hide_index=True, width="stretch")
+        st.caption(
+            "Показатели сторон не меняют физические ограничения модели. "
+            "Недопоставка не превращается в денежный ущерб без отдельного явного допущения."
+        )
     mitigation = st.session_state.get("mitigation_result")
     if mitigation:
         st.subheader("Выбранный риск: до и после меры")
@@ -357,6 +436,11 @@ def _stakeholders_tab() -> None:
 
 def render() -> None:
     st.title("Риски и чувствительность")
+    st.caption(
+        "Риски проверяют конкретные неблагоприятные события; чувствительность показывает, "
+        "как результат меняется при последовательном изменении одного параметра; предел устойчивости "
+        "ищет первое значение, при котором план нарушает ограничение."
+    )
     if is_dirty():
         st.warning("В форме есть несчитанные изменения. Новые анализы запускаются для последнего подтверждённого плана.")
     tabs = st.tabs(["Реестр рисков", "Чувствительность", "Предел устойчивости", "Участники"])
