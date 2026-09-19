@@ -25,6 +25,8 @@ if str(CORE_SRC) not in sys.path:
 from kosmohak.service import (  # noqa: E402
     StrategyBuilderConfig,
     add_workspace_source,
+    build_case_with_source_overrides,
+    build_custom_environment,
     build_download_bundle,
     build_effective_case,
     build_future_year_spec,
@@ -83,6 +85,16 @@ def plan_hash(raw: dict[str, Any]) -> str:
     return hashlib.sha256(canonical_json(raw).encode("utf-8")).hexdigest()[:12]
 
 
+def input_hash(source_overrides: dict[str, Any] | None = None) -> str:
+    payload = canonical_json(source_overrides or {})
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
+
+
+def scenario_hash(spec: dict[str, Any] | None = None) -> str:
+    payload = canonical_json(spec or {})
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
+
+
 def _workspace(value: dict[str, Any] | CaseWorkspace | None) -> CaseWorkspace | None:
     if value is None:
         return None
@@ -96,6 +108,26 @@ def _workspace(value: dict[str, Any] | CaseWorkspace | None) -> CaseWorkspace | 
 def _case_data(workspace: dict[str, Any] | CaseWorkspace | None = None):
     overlay = _workspace(workspace)
     return build_effective_case(overlay) if overlay is not None else application_context().case_data
+
+
+def _case_data_with_source_overrides(
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+):
+    return build_case_with_source_overrides(
+        application_context().case_data,
+        copy.deepcopy(source_overrides or {}),
+    )
+
+
+def _validated_plan_for_case(raw: dict[str, Any], case_data):
+    ctx = application_context()
+    result = validate_plan(raw, case_data, ctx.assumptions)
+    if result.valid and result.plan is not None:
+        return result.plan
+    error = result.errors[0] if result.errors else None
+    if error is None:
+        raise BridgeError("PLAN_VALIDATION_ERROR", "План не прошёл структурную проверку.")
+    raise BridgeError(error.code, error.message, field=error.field, details=error.details)
 
 
 def _error_dict(error: Any) -> dict[str, Any]:
@@ -238,22 +270,46 @@ def _validated_plan(
     raise BridgeError(error.code, error.message, field=error.field, details=error.details)
 
 
-def evaluate(raw: dict[str, Any]) -> dict[str, Any]:
+def evaluate(
+    raw: dict[str, Any],
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+    custom_scenario: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     pair = evaluate_both_scenarios(
         plan,
         ctx.base_scenario,
         ctx.stress_scenario,
-        ctx.case_data,
+        case_data,
         ctx.assumptions,
     )
-    return {
+    value = {
         "BASE": pair["BASE"].to_dict(),
         "MANDATORY_STRESS": pair["MANDATORY_STRESS"].to_dict(),
         "comparison": copy.deepcopy(pair["comparison"]),
         "plan_hash": plan_hash(raw),
+        "input_hash": input_hash(source_overrides),
+        "source_overrides": copy.deepcopy(source_overrides or {}),
     }
+    if custom_scenario:
+        base_key = str(custom_scenario.get("base_scenario", "BASE"))
+        base_environment = (
+            ctx.stress_scenario if base_key == "MANDATORY_STRESS" else ctx.base_scenario
+        )
+        environment = build_custom_environment(base_environment, custom_scenario)
+        custom = evaluate_plan(plan, environment, case_data, ctx.assumptions)
+        value["CUSTOM"] = custom.to_dict()
+        value["custom_scenario"] = {
+            "name": str(custom_scenario.get("name", "Пользовательский сценарий")),
+            "base_scenario": base_key,
+            "period_start": custom_scenario.get("period_start"),
+            "period_end": custom_scenario.get("period_end"),
+            "factor_changes": copy.deepcopy(custom_scenario.get("factor_changes", [])),
+            "scenario_hash": scenario_hash(custom_scenario),
+        }
+    return value
 
 
 def build_stress_specific(
