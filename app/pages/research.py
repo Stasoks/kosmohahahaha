@@ -15,6 +15,7 @@ from app.kernel_bridge import (
     workspace_extend_year,
     workspace_from_bytes,
 )
+from app.research_plan import apply_research_decisions
 from app.state import reset_research
 from app.view_models import source_names
 
@@ -373,9 +374,10 @@ def _research_plan_editor() -> None:
         reserves.append(reserve_row)
     st.subheader("Решения расширенного плана")
     st.caption(
-        "Чтобы исключить даже официальный источник из этого исследовательского плана, "
-        "снимите флажок «Использовать». Сам источник останется в модели и в исходных данных, "
-        "но его заказы и резервирование будут обнулены."
+        "Таблица показывает годовые суммы, но исходная помесячная структура поставок сохраняется, "
+        "пока вы не меняете объём соответствующего года. Для нового года объём существующего "
+        "помесячного канала распределяется равномерно по 12 месяцам. Чтобы исключить источник "
+        "из этого исследовательского плана, снимите «Использовать»."
     )
     order_frame = st.data_editor(
         pd.DataFrame(orders),
@@ -392,43 +394,18 @@ def _research_plan_editor() -> None:
     with st.expander("Резервирование мощности"):
         reserve_frame = st.data_editor(pd.DataFrame(reserves), hide_index=True, width="stretch")
     if st.button("Применить решения", width="stretch"):
-        updated = copy.deepcopy(raw)
-        active_sources = {
-            str(row["Источник"])
-            for _, row in order_frame.iterrows()
-            if bool(row.get("Использовать", True))
-        }
-        updated["decisions"]["supply_orders"] = [
-            {
-                "source_id": str(row["Источник"]),
-                "mode": "annual_even",
-                "values": {
-                    str(year): (
-                        float(row[str(year)])
-                        if str(row["Источник"]) in active_sources
-                        else 0.0
-                    )
-                    for year in metadata["years"]
-                },
-            }
-            for _, row in order_frame.iterrows()
-        ]
-        updated["decisions"]["capacity_reservations"] = [
-            {
-                "source_id": str(row["Источник"]),
-                "year": year,
-                "reserved_capacity_t": float(row[str(year)]),
-            }
-            for _, row in reserve_frame.iterrows()
-            for year in metadata["years"]
-            if (
-                str(row["Источник"]) in active_sources
-                and float(row[str(year)]) > 0
-            )
-        ]
+        updated = apply_research_decisions(
+            raw,
+            order_frame.to_dict("records"),
+            reserve_frame.to_dict("records"),
+            metadata["years"],
+        )
         st.session_state.research_plan = updated
         st.session_state.research_result = None
-        st.success("Решения применены; требуется отдельный расчёт.")
+        st.success(
+            "Решения применены. Неизменённые помесячные графики 2035–2040 сохранены; "
+            "требуется отдельный расчёт."
+        )
     if st.button("Рассчитать расширенный вариант", type="primary", width="stretch"):
         try:
             with st.spinner("Расчёт расширенного варианта…"):
