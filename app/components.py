@@ -33,8 +33,25 @@ h1,h2,h3 { font-family:Manrope,Inter,-apple-system,BlinkMacSystemFont,"Segoe UI"
 [data-testid="stSidebar"] [data-baseweb="select"] * { color:#17151a!important;opacity:1!important; }
 [data-testid="stSidebar"] [data-baseweb="select"] input { color:#17151a!important; }
 [data-testid="stSidebar"] [data-testid="stAlert"] p { color:#17151a!important;opacity:1!important; }
-[data-testid="stSidebar"] .stButton button p,[data-testid="stSidebar"] .stDownloadButton button p { color:#17151a!important; }
-[data-testid="stSidebar"] .stButton button[kind="primary"] p { color:#fff!important; }
+[data-testid="stSidebar"] .stButton button:not([kind="primary"]),
+[data-testid="stSidebar"] .stDownloadButton button {
+    background:#27232c!important;
+    border-color:#4b4352!important;
+    color:#f8f7fb!important;
+}
+[data-testid="stSidebar"] .stButton button:not([kind="primary"]) p,
+[data-testid="stSidebar"] .stButton button:not([kind="primary"]) span,
+[data-testid="stSidebar"] .stDownloadButton button p,
+[data-testid="stSidebar"] .stDownloadButton button span { color:#f8f7fb!important;opacity:1!important; }
+[data-testid="stSidebar"] .stButton button:not([kind="primary"]):hover,
+[data-testid="stSidebar"] .stDownloadButton button:hover {
+    background:#342f3a!important;
+    border-color:#70647b!important;
+}
+[data-testid="stSidebar"] .stButton button[kind="primary"] { background:#5b4bff!important;border-color:#6e61ff!important; }
+[data-testid="stSidebar"] .stButton button[kind="primary"] p,
+[data-testid="stSidebar"] .stButton button[kind="primary"] span { color:#fff!important;opacity:1!important; }
+[data-testid="stSidebar"] button:disabled { opacity:.58!important; }
 [data-testid="stSidebar"] .stRadio label { padding:.42rem .6rem;border-radius:.65rem; }
 [data-testid="stSidebar"] .stRadio label:hover { background:#28242d; }
 .brand { font-size:1.32rem;font-weight:800;margin:.25rem 0 1.25rem;letter-spacing:-.04em; }
