@@ -565,10 +565,8 @@ def _stress_repair_requirements(
         remaining_critical = critical_need
         for row in sorted(
             rows,
-            key=lambda item: (
-                -float(item["shortage_critical_t"]),
-                item["month"],
-            ),
+            key=lambda item: str(item["month"]),
+            reverse=True,
         ):
             if remaining_critical <= 1e-10:
                 break
@@ -584,13 +582,8 @@ def _stress_repair_requirements(
         remaining_total = max(0.0, total_need - (critical_need - remaining_critical))
         for row in sorted(
             rows,
-            key=lambda item: (
-                -(
-                    float(item["shortage_critical_t"])
-                    + float(item["shortage_noncritical_t"])
-                ),
-                item["month"],
-            ),
+            key=lambda item: str(item["month"]),
+            reverse=True,
         ):
             if remaining_total <= 1e-10:
                 break
