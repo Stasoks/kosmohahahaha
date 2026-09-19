@@ -463,10 +463,10 @@ def mitigation_detail(raw: dict[str, Any], risk_id: str) -> dict[str, Any]:
     if risk is None:
         raise BridgeError("RISK_NOT_FOUND", f"Риск {risk_id!r} не найден.", field="risk_id")
     mitigation = risk.mitigation or {}
-    if not mitigation.get("plan_patch"):
+    if not (mitigation.get("plan_patch") or mitigation.get("plan_reference")):
         raise BridgeError(
             "MITIGATION_NOT_QUANTIFIED",
-            "Мера описана качественно, количественный plan_patch не задан.",
+            "Мера описана качественно, количественный plan_patch/plan_reference не задан.",
             field="mitigation",
         )
     original = evaluate_single_risk(plan, ctx.base_scenario, risk, ctx.case_data, ctx.assumptions)
