@@ -90,14 +90,14 @@ def render() -> None:
     rows = pd.DataFrame(view["rows"])
     display = rows[
         [
-            "case", "label", "valid", "minimum_annual_total_service",
+            "label", "valid", "minimum_annual_total_service",
             "minimum_annual_critical_service", "total_shortage_t", "critical_shortage_t",
             "undiscounted_cost_mln", "discounted_cost_mln", "total_capex_mln",
             "minimum_reserve_days", "source_mix_t",
         ]
     ].rename(
         columns={
-            "case": "Код", "label": "Что сравниваем", "valid": "Исполним",
+            "label": "Что сравниваем", "valid": "Исполним",
             "minimum_annual_total_service": "Мин. годовой сервис",
             "minimum_annual_critical_service": "Мин. критический сервис",
             "total_shortage_t": "Дефицит, т", "critical_shortage_t": "Крит. дефицит, т",
@@ -278,7 +278,8 @@ def render() -> None:
         st.dataframe(pd.DataFrame(diff), hide_index=True, width="stretch")
         with st.expander("Версии сравниваемых планов"):
             st.caption(
-                f"A/B: {plan_hash(abc_payload['base_plan'])} · C: {plan_hash(abc_payload['stress_plan'])}"
+                f"Ваш план (обычные условия и стресс): {plan_hash(abc_payload['base_plan'])} · "
+                f"стресс-адаптация: {plan_hash(abc_payload['stress_plan'])}"
             )
     else:
         st.info("Адаптированный план пока не выбран.")
