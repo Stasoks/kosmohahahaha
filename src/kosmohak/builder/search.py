@@ -1218,6 +1218,25 @@ def build_strategies(
             "inside the explored bounded search space."
         )
 
+    base_valid_candidates = [
+        item for item in all_candidates if item.base_result.summary["valid"]
+    ]
+    closest_base_valid = (
+        min(
+            base_valid_candidates,
+            key=lambda item: (
+                _annual_target_deficit(item),
+                _target_deficit(item),
+                item.metrics["stress_critical_shortage_t"],
+                item.metrics["stress_total_shortage_t"],
+                item.metrics["total_cost_mln"],
+                item.canonical_key,
+            ),
+        )
+        if base_valid_candidates
+        else None
+    )
+
     return StrategyBuilderResult(
         status=status,
         config=config.to_dict(),
@@ -1237,6 +1256,25 @@ def build_strategies(
             "candidate_budget": config.max_candidates,
             "budget_exhausted": budget_exhausted,
             "global_optimum_claimed": False,
+            "closest_base_valid": (
+                {
+                    "plan_id": closest_base_valid.plan.plan_id,
+                    "metrics": copy.deepcopy(closest_base_valid.metrics),
+                    "target_satisfaction": copy.deepcopy(
+                        closest_base_valid.target_satisfaction
+                    ),
+                    "annual_target_deficit": _annual_target_deficit(
+                        closest_base_valid
+                    ),
+                    "search_depth": closest_base_valid.depth,
+                    "mutation_history": list(closest_base_valid.history),
+                    "stress_annual": copy.deepcopy(
+                        closest_base_valid.stress_result.annual
+                    ),
+                }
+                if closest_base_valid is not None
+                else None
+            ),
         },
         failure_reason=failure_reason,
     )
