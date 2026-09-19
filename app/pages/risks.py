@@ -90,9 +90,9 @@ def _stale(value: dict | None) -> bool:
 
 
 def _analysis_controls() -> None:
-    choices = {"operator": "Текущий рассчитанный план оператора"}
+    choices = {"operator": "Ваш текущий план"}
     if st.session_state.get("stress_plan"):
-        choices["adapted"] = "Адаптированный план C"
+        choices["adapted"] = "Стратегия, адаптированная под стресс"
     cols = st.columns(2)
     cols[0].selectbox(
         "Анализируемый план",
@@ -142,26 +142,57 @@ def _risk_tab() -> None:
     columns[0].metric("Рисков", len(register))
     columns[1].metric("С оценкой вероятности", int(register.likelihood_score.notna().sum()))
     columns[2].metric("Без оценки вероятности", len(data["unknown_likelihood_risks"]))
-    known = register.dropna(subset=["likelihood_score"])
-    if not known.empty:
-        known = known.copy()
-        known["name"] = known.apply(
-            lambda row: RISK_TEXT.get(row["risk_id"], (row["name"],))[0], axis=1
+    impact_rows = []
+    for item in data["risk_register"]:
+        delta = item.get("quantitative_delta", {})
+        costs = delta.get("costs", {})
+        impact_rows.append(
+            {
+                "risk_id": item["risk_id"],
+                "risk_name": RISK_TEXT.get(item["risk_id"], (item["name"],))[0],
+                "shortage_delta_t": float(delta.get("total_shortage_t", 0.0) or 0.0),
+                "critical_shortage_delta_t": float(
+                    delta.get("critical_shortage_t", 0.0) or 0.0
+                ),
+                "cost_delta_mln": float(costs.get("total_cost_mln", 0.0) or 0.0),
+                "likelihood": (
+                    f"{float(item['likelihood_score']):g}/5"
+                    if item.get("likelihood_score") is not None
+                    else "не оценена"
+                ),
+            }
         )
-        fig = px.scatter(
-            known,
-            x="likelihood_score",
-            y="impact_score",
-            size="impact_score",
-            color="ordinal_risk_score",
-            hover_name="name",
-            text="risk_id",
-            range_x=[0.5, 5.5],
-            range_y=[0.5, 5.5],
-            color_continuous_scale=[[0, "#DCC5F1"], [1, "#5B4BFF"]],
-            title="Матрица рисков с оценённой вероятностью",
-        )
-        render_chart(charts.style(fig, 420))
+    st.caption(
+        "Главный график ранжирует не абстрактный балл, а рассчитанный физический эффект: "
+        "на сколько тонн конкретный риск увеличивает дефицит выбранного плана."
+    )
+    render_chart(charts.risk_impact(impact_rows))
+    impact_table = pd.DataFrame(impact_rows).rename(
+        columns={
+            "risk_name": "Риск",
+            "shortage_delta_t": "Δ общего дефицита, т",
+            "critical_shortage_delta_t": "Δ критического дефицита, т",
+            "cost_delta_mln": "Δ стоимости, млн",
+            "likelihood": "Вероятность",
+        }
+    )
+    st.dataframe(
+        impact_table[
+            [
+                "Риск",
+                "Δ общего дефицита, т",
+                "Δ критического дефицита, т",
+                "Δ стоимости, млн",
+                "Вероятность",
+            ]
+        ],
+        hide_index=True,
+        width="stretch",
+    )
+    st.caption(
+        "Если вероятность «не оценена», риск нельзя честно ранжировать по вероятности × ущерб. "
+        "Поэтому на первом экране показаны только рассчитанные последствия."
+    )
     risk_rows = []
     for item in data["risk_register"]:
         name, event, cause = RISK_TEXT.get(item["risk_id"], (item["name"], item["event"], item["cause"]))
@@ -303,6 +334,11 @@ def _risk_tab() -> None:
 
 def _sensitivity_tab() -> None:
     analysis_plan, environment_key = _selected_analysis()
+    st.info(
+        "Что показывает чувствительность: мы меняем только один параметр, а остальные решения "
+        "оставляем прежними. Если небольшой сдвиг быстро создаёт дефицит или нарушение, "
+        "значит план сильно зависит от этого допущения."
+    )
     official_disabled = environment_key != "BASE"
     if st.button(
         "Проверить нижний, базовый и верхний спрос",
@@ -398,11 +434,25 @@ def _sensitivity_tab() -> None:
             },
         )
         if result.get("first_failing_point"):
-            st.warning(f"Первое неуспешное значение: {result['first_failing_point']['value']}")
+            first = result["first_failing_point"]
+            st.warning(
+                f"Вывод: первое проверенное значение, при котором план перестаёт проходить "
+                f"ограничения — {first['value']}. До этой точки на выбранной сетке план "
+                "сохранял исполнимость."
+            )
+        else:
+            st.success(
+                "Вывод: на всей заданной сетке этот параметр не довёл план до нарушения. "
+                "Это не доказывает устойчивость за пределами проверенного диапазона."
+            )
 
 
 def _reverse_tab() -> None:
     analysis_plan, environment_key = _selected_analysis()
+    st.info(
+        "Здесь ищется не «оценка устойчивости», а конкретная граница: какое максимальное "
+        "значение параметра план выдерживает на заданной сетке и где появляется первое нарушение."
+    )
     preset = st.selectbox("Искомый предел", ["Рост спроса", "Задержка Earth-Flex"])
     if preset == "Рост спроса":
         parameter: str | dict = "demand_multiplier"
@@ -444,6 +494,19 @@ def _reverse_tab() -> None:
             f"Период: {violation.get('period')} · факт: {violation.get('actual')} · "
             f"условие: {violation.get('operator')} {violation.get('limit')}"
         )
+    last_safe = result.get("last_safe_value")
+    first_fail = result.get("first_failing_value")
+    if first_fail is not None:
+        st.warning(
+            f"Вывод: последнее проверенное безопасное значение — {last_safe}; "
+            f"первое неуспешное — {first_fail}. Вертикальная граница на графике показывает "
+            "первый обнаруженный отказ, а не теоретический непрерывный предел."
+        )
+    else:
+        st.success(
+            "Вывод: в заданном диапазоне первое нарушение не найдено. "
+            "Чтобы искать дальше, увеличьте верхнюю границу."
+        )
     render_chart(charts.reverse_zone(result))
     with st.expander("Технические данные"):
         st.json(result)
@@ -462,68 +525,79 @@ def _stakeholders_tab() -> None:
     except Exception as exc:
         render_error(exc, "Не удалось собрать последствия для сторон")
         return
-    for item in config.get("participants", []):
-        name, interests = STAKEHOLDER_TEXT.get(item["stakeholder_id"], (item["name"], ""))
-        with st.expander(name):
-            st.write("**Интересы:**", interests)
-            st.write("**KPI:**", ", ".join(item.get("kpis", [])) or "не заданы")
-            st.write("**Обязательства:**", "; ".join(item.get("obligations", [])) or "не заданы")
-            st.write(
-                "**Кто несёт затраты:**",
-                "; ".join(item.get("cost_bearer", []))
-                or "нет отдельной денежной аллокации в кейсе",
+
+    st.info(
+        "Зачем этот блок: он отвечает не на вопрос «кто существует в системе», а на вопрос "
+        "«кто именно чувствует последствия стресса и что меняется после адаптации»."
+    )
+    mode = st.segmented_control(
+        "Что сравнить",
+        ["stress", "adaptation"],
+        default="stress",
+        format_func=lambda value: (
+            "Обычные условия → стресс без адаптации"
+            if value == "stress"
+            else "Стресс без адаптации → после адаптации"
+        ),
+    ) or "stress"
+
+    before_key, after_key = (
+        ("A · BASE", "B · тот же план в стрессе")
+        if mode == "stress"
+        else ("B · тот же план в стрессе", "C · адаптация в стрессе")
+    )
+
+    participant_by_name = {
+        item.get("name", ""): item for item in config.get("participants", [])
+    }
+    for row in rows:
+        participant = participant_by_name.get(row["Сторона"], {})
+        stakeholder_id = participant.get("stakeholder_id", "")
+        name = STAKEHOLDER_TEXT.get(
+            stakeholder_id,
+            (row["Сторона"], ""),
+        )[0]
+        with st.expander(name, expanded=stakeholder_id in {"operator", "critical_consumers", "commercial_consumers"}):
+            cols = st.columns(2)
+            cols[0].markdown(f"**До:** {row.get(before_key, '—')}")
+            cols[1].markdown(f"**После:** {row.get(after_key, '—')}")
+            st.caption(
+                f"Интересы: {'; '.join(participant.get('interests', [])) or 'не заданы'}. "
+                f"Несёт риск: {'; '.join(participant.get('risk_bearer', [])) or 'не задан'}. "
+                f"Несёт затраты: {'; '.join(participant.get('cost_bearer', [])) or 'отдельно не задано'}."
             )
-            st.write(
-                "**Какой риск несёт:**",
-                "; ".join(item.get("risk_bearer", [])) or "не задан",
-            )
-    st.subheader("Рассчитанные последствия A/B/C и распределение ответственности")
-    scenario_rows = pd.DataFrame(rows)
-    if not scenario_rows.empty:
-        scenario_rows["Сторона"] = [
-            STAKEHOLDER_TEXT.get(item["stakeholder_id"], (item["name"], ""))[0]
-            for item in config.get("participants", [])
-        ]
-        st.dataframe(scenario_rows, hide_index=True, width="stretch")
-        st.caption(
-            "Показатели сторон не меняют физические ограничения модели. "
-            "Недопоставка не превращается в денежный ущерб без отдельного явного допущения."
-        )
+
     mitigation = st.session_state.get("mitigation_result")
-    if mitigation:
-        st.subheader("Выбранный риск: до и после меры")
+    if mitigation and not _stale(mitigation):
+        st.subheader("Выбранный риск: что изменила мера")
         before = mitigation["original_risk_metrics"]
         after = mitigation["residual_consequence"]["risk"]
-        st.dataframe(
-            pd.DataFrame(
-                [
-                    {
-                        "Состояние": "До меры",
-                        "Общий дефицит, т": before["total_shortage_t"],
-                        "Критический дефицит, т": before["critical_shortage_t"],
-                        "Минимальный запас, т": before["minimum_inventory_t"],
-                        "Критические нарушения": before["hard_violation_count"],
-                    },
-                    {
-                        "Состояние": "После меры",
-                        "Общий дефицит, т": after["total_shortage_t"],
-                        "Критический дефицит, т": after["critical_shortage_t"],
-                        "Минимальный запас, т": after["minimum_inventory_t"],
-                        "Критические нарушения": after["hard_violation_count"],
-                    },
-                ]
-            ),
-            hide_index=True,
-            width="stretch",
+        cols = st.columns(3)
+        cols[0].metric(
+            "Общий дефицит",
+            f"{after['total_shortage_t']:.2f} т",
+            f"{after['total_shortage_t']-before['total_shortage_t']:+.2f} т после меры",
+            delta_color="inverse",
         )
-
+        cols[1].metric(
+            "Критический дефицит",
+            f"{after['critical_shortage_t']:.2f} т",
+            f"{after['critical_shortage_t']-before['critical_shortage_t']:+.2f} т после меры",
+            delta_color="inverse",
+        )
+        cols[2].metric(
+            "Критические нарушения",
+            str(after["hard_violation_count"]),
+            f"{after['hard_violation_count']-before['hard_violation_count']:+d} после меры",
+            delta_color="inverse",
+        )
 
 def render() -> None:
     st.title("Риски и чувствительность")
     st.caption(
-        "Риски проверяют конкретные неблагоприятные события; чувствительность показывает, "
-        "как результат меняется при последовательном изменении одного параметра; предел устойчивости "
-        "ищет первое значение, при котором план нарушает ограничение."
+        "Риски отвечают «что будет при конкретном событии», чувствительность — "
+        "«от каких допущений план зависит сильнее всего», предел устойчивости — "
+        "«где находится первое проверенное значение отказа»."
     )
     if is_dirty():
         st.warning(
