@@ -18,7 +18,7 @@ def test_recommended_base_passes_declared_guardrails():
         seed=17,
     )
 
-    assert result["status"] == "success"
+    assert result["status"] == "success", result["candidates"]
     assert result["plan"] is not None
     selected = result["selected_candidate"]
     assert selected["base_valid"] is True
