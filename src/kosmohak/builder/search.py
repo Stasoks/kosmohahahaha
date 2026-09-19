@@ -610,6 +610,154 @@ def _stress_repair_requirements(
     return {month: amount for month, amount in requirements.items() if amount > 1e-10}
 
 
+def _pre_stress_inventory_release_mutations(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+    base_scenario: Scenario,
+    stress_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> list[tuple[dict[str, Any], str]]:
+    """Release BASE carry-in before the first stressed demand year."""
+    has_overflow = any(
+        item.severity == "hard" and item.code == "STORAGE_CAPACITY_EXCEEDED"
+        for item in candidate.base_result.violations
+    )
+    if not has_overflow:
+        return []
+    if not candidate.target_satisfaction["stress_total_service"]["satisfied"]:
+        return []
+    if not candidate.target_satisfaction["stress_critical_service"]["satisfied"]:
+        return []
+
+    demand_multipliers = stress_scenario.config.get("demand_multiplier", {})
+    stressed_years = sorted(
+        int(year)
+        for year, multiplier in demand_multipliers.items()
+        if abs(float(multiplier) - 1.0) > 1e-12
+    )
+    if not stressed_years:
+        return []
+    first_stress_year = stressed_years[0]
+    previous_year = first_stress_year - 1
+    opening_row = next(
+        (
+            row
+            for row in candidate.base_result.annual
+            if int(row["year"]) == first_stress_year
+        ),
+        None,
+    )
+    if opening_row is None:
+        return []
+    carry_in = float(opening_row["opening_inventory_t"])
+    if carry_in <= 1e-8:
+        return []
+
+    base_env = ensure_environment(base_scenario)
+    base_monthly = {
+        str(row["month"]): row for row in candidate.base_result.monthly
+    }
+    base = copy.deepcopy(candidate.plan.raw)
+    strategies = base["decisions"].setdefault("inventory_policy", {}).setdefault(
+        "reserve_strategy_by_year", {}
+    )
+    roles = base["decisions"].setdefault("emergency_role_by_year", {})
+    emergency_lead = (
+        assumptions.source_delivery_lead_months(case_data.sources["E"])
+        if "E" in case_data.sources
+        else 0
+    )
+    if "E" in case_data.sources:
+        emergency_schedule = _schedule(base, "E")
+    else:
+        emergency_schedule = None
+
+    for year in stressed_years:
+        strategies[str(year)] = "emergency_contract"
+        roles[str(year)] = "reserve_only"
+        if emergency_schedule is not None:
+            for order_month in list(emergency_schedule.get("values", {})):
+                arrival = add_months(str(order_month), emergency_lead)
+                if int(arrival[:4]) == year:
+                    emergency_schedule["values"][order_month] = 0.0
+
+    entries: list[dict[str, Any]] = []
+    for source_id in sorted(case_data.sources):
+        if source_id == "E":
+            continue
+        source = case_data.sources[source_id]
+        lead = assumptions.source_delivery_lead_months(source)
+        schedule = _schedule(base, source_id)
+        for order_month, raw_amount in schedule.get("values", {}).items():
+            amount = float(raw_amount)
+            if amount <= 1e-10:
+                continue
+            arrival = add_months(str(order_month), lead)
+            if int(arrival[:4]) != previous_year or arrival not in base_monthly:
+                continue
+            share = base_env.actual_delivery_share(
+                source.name, arrival, source_id=source_id
+            ) * base_env.availability_share(source_id, arrival)
+            net_per_order = share * max(
+                0.0, 1.0 - float(base_monthly[arrival]["active_loss_rate"])
+            )
+            if net_per_order <= 1e-10:
+                continue
+            entries.append(
+                {
+                    "source_id": source_id,
+                    "order_month": str(order_month),
+                    "arrival_month": arrival,
+                    "available_order": amount,
+                    "net_per_order": net_per_order,
+                }
+            )
+
+    entries.sort(
+        key=lambda item: (
+            -int(item["arrival_month"].replace("-", "")),
+            item["source_id"],
+            item["order_month"],
+        )
+    )
+    outputs: list[tuple[dict[str, Any], str]] = []
+    for fraction in (0.50, 0.75, 1.00):
+        raw = copy.deepcopy(base)
+        remaining_net = carry_in * fraction
+        removed_net = 0.0
+        for entry in entries:
+            if remaining_net <= 1e-8:
+                break
+            schedule = _schedule(raw, str(entry["source_id"]))
+            order_month = str(entry["order_month"])
+            available = float(schedule["values"].get(order_month, 0.0))
+            if available <= 1e-10:
+                continue
+            reduction = min(
+                available,
+                remaining_net / float(entry["net_per_order"]),
+            )
+            if reduction <= 1e-10:
+                continue
+            schedule["values"][order_month] = available - reduction
+            net = reduction * float(entry["net_per_order"])
+            remaining_net -= net
+            removed_net += net
+        if removed_net <= 1e-8:
+            continue
+        commissions = _commissions(raw, base_scenario, case_data, assumptions)
+        _rebuild_reservations(raw, commissions, case_data)
+        outputs.append(
+            (
+                raw,
+                "pre_stress_inventory_release:"
+                f"{first_stress_year}:{fraction:.2f}:{removed_net:.6f}net_t",
+            )
+        )
+    return outputs
+
+
 def _base_overflow_trim_repair(
     candidate: _Candidate,
     config: StrategyBuilderConfig,
@@ -1133,6 +1281,16 @@ def _hard_repair_mutations(
     assumptions: ModelAssumptions,
 ) -> list[tuple[dict[str, Any], str]]:
     values: list[tuple[dict[str, Any], str]] = []
+    values.extend(
+        _pre_stress_inventory_release_mutations(
+            candidate,
+            config,
+            base_scenario,
+            stress_scenario,
+            case_data,
+            assumptions,
+        )
+    )
     bridge_repair = _emergency_bridge_repair(
         candidate,
         base_scenario,
