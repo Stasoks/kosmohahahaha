@@ -456,7 +456,8 @@ def synthesize_strategy(
     *,
     config: StrategyBuilderConfig | None = None,
 ) -> StrategyBuilderResult:
-    """Build a standard plan or a separate mandatory-stress adaptation.\n\n    BASE_PLAN returns plans valid under official BASE hard constraints.\n    STRESS_ADAPTATION returns plans valid under MANDATORY_STRESS hard\n    constraints while reporting 97%/99% service as resilience benchmarks.\n    Unlike Strategy Advisor, no existing OperatorPlan is required. Every\n    candidate is evaluated by the normal digital twin.\n    """    return build_strategies(
+    """Build a standard plan or a separate mandatory-stress adaptation.\n\n    BASE_PLAN returns plans valid under official BASE hard constraints.\n    STRESS_ADAPTATION returns plans valid under MANDATORY_STRESS hard\n    constraints while reporting 97%/99% service as resilience benchmarks.\n    Unlike Strategy Advisor, no existing OperatorPlan is required. Every\n    candidate is evaluated by the normal digital twin.\n    """
+    return build_strategies(
         base_scenario=base_scenario,
         stress_scenario=stress_scenario,
         case_data=case_data,
