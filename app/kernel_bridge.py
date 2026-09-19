@@ -723,7 +723,12 @@ def research_plan_template(raw: dict[str, Any], workspace: dict[str, Any]) -> di
     for year in years:
         reserve_policy.setdefault(str(year), "physical")
         emergency_roles.setdefault(str(year), "reserve_only")
-    value["plan_id"] = f"{value.get('plan_id', 'plan')}-research"
+    current_plan_id = str(value.get("plan_id", "plan"))
+    value["plan_id"] = (
+        current_plan_id
+        if current_plan_id.endswith("-research")
+        else f"{current_plan_id}-research"
+    )
     value["scenario_id"] = "BASE"
     value.setdefault("metadata", {})["research_workspace"] = "TEAM_ASSUMPTION"
     return value
