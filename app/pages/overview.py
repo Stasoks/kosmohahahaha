@@ -34,6 +34,15 @@ def render() -> None:
         metadata["constraints"]["CAPEX_2040"]["value"],
     )
     kpi_grid(result, limits)
+    if (
+        selected == "BASE"
+        and st.session_state.plan.get("scenario_id") == "MANDATORY_STRESS"
+        and not result["summary"].get("valid", False)
+    ):
+        st.caption(
+            "Этот план был подготовлен специально под стрессовый профиль. В обычном сценарии он проверяется без "
+            "изменения решений; избыточные поставки могут нарушать ограничения по хранению."
+        )
     left, right = st.columns([1.12, 1])
     with left:
         render_chart(charts.demand_service(result))
