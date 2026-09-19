@@ -240,6 +240,20 @@ def _rank(candidate: _Candidate, objective: str) -> tuple:
     )
 
 
+def _target_first_rank(candidate: _Candidate) -> tuple:
+    """Keep near-target candidates alive even when they need another hard-rule repair."""
+    return (
+        _annual_target_deficit(candidate),
+        _target_deficit(candidate),
+        candidate.metrics["base_hard_violation_count"]
+        + candidate.metrics["stress_hard_violation_count"],
+        candidate.metrics["stress_critical_shortage_t"],
+        candidate.metrics["stress_total_shortage_t"],
+        candidate.metrics["total_cost_mln"],
+        candidate.canonical_key,
+    )
+
+
 def _solution_rank(candidate: _Candidate, objective: str) -> tuple:
     metrics = candidate.metrics
     if objective == "MAX_RESILIENCE":
@@ -1262,8 +1276,22 @@ def build_strategies(
         )
         pool, pruned = _dominance_prune(pool)
         dominance_pruned += pruned
-        pool.sort(key=lambda item: _rank(item, config.objective))
-        beam = pool[: config.beam_width]
+        official_order = sorted(pool, key=lambda item: _rank(item, config.objective))
+        target_order = sorted(pool, key=_target_first_rank)
+        official_slots = max(1, config.beam_width // 2)
+        selected_beam: list[_Candidate] = []
+        selected_keys: set[str] = set()
+        for item in official_order[:official_slots]:
+            selected_beam.append(item)
+            selected_keys.add(item.canonical_key)
+        for item in target_order:
+            if item.canonical_key in selected_keys:
+                continue
+            selected_beam.append(item)
+            selected_keys.add(item.canonical_key)
+            if len(selected_beam) >= config.beam_width:
+                break
+        beam = selected_beam
         completed_iterations = iteration
 
     eligible = [
