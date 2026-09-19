@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from app import charts
-from app.components import badges, kpi_grid, render_chart, violations
+from app.components import kpi_grid, render_chart, violations
 from app.kernel_bridge import case_metadata
 from app.view_models import source_names
 
@@ -33,6 +33,37 @@ RUSSIAN_COLUMNS = {
     "active_storage_capacity_t": "Ёмкость, т",
 }
 
+SOURCE_COLUMNS = {
+    "source_id": "Код",
+    "source_name": "Источник",
+    "year": "Год",
+    "reserved_capacity_t_per_year": "Зарезервировано, т/год",
+    "requested_order_t": "Запрошено, т",
+    "feasible_order_t": "Допустимый заказ, т",
+    "gross_delivery_t": "Доставлено, т",
+    "unfulfilled_request_t": "Не выполнено, т",
+    "utilization": "Загрузка мощности",
+    "active_variable_price_mln_per_t": "Цена, млн/т",
+    "procurement_cost_mln": "Закупка, млн",
+    "reservation_cost_mln": "Резервирование, млн",
+    "take_or_pay_effect_mln": "Доплата до минимума, млн",
+}
+
+COST_COLUMNS = {
+    "year": "Год",
+    "capex_mln": "Инвестиции, млн",
+    "fixed_opex_mln": "Постоянные расходы, млн",
+    "procurement_mln": "Закупки, млн",
+    "reservation_mln": "Резервирование, млн",
+    "take_or_pay_effect_in_procurement_mln": "Доплата до минимума, млн",
+    "holding_mln": "Хранение, млн",
+    "initial_stock_procurement_mln": "Начальный запас, млн",
+    "initial_stock_reservation_mln": "Резерв под начальный запас, млн",
+    "total_cost_mln": "Всего, млн",
+    "discounted_cost_mln": "Приведённая стоимость, млн",
+    "cumulative_total_mln": "Накопленная стоимость, млн",
+}
+
 
 def _table(rows: list[dict], columns: list[str]) -> None:
     frame = pd.DataFrame(rows)
@@ -43,10 +74,12 @@ def _table(rows: list[dict], columns: list[str]) -> None:
 def render() -> None:
     st.title("Результаты расчёта")
     selected = st.segmented_control(
-        "Среда исполнения", ["BASE", "MANDATORY_STRESS"], default="BASE"
+        "Условия расчёта",
+        ["BASE", "MANDATORY_STRESS"],
+        default="BASE",
+        format_func=lambda value: "Обычные" if value == "BASE" else "Обязательный стресс",
     ) or "BASE"
     result = st.session_state.result[selected]
-    badges(("DIGITAL_TWIN_RESULT", "result"), (("BASE HARD" if selected == "BASE" else "STRESS BENCHMARKS"), ("case" if selected == "BASE" else "benchmark")))
     kpi_grid(result)
     metadata = case_metadata()
     tabs = st.tabs(["Годовой баланс", "Помесячный баланс", "Источники", "Экономика", "Ограничения"])
@@ -83,12 +116,18 @@ def render() -> None:
             "unfulfilled_request_t", "utilization", "active_variable_price_mln_per_t",
             "procurement_cost_mln", "reservation_cost_mln", "take_or_pay_effect_mln",
         ]
-        st.dataframe(pd.DataFrame(result["sources"])[source_columns], hide_index=True, width="stretch")
+        source_frame = pd.DataFrame(result["sources"])[source_columns].rename(columns=SOURCE_COLUMNS)
+        st.dataframe(
+            source_frame,
+            hide_index=True,
+            width="stretch",
+            column_config={"Загрузка мощности": st.column_config.NumberColumn(format="percent")},
+        )
     with tabs[3]:
         render_chart(charts.costs(result))
         costs = pd.DataFrame(result["costs"])
         costs["cumulative_total_mln"] = costs.total_cost_mln.cumsum()
-        st.dataframe(costs, hide_index=True, width="stretch")
-        st.caption("TOP-эффект показан отдельно, когда он ненулевой; total lifecycle cost не сравнивается с лимитом CAPEX 2800.")
+        st.dataframe(costs.rename(columns=COST_COLUMNS), hide_index=True, width="stretch")
+        st.caption("Доплата до минимального объёма показана отдельно. Полная стоимость не сравнивается с лимитом инвестиций 2 800 млн.")
     with tabs[4]:
         violations(result, selected)

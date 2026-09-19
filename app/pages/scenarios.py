@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from app import charts, runtime
-from app.components import badges, note, render_chart, render_error
+from app.components import render_chart, render_error
 from app.formatting import mass, money, percentage_points, signed
 from app.kernel_bridge import plan_hash, stress_reference_raw
 from app.state import is_dirty
@@ -17,51 +17,46 @@ def _delta_cards(value: dict | None) -> None:
     if not value:
         return
     st.markdown(f"**{value['label']}**")
-    columns = st.columns(5)
+    columns = st.columns(3)
     columns[0].metric("Мин. сервис", percentage_points(value["total_service_pp"]))
     columns[1].metric("Мин. критический", percentage_points(value["critical_service_pp"]))
     columns[2].metric("Дефицит", signed(value["shortage_t"], "т"))
-    columns[3].metric("Критич. дефицит", signed(value["critical_shortage_t"], "т"))
-    columns[4].metric("Стоимость", signed(value["cost_mln"], "млн у.е."))
+    columns = st.columns(2)
+    columns[0].metric("Критический дефицит", signed(value["critical_shortage_t"], "т"))
+    columns[1].metric("Стоимость", signed(value["cost_mln"], "млн у.е."))
 
 
 def render() -> None:
     st.title("Сценарная лаборатория")
-    badges(("A/B · DIGITAL_TWIN_RESULT", "result"), ("C · TEAM_DECISION", "team"), ("97/99 · RESILIENCE_BENCHMARK", "benchmark"))
-    note(
-        "A — текущий рассчитанный BASE-план в BASE. B — точно тот же план без изменения решений в MANDATORY_STRESS. "
-        "C — отдельная ex-ante scenario-specific альтернатива для известного стресса, а не мгновенное переключение после события."
+    st.caption(
+        "A — текущий план в обычных условиях; B — тот же план в стрессе; "
+        "C — заранее адаптированный план в стрессе."
     )
     if is_dirty():
-        st.warning("Есть несчитанные изменения. A/B ниже относятся к последнему подтверждённому plan_hash, а не к форме редактора.")
+        st.warning("Есть несчитанные изменения. Сравнение относится к последней рассчитанной версии плана.")
 
-    with st.expander("Построить новый stress-specific вариант"):
-        st.caption("Strategy Builder — bounded deterministic heuristic. Результат не является доказанным global optimum.")
-        cols = st.columns(4)
-        max_candidates = cols[0].number_input("Кандидаты", 40, 3000, 260, 20)
-        beam_width = cols[1].number_input("Beam width", 2, 50, 10, 1)
-        iterations = cols[2].number_input("Итерации", 0, 12, 4, 1)
-        seed = cols[3].number_input("Seed", 0, 100000, 17, 1)
-        if st.button("Построить stress-specific вариант", type="primary", width="stretch"):
+    with st.expander("Подобрать адаптированный план"):
+        max_candidates, beam_width, iterations, seed = 260, 10, 4, 17
+        if st.checkbox("Настроить параметры поиска"):
+            cols = st.columns(2)
+            max_candidates = cols[0].number_input("Число вариантов", 40, 3000, 260, 20)
+            iterations = cols[1].number_input("Число итераций", 0, 12, 4, 1)
+            beam_width = cols[0].number_input("Ширина поиска", 2, 50, 10, 1)
+            seed = cols[1].number_input("Начальное число", 0, 100000, 17, 1)
+        if st.button("Подобрать вариант", type="primary", width="stretch"):
             try:
-                with st.spinner("Builder исследует ограниченное пространство кандидатов…"):
+                with st.spinner("Идёт поиск подходящего варианта…"):
                     built = runtime.builder(int(max_candidates), int(beam_width), int(iterations), int(seed))
                 st.session_state.builder_result = built
                 if built["solutions"]:
                     st.session_state.stress_plan = built["solutions"][0]["plan"]
                     st.session_state.abc_result = None
-                    st.success("Новый кандидат C построен и выбран для сравнения. Текущий BASE-план не изменён.")
+                    st.success("Вариант C построен и выбран для сравнения. Текущий план не изменён.")
                 else:
-                    st.warning(f"Builder: {built['status']} · {built.get('failure_reason', '')}")
+                    st.warning("Подходящий вариант не найден в заданных пределах поиска.")
             except Exception as exc:
-                render_error(exc, "Builder не завершил поиск")
-        if st.session_state.get("builder_result"):
-            data = st.session_state.builder_result
-            st.caption(
-                f"Статус: {data['status']} · рассчитано кандидатов: {data['evaluated_candidate_count']} · "
-                f"итераций: {data['iterations']} · global_optimum_claimed=false"
-            )
-        if st.button("Вернуть финальный reference C", width="stretch"):
+                render_error(exc, "Поиск не завершён")
+        if st.button("Вернуть исходный вариант C", width="stretch"):
             st.session_state.stress_plan = stress_reference_raw()
             st.session_state.abc_result = None
 
@@ -83,13 +78,13 @@ def render() -> None:
         ]
     ].rename(
         columns={
-            "case": "Кейс", "label": "План / среда", "valid": "Valid",
+            "case": "Вариант", "label": "План и условия", "valid": "Исполним",
             "minimum_annual_total_service": "Мин. годовой сервис",
             "minimum_annual_critical_service": "Мин. критический сервис",
             "total_shortage_t": "Дефицит, т", "critical_shortage_t": "Крит. дефицит, т",
-            "undiscounted_cost_mln": "Lifecycle cost, млн", "discounted_cost_mln": "PV, млн",
-            "total_capex_mln": "CAPEX, млн", "minimum_reserve_days": "Мин. резерв, дней",
-            "source_mix_t": "Source mix, т",
+            "undiscounted_cost_mln": "Полная стоимость, млн", "discounted_cost_mln": "Приведённая стоимость, млн",
+            "total_capex_mln": "Инвестиции, млн", "minimum_reserve_days": "Мин. резерв, дней",
+            "source_mix_t": "Поставки по источникам, т",
         }
     )
     st.dataframe(
@@ -113,17 +108,18 @@ def render() -> None:
     with columns[1]:
         render_chart(charts.abc_metric(chart_rows, "total_shortage_t", "Дефицит", "т"))
     with columns[2]:
-        render_chart(charts.abc_metric(chart_rows, "undiscounted_cost_mln", "Lifecycle cost", "млн у.е."))
+        render_chart(charts.abc_metric(chart_rows, "undiscounted_cost_mln", "Полная стоимость", "млн у.е."))
 
     st.subheader("Что изменилось в решениях")
     if abc_payload.get("stress_plan"):
         diff = decision_diff(abc_payload["base_plan"], abc_payload["stress_plan"])
         st.dataframe(pd.DataFrame(diff), hide_index=True, width="stretch")
-        st.caption(
-            f"A/B plan_hash: {plan_hash(abc_payload['base_plan'])} · C plan_hash: {plan_hash(abc_payload['stress_plan'])}"
-        )
+        with st.expander("Версии сравниваемых планов"):
+            st.caption(
+                f"A/B: {plan_hash(abc_payload['base_plan'])} · C: {plan_hash(abc_payload['stress_plan'])}"
+            )
     else:
-        st.info("Stress-specific план пока не выбран.")
+        st.info("Адаптированный план пока не выбран.")
 
     st.subheader("Сравнение общих альтернатив")
     try:
@@ -134,10 +130,19 @@ def render() -> None:
             alt[[
                 "plan_id", "base_valid", "base_cost_mln", "stress_service",
                 "stress_shortage_t", "base_capex_mln", "base_minimum_inventory_t", "source_mix_t",
-            ]],
+            ]].rename(columns={
+                "plan_id": "План",
+                "base_valid": "Исполним в обычных условиях",
+                "base_cost_mln": "Стоимость, млн",
+                "stress_service": "Сервис в стрессе",
+                "stress_shortage_t": "Дефицит в стрессе, т",
+                "base_capex_mln": "Инвестиции, млн",
+                "base_minimum_inventory_t": "Минимальный запас, т",
+                "source_mix_t": "Поставки по источникам, т",
+            }),
             hide_index=True,
             width="stretch",
         )
-        st.caption("Выбор зависит от компромисса стоимость / устойчивость. Интерфейс не назначает winner автоматически.")
+        st.caption("Выбор зависит от компромисса между стоимостью и устойчивостью.")
     except Exception as exc:
         render_error(exc, "Не удалось сравнить альтернативы")

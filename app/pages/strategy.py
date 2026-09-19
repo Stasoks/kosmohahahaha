@@ -6,10 +6,16 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
-from app.components import badges, note, render_error
+from app.components import render_error
 from app.kernel_bridge import case_metadata, plan_hash, validate
 from app.state import apply_plan, is_dirty
 from app.view_models import contract_rows, investment_timeline, source_names
+
+
+MODE_LABELS = {"annual_even": "Равномерно по году", "monthly": "Помесячно"}
+MODE_VALUES = {label: value for value, label in MODE_LABELS.items()}
+RESERVE_LABELS = {"physical": "Физический запас", "emergency_contract": "Аварийный контракт"}
+ROLE_LABELS = {"reserve_only": "Только резерв", "planned_supply": "Плановые поставки"}
 
 
 def _annual_orders(raw: dict[str, Any], metadata: dict[str, Any]) -> pd.DataFrame:
@@ -20,7 +26,7 @@ def _annual_orders(raw: dict[str, Any], metadata: dict[str, Any]) -> pd.DataFram
         row = {
             "Источник": source_id,
             "Название": source["name"],
-            "Режим после применения": schedule.get("mode", "annual_even"),
+            "Распределение": MODE_LABELS.get(schedule.get("mode", "annual_even"), "Равномерно по году"),
             "Применить годовые итоги": False,
         }
         for year in metadata["years"]:
@@ -88,7 +94,7 @@ def _apply_orders(
         if not bool(row["Применить годовые итоги"]):
             output.append(previous)
             continue
-        mode = str(row["Режим после применения"])
+        mode = MODE_VALUES.get(str(row["Распределение"]), "annual_even")
         if mode == "monthly":
             values = {
                 f"{year}-{month:02d}": float(row[str(year)]) / 12.0
@@ -103,32 +109,27 @@ def _apply_orders(
 
 
 def _source_cards(metadata: dict[str, Any]) -> None:
-    st.subheader("Паспорта источников")
+    rows = []
     for source_id, source in metadata["sources"].items():
-        status = "TEAM_ASSUMPTION" if source_id in metadata["research_source_ids"] else "CASE_INPUT"
-        with st.expander(f"{source_id} · {source['name']} · {status}"):
-            badges(((status), "team" if status == "TEAM_ASSUMPTION" else "case"))
-            columns = st.columns(4)
-            columns[0].metric("Мощность", f"{source['capacity_t_per_year']:.1f} т/год")
-            columns[1].metric("Цена", f"{source['variable_cost_mln_per_t']:.2f} млн/т")
-            columns[2].metric("Резерв", f"{source['reservation_rate_mln_per_t_year_capacity']:.2f} млн/(т/год)")
-            columns[3].metric("TOP", f"{100*source['take_or_pay_share']:.1f}%")
-            st.write(
-                f"Lead time: {source['lead_time_min_value']:g}–{source['lead_time_max_value']:g} {source['lead_time_unit']}; "
-                f"выбранный: {source.get('selected_lead_time_months') or 'backend default'} мес."
-            )
-            st.caption(
-                f"Доступность: {source.get('availability_rule')} · Надёжность: {source.get('reliability_metadata')} · {source.get('notes', '')}"
-            )
+        unit = {"month": "мес.", "week": "нед.", "day": "дн.", "year": "г."}.get(
+            source["lead_time_unit"], source["lead_time_unit"]
+        )
+        rows.append(
+            {
+                "Источник": f"{source_id} · {source['name']}",
+                "Мощность, т/год": source["capacity_t_per_year"],
+                "Цена, млн/т": source["variable_cost_mln_per_t"],
+                "Плата за резерв": source["reservation_rate_mln_per_t_year_capacity"],
+                "Минимальная оплата, %": 100 * source["take_or_pay_share"],
+                "Срок поставки": f"{source['lead_time_min_value']:g}–{source['lead_time_max_value']:g} {unit}",
+            }
+        )
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
 
 def render() -> None:
     st.title("Стратегия")
-    note(
-        "UI никогда не меняет план автоматически. Builder/Advisor создаёт отдельное явно подтверждаемое предложение. "
-        "После редактирования результат помечается как несчитанный до нажатия «Пересчитать»."
-    )
-    badges(("TEAM_DECISION", "team"), ("CASE_INPUT · read-only", "case"))
+    st.caption("Изменения вступают в силу только после нажатия «Применить», а результаты обновляются после пересчёта.")
     raw = st.session_state.plan
     metadata = case_metadata()
     years = metadata["years"]
@@ -137,9 +138,9 @@ def render() -> None:
 
     with st.form(f"strategy-{key}"):
         first, second = st.columns([1, 2])
-        plan_id = first.text_input("plan_id · TEAM_DECISION", raw.get("plan_id", "operator-plan"))
+        plan_id = first.text_input("Название плана", raw.get("plan_id", "operator-plan"))
         notes = second.text_input("Комментарий оператора", raw.get("metadata", {}).get("notes", ""))
-        st.caption("Годовые итоги применяются только при явном флаге. Простое открытие формы не разрушает monthly schedule.")
+        st.caption("Отметьте строку в последнем столбце, чтобы применить изменённые годовые объёмы.")
         annual = st.data_editor(
             _annual_orders(raw, metadata),
             hide_index=True,
@@ -147,7 +148,7 @@ def render() -> None:
             column_config={
                 "Источник": st.column_config.TextColumn(disabled=True),
                 "Название": st.column_config.TextColumn(disabled=True),
-                "Режим после применения": st.column_config.SelectboxColumn(options=["annual_even", "monthly"]),
+                "Распределение": st.column_config.SelectboxColumn(options=list(MODE_VALUES)),
                 "Применить годовые итоги": st.column_config.CheckboxColumn(help="Явно преобразовать значения в выбранный режим."),
                 **{
                     str(year): st.column_config.NumberColumn(f"{year}, т", min_value=0.0, step=1.0)
@@ -156,7 +157,7 @@ def render() -> None:
             },
         )
         with st.expander("Расширенный помесячный график", expanded=False):
-            st.caption("Точный monthly-график. Строки можно добавлять и удалять; формат месяца ГГГГ-ММ.")
+            st.caption("Строки можно добавлять и удалять. Формат месяца: ГГГГ-ММ.")
             monthly = st.data_editor(
                 _monthly_orders(raw),
                 hide_index=True,
@@ -183,40 +184,41 @@ def render() -> None:
                 },
             )
 
-        st.subheader("Инвестиционные решения")
-        investments = {item["investment_id"]: item for item in raw["decisions"]["investments"]}
-        cols = st.columns(3)
-        with cols[0]:
-            zbo = st.checkbox("ZBO · решение принято", investments.get("ZBO", {}).get("enabled", False))
-            zbo_date = st.text_input("Ввод ZBO", investments.get("ZBO", {}).get("commissioning_month", "2036-01"))
-            st.caption("CAPEX 180 млн; мощность доступна только после ввода.")
-        with cols[1]:
-            earth = st.checkbox("Earth-New · исполнить опцион", investments.get("EARTH_NEW", {}).get("enabled", False))
-            earth_buy = st.text_input("Покупка опциона", investments.get("EARTH_NEW", {}).get("option_purchase_month", "2035-01"))
-            earth_ex = st.text_input("Исполнение опциона", investments.get("EARTH_NEW", {}).get("option_exercise_month", "2035-02"))
-            st.caption("90 + 270 млн; решение ≠ мгновенная доступность.")
-        with cols[2]:
-            lunar = st.checkbox("Lunar-ISRU · финансировать", investments.get("LUNAR_ISRU", {}).get("enabled", False))
-            lunar_date = st.text_input("Финансирование", investments.get("LUNAR_ISRU", {}).get("funding_month", "2035-01"))
-            st.caption("CAPEX 1 250 млн; доступность с 2038 при выполнении условий.")
+        with st.expander("Инвестиционные решения", expanded=False):
+            investments = {item["investment_id"]: item for item in raw["decisions"]["investments"]}
+            cols = st.columns(3)
+            with cols[0]:
+                zbo = st.checkbox("Хранилище ZBO", investments.get("ZBO", {}).get("enabled", False))
+                zbo_date = st.text_input("Месяц ввода ZBO", investments.get("ZBO", {}).get("commissioning_month", "2036-01"))
+                st.caption("Инвестиции: 180 млн. Мощность доступна после ввода.")
+            with cols[1]:
+                earth = st.checkbox("Новый земной канал", investments.get("EARTH_NEW", {}).get("enabled", False))
+                earth_buy = st.text_input("Месяц покупки опциона", investments.get("EARTH_NEW", {}).get("option_purchase_month", "2035-01"))
+                earth_ex = st.text_input("Месяц исполнения опциона", investments.get("EARTH_NEW", {}).get("option_exercise_month", "2035-02"))
+                st.caption("Инвестиции: 90 + 270 млн.")
+            with cols[2]:
+                lunar = st.checkbox("Лунное производство", investments.get("LUNAR_ISRU", {}).get("enabled", False))
+                lunar_date = st.text_input("Месяц финансирования", investments.get("LUNAR_ISRU", {}).get("funding_month", "2035-01"))
+                st.caption("Инвестиции: 1 250 млн. Доступность — с 2038 года.")
 
         stock = raw["decisions"].get("initial_stock_acquisition", {})
-        st.subheader("Начальный запас · подтверждённая закупка")
-        cols = st.columns(3)
-        stock_source = cols[0].selectbox(
-            "Источник",
-            list(names),
-            index=list(names).index(stock.get("source_id", next(iter(names)))),
-        )
-        stock_ordered = cols[1].number_input("Заказано, т", min_value=0.0, value=float(stock.get("ordered_volume_t", 0)), step=0.1)
-        stock_reserved = cols[2].number_input("Зарезервировано, т/год", min_value=0.0, value=float(stock.get("reserved_capacity_t_per_year", 0)), step=0.1)
-        cols = st.columns(3)
-        stock_order_date = cols[0].text_input("Дата заказа", stock.get("order_date", "2034-01"))
-        stock_delivery = cols[1].text_input("Плановая доставка", stock.get("planned_delivery_date", "2035-01"))
-        contract_start = cols[2].text_input("Начало контракта", stock.get("contract_period_start", "2034-01"))
-        contract_end = st.text_input("Конец контракта", stock.get("contract_period_end", "2034-12"))
+        with st.expander("Начальный запас", expanded=False):
+            cols = st.columns(3)
+            stock_source = cols[0].selectbox(
+                "Источник",
+                list(names),
+                index=list(names).index(stock.get("source_id", next(iter(names)))),
+                format_func=lambda value: f"{value} · {names[value]}",
+            )
+            stock_ordered = cols[1].number_input("Заказано, т", min_value=0.0, value=float(stock.get("ordered_volume_t", 0)), step=0.1)
+            stock_reserved = cols[2].number_input("Зарезервировано, т/год", min_value=0.0, value=float(stock.get("reserved_capacity_t_per_year", 0)), step=0.1)
+            cols = st.columns(2)
+            stock_order_date = cols[0].text_input("Месяц заказа", stock.get("order_date", "2034-01"))
+            stock_delivery = cols[1].text_input("Месяц доставки", stock.get("planned_delivery_date", "2035-01"))
+            contract_start = cols[0].text_input("Начало контракта", stock.get("contract_period_start", "2034-01"))
+            contract_end = cols[1].text_input("Конец контракта", stock.get("contract_period_end", "2034-12"))
 
-        st.subheader("Резерв и роль Emergency")
+        st.subheader("Резерв и аварийные поставки")
         reserve_policy = raw["decisions"].get("inventory_policy", {}).get("reserve_strategy_by_year", {})
         roles = raw["decisions"].get("emergency_role_by_year", {})
         policy_values: dict[str, str] = {}
@@ -227,17 +229,19 @@ def render() -> None:
                 st.markdown(f"**{year}**")
                 policy_values[str(year)] = st.selectbox(
                     f"Стратегия резерва {year}",
-                    ["physical", "emergency_contract"],
-                    index=["physical", "emergency_contract"].index(reserve_policy.get(str(year), "physical")),
+                    list(RESERVE_LABELS),
+                    index=list(RESERVE_LABELS).index(reserve_policy.get(str(year), "physical")),
+                    format_func=RESERVE_LABELS.get,
                     key=f"reserve-policy-{key}-{year}",
                 )
                 role_values[str(year)] = st.selectbox(
-                    f"Роль Emergency {year}",
-                    ["reserve_only", "planned_supply"],
-                    index=["reserve_only", "planned_supply"].index(roles.get(str(year), "reserve_only")),
+                    f"Роль аварийного канала {year}",
+                    list(ROLE_LABELS),
+                    index=list(ROLE_LABELS).index(roles.get(str(year), "reserve_only")),
+                    format_func=ROLE_LABELS.get,
                     key=f"emergency-role-{key}-{year}",
                 )
-        submitted = st.form_submit_button("Применить TEAM_DECISION", type="primary", width="stretch")
+        submitted = st.form_submit_button("Применить решения", type="primary", width="stretch")
 
     if submitted:
         try:
@@ -270,7 +274,7 @@ def render() -> None:
             updated["decisions"].setdefault("inventory_policy", {})["reserve_strategy_by_year"] = policy_values
             updated["decisions"]["emergency_role_by_year"] = role_values
             apply_plan(updated)
-            st.success("TEAM_DECISION применены. Есть несчитанные изменения — запустите проверку и расчёт.")
+            st.success("Решения применены. Теперь проверьте и пересчитайте план.")
             st.rerun()
         except Exception as exc:
             render_error(exc, "Не удалось применить решения")
@@ -285,14 +289,16 @@ def render() -> None:
         else:
             for error in validation["errors"]:
                 render_error(error, "План не прошёл структурную проверку")
-    c2.caption("После проверки используйте общую кнопку «Пересчитать» в sidebar.")
+    c2.caption("После проверки нажмите «Пересчитать» слева.")
 
-    _source_cards(metadata)
-    st.subheader("Контрактная архитектура")
-    if is_dirty():
-        st.warning("Таблица ниже относится к последнему рассчитанному plan_hash и помечена как устаревшая.")
-    contract_plan = st.session_state.calculated_plan if is_dirty() else st.session_state.plan
-    contracts = contract_rows(contract_plan, metadata, st.session_state.result["BASE"])
-    st.dataframe(pd.DataFrame(contracts), hide_index=True, width="stretch")
-    st.subheader("Investment timeline")
-    st.dataframe(pd.DataFrame(investment_timeline(st.session_state.plan, metadata)), hide_index=True, width="stretch")
+    with st.expander("Справочник источников и детали контрактов"):
+        st.subheader("Источники")
+        _source_cards(metadata)
+        st.subheader("Контракты")
+        if is_dirty():
+            st.warning("Таблица относится к последнему расчёту и может быть устаревшей.")
+        contract_plan = st.session_state.calculated_plan if is_dirty() else st.session_state.plan
+        contracts = contract_rows(contract_plan, metadata, st.session_state.result["BASE"])
+        st.dataframe(pd.DataFrame(contracts), hide_index=True, width="stretch")
+        st.subheader("Календарь инвестиций")
+        st.dataframe(pd.DataFrame(investment_timeline(st.session_state.plan, metadata)), hide_index=True, width="stretch")

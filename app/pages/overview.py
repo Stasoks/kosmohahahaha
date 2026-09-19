@@ -10,7 +10,7 @@ from app.view_models import source_names
 
 def render() -> None:
     st.markdown(
-        '<div class="hero"><div class="eyebrow">КОСМОХАКАТОН 2026 · COMMAND CENTER</div>'
+        '<div class="hero"><div class="eyebrow">КОСМОХАКАТОН 2026 · ЦЕНТР УПРАВЛЕНИЯ</div>'
         '<h1>Топливный контур.<br><span>Решения в цифрах.</span></h1>'
         '<p>Исполнимость, стоимость и устойчивость стратегии — из одного авторитетного расчётного ядра.</p></div>',
         unsafe_allow_html=True,
@@ -20,7 +20,7 @@ def render() -> None:
         "Сценарий",
         ["BASE", "MANDATORY_STRESS"],
         default="BASE",
-        format_func=lambda value: "BASE · контрольный" if value == "BASE" else "MANDATORY_STRESS · benchmark",
+        format_func=lambda value: "Обычный" if value == "BASE" else "Обязательный стресс",
     ) or "BASE"
     result = result_pair[selected]
     results_status(
@@ -47,6 +47,6 @@ def render() -> None:
     render_chart(charts.service(result, selected))
     if selected == "MANDATORY_STRESS":
         st.caption(
-            "Линии 97%/99% в MANDATORY_STRESS — RESILIENCE_BENCHMARK, а не дополнительные официальные hard-ограничения."
+            "Линии 97% и 99% в стрессовом сценарии — ориентиры устойчивости, а не дополнительные обязательные ограничения."
         )
     problems(result)

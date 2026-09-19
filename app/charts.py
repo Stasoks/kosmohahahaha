@@ -94,7 +94,7 @@ def inventory(result: dict[str, Any]) -> go.Figure:
     for year in sorted(breach_years):
         fig.add_vrect(
             x0=f"{year}-01", x1=f"{year}-12", fillcolor="#FDAEAD", opacity=0.12,
-            line_width=0, annotation_text=f"BREACH {year}", annotation_position="top left"
+            line_width=0, annotation_text=f"НАРУШЕНИЕ {year}", annotation_position="top left"
         )
     fig.update_layout(title="Запас, ёмкость и рассчитанный резерв", yaxis_title="т")
     return style(fig)
@@ -124,10 +124,10 @@ def costs(result: dict[str, Any]) -> go.Figure:
     fields = (
         ("procurement_mln", "Закупка", "#5B4BFF"),
         ("reservation_mln", "Резерв мощности", "#9B72FF"),
-        ("capex_mln", "CAPEX", "#242129"),
-        ("fixed_opex_mln", "Fixed OPEX", "#DCA4C0"),
+        ("capex_mln", "Инвестиции", "#242129"),
+        ("fixed_opex_mln", "Постоянные расходы", "#DCA4C0"),
         ("holding_mln", "Хранение", "#FDAEAD"),
-        ("take_or_pay_effect_in_procurement_mln", "TOP-эффект", "#D07A35"),
+        ("take_or_pay_effect_in_procurement_mln", "Доплата до минимума", "#D07A35"),
     )
     fig = go.Figure()
     for field, label, color in fields:
@@ -166,7 +166,7 @@ def service(result: dict[str, Any], scenario_id: str) -> go.Figure:
             hovertemplate="%{x}: %{y:.2f}%<extra></extra>",
         )
     )
-    label = "HARD" if scenario_id == "BASE" else "resilience benchmark"
+    label = "обязательный минимум" if scenario_id == "BASE" else "ориентир устойчивости"
     fig.add_hline(y=97, line_dash="dash", line_color="#9B72FF", annotation_text=f"97% · {label}")
     fig.add_hline(y=99, line_dash="dot", line_color="#D06B6B", annotation_text=f"99% · {label}")
     fig.update_layout(title="Минимумы проверяются по каждому году", yaxis_title="%")
@@ -194,8 +194,8 @@ def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figu
     service_fig = go.Figure()
     service_fig.add_trace(go.Scatter(x=df.value, y=df.total_service_level * 100, name="Общий", mode="lines+markers"))
     service_fig.add_trace(go.Scatter(x=df.value, y=df.critical_service_level * 100, name="Критический", mode="lines+markers"))
-    service_fig.add_hline(y=97, line_dash="dash", annotation_text="97% BASE HARD")
-    service_fig.add_hline(y=99, line_dash="dot", annotation_text="99% BASE HARD")
+    service_fig.add_hline(y=97, line_dash="dash", annotation_text="97% · обязательный минимум")
+    service_fig.add_hline(y=99, line_dash="dot", annotation_text="99% · обязательный минимум")
     service_fig.update_layout(title=f"{title}: сервис", xaxis_title="Значение параметра", yaxis_title="%")
     impact = go.Figure()
     impact.add_trace(go.Bar(x=df.value, y=df.total_shortage_t, name="Дефицит, т", marker_color="#FDAEAD"))
@@ -212,7 +212,7 @@ def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figu
 def reverse_zone(data: dict[str, Any]) -> go.Figure:
     df = pd.DataFrame(data.get("evaluated_points", []))
     colors = ["#278D8D" if bool(item) else "#FDAEAD" for item in df.valid]
-    labels = ["SAFE" if bool(item) else "FAILING" for item in df.valid]
+    labels = ["УСТОЙЧИВО" if bool(item) else "ОТКАЗ" for item in df.valid]
     fig = go.Figure(
         go.Scatter(
             x=df.value,
@@ -243,7 +243,7 @@ def alternatives(rows: list[dict[str, Any]]) -> go.Figure:
         color="Стресс-дефицит, т",
         hover_name="plan_id",
         color_continuous_scale=[[0, "#278D8D"], [1, "#FDAEAD"]],
-        labels={"base_cost_mln": "BASE lifecycle cost, млн у.е."},
-        title="Стоимость BASE и устойчивость неизменного плана в стрессе",
+        labels={"base_cost_mln": "Стоимость в обычных условиях, млн у.е."},
+        title="Стоимость и устойчивость неизменного плана в стрессе",
     )
     return style(fig, 430)

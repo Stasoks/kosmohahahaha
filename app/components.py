@@ -10,7 +10,7 @@ import streamlit as st
 
 from app.formatting import mass, money, percent
 from app.kernel_bridge import service_error
-from app.view_models import minimum_annual_metrics, top_problems, violations_view
+from app.view_models import SEVERITY_LABELS, constraint_label, minimum_annual_metrics, top_problems, violations_view
 
 
 def inject_styles() -> None:
@@ -22,7 +22,12 @@ def inject_styles() -> None:
 html,body,[class*="css"] { font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
 h1,h2,h3 { font-family:Manrope,Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.035em;color:var(--ink); }
 [data-testid="stSidebar"] { background:#17151a;border-right:0; }
-[data-testid="stSidebar"] * { color:#f8f7fb; }
+[data-testid="stSidebar"] p,[data-testid="stSidebar"] label,[data-testid="stSidebar"] h1,[data-testid="stSidebar"] h2,[data-testid="stSidebar"] h3,[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] { color:#f8f7fb; }
+[data-testid="stSidebar"] input,[data-testid="stSidebar"] textarea { color:#17151a!important;background:#fff!important; }
+[data-testid="stSidebar"] [data-baseweb="select"] * { color:#17151a; }
+[data-testid="stSidebar"] [data-testid="stAlert"] p { color:#17151a!important; }
+[data-testid="stSidebar"] .stButton button p,[data-testid="stSidebar"] .stDownloadButton button p { color:#17151a!important; }
+[data-testid="stSidebar"] .stButton button[kind="primary"] p { color:#fff!important; }
 [data-testid="stSidebar"] .stRadio label { padding:.42rem .6rem;border-radius:.65rem; }
 [data-testid="stSidebar"] .stRadio label:hover { background:#28242d; }
 .brand { font-size:1.32rem;font-weight:800;margin:.25rem 0 1.25rem;letter-spacing:-.04em; }
@@ -37,8 +42,11 @@ h1,h2,h3 { font-family:Manrope,Inter,-apple-system,BlinkMacSystemFont,"Segoe UI"
 .pill.ok { background:#e5f8ee;border-color:#b9e7ca;color:#17653a; }.pill.warn { background:#fff1ea;border-color:#f5c7b4;color:#9a3e1a; }.pill.blue { background:#eeecff;color:#4939db;border-color:#d5d0ff; }
 .badge { display:inline-block;border-radius:999px;padding:.18rem .48rem;margin-right:.25rem;font-size:.62rem;font-weight:800;letter-spacing:.05em;border:1px solid #d8d1df;background:#f5f1f8; }
 .badge.case { color:#4939db;background:#eeecff;border-color:#d5d0ff; }.badge.team { color:#9b3e69;background:#fff0f7;border-color:#f1cadc; }.badge.result { color:#17653a;background:#e5f8ee;border-color:#b9e7ca; }.badge.benchmark { color:#8a4b15;background:#fff4df;border-color:#edcf97; }
-[data-testid="stMetric"] { border:1px solid #ded9e3;background:rgba(255,255,255,.88);padding:.8rem .9rem;border-radius:.9rem;box-shadow:0 8px 26px rgba(40,30,60,.04); }
-[data-testid="stMetricLabel"] { color:#6d6673; }[data-testid="stMetricValue"] { font-weight:760;letter-spacing:-.03em; }
+[data-testid="stMetric"] { border:1px solid #ded9e3;background:rgba(255,255,255,.92);padding:.9rem 1rem;border-radius:.9rem;box-shadow:0 8px 26px rgba(40,30,60,.04);min-height:7.2rem; }
+[data-testid="stMetricLabel"] { color:#5d5662;min-height:2.15rem;align-items:flex-start; }
+[data-testid="stMetricLabel"] p { font-size:clamp(.72rem,.86vw,.9rem);line-height:1.2;white-space:normal; }
+[data-testid="stMetricValue"] { font-weight:760;letter-spacing:-.035em;font-size:clamp(1.12rem,1.65vw,1.75rem);line-height:1.15;white-space:normal;overflow-wrap:anywhere; }
+[data-testid="stMetricDelta"] { font-size:.72rem;white-space:normal; }
 .block-container { padding-top:1.7rem;max-width:1500px; }
 div[data-testid="stPlotlyChart"] { border:1px solid #e2dde7;background:#fff;border-radius:1rem;padding:.2rem; }
 div[data-testid="stDataFrame"] { border:1px solid #e2dde7;border-radius:.8rem;overflow:hidden; }
@@ -49,6 +57,10 @@ div[data-testid="stDataFrame"] { border:1px solid #e2dde7;border-radius:.8rem;ov
 .footer { color:#857e8b;font-size:.7rem;letter-spacing:.07em;border-top:1px solid #e4dfe7;padding-top:1rem;margin-top:2rem; }
 .stButton>button,.stDownloadButton>button { border-radius:.65rem;font-weight:700;border-color:#cdc5d6; }
 .stButton>button[kind="primary"] { background:var(--violet);border-color:var(--violet); }
+[data-testid="stAlert"] { color:#17151a; }
+[data-testid="stAlert"] p { color:inherit!important; }
+[data-baseweb="popover"],[data-baseweb="menu"],[role="listbox"] { color:#17151a!important;background:#fff!important; }
+[data-baseweb="popover"] * ,[data-baseweb="menu"] * ,[role="listbox"] * { color:#17151a!important; }
 @media(max-width:900px){.block-container{padding:1rem}.hero{padding:1.25rem}.hero h1{font-size:2.25rem}.hero:after{font-size:7rem}.statusbar{gap:.3rem}}
 </style>
 """,
@@ -92,9 +104,9 @@ def results_status(result: dict[str, Any], current_hash: str, calculated_hash: s
     st.markdown(
         '<div class="statusbar">'
         f'<span class="pill {"warn" if dirty else "ok"}">{"● ЕСТЬ НЕСЧИТАННЫЕ ИЗМЕНЕНИЯ" if dirty else "✓ РЕЗУЛЬТАТЫ АКТУАЛЬНЫ"}</span>'
-        f'<span class="pill {"ok" if summary["valid"] else "warn"}">{"✓ VALID" if summary["valid"] else "⚠ INVALID"}</span>'
-        f'<span class="pill blue">HARD: {summary["hard_violation_count"]}</span>'
-        f'<span class="pill">hash {calculated_hash}</span>'
+        f'<span class="pill {"ok" if summary["valid"] else "warn"}">{"✓ ПЛАН ИСПОЛНИМ" if summary["valid"] else "⚠ ПЛАН НЕИСПОЛНИМ"}</span>'
+        f'<span class="pill blue">Критических нарушений: {summary["hard_violation_count"]}</span>'
+        f'<span class="pill">Версия {calculated_hash}</span>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -102,38 +114,42 @@ def results_status(result: dict[str, Any], current_hash: str, calculated_hash: s
 
 def kpi_grid(result: dict[str, Any], capex_limits: tuple[float, float] = (1800, 2800)) -> None:
     values = minimum_annual_metrics(result)
-    first = st.columns(5)
-    first[0].metric("Статус", "VALID" if values["valid"] else "INVALID", f"HARD: {values['hard_violation_count']}")
-    first[1].metric("Мин. годовой сервис", percent(values["minimum_annual_total_service"]))
-    first[2].metric("Мин. критический", percent(values["minimum_annual_critical_service"]))
+    first = st.columns(4)
+    first[0].metric(
+        "Статус",
+        "Исполним" if values["valid"] else "Неисполним",
+        f"Нарушений: {values['hard_violation_count']}",
+    )
+    first[1].metric("Мин. общий сервис", percent(values["minimum_annual_total_service"]))
+    first[2].metric("Мин. критический сервис", percent(values["minimum_annual_critical_service"]))
     first[3].metric("Общий дефицит", mass(values["total_shortage_t"]))
-    first[4].metric("Критический дефицит", mass(values["critical_shortage_t"]))
-    second = st.columns(5)
-    second[0].metric("Мин. резерв", f"{values['minimum_reserve_days']:.1f} дней")
-    second[1].metric("CAPEX ≤2037", f"{values['capex_through_2037_mln']:.0f} / {capex_limits[0]:.0f}", help="Официальный лимит CAPEX до конца 2037 года.")
-    second[2].metric("CAPEX всего", f"{values['total_capex_mln']:.0f} / {capex_limits[1]:.0f}", help="2800 — лимит CAPEX, а не общий бюджет стратегии.")
-    second[3].metric("Lifecycle cost", money(values["undiscounted_cost_mln"]))
-    second[4].metric("Мин. запас", mass(values["minimum_inventory_t"]))
-    third = st.columns(2)
-    third[0].metric("PV стоимости", money(values["discounted_cost_mln"]))
-    third[1].metric("Стоимость обслуженной тонны", money(values["cost_per_served_ton_mln"], 3))
+    second = st.columns(4)
+    second[0].metric("Критический дефицит", mass(values["critical_shortage_t"]))
+    second[1].metric("Минимальный резерв", f"{values['minimum_reserve_days']:.1f} дней")
+    second[2].metric("Инвестиции до 2037", f"{values['capex_through_2037_mln']:.0f} / {capex_limits[0]:.0f}", help="Официальный лимит инвестиций до конца 2037 года.")
+    second[3].metric("Инвестиции всего", f"{values['total_capex_mln']:.0f} / {capex_limits[1]:.0f}", help="2 800 — лимит инвестиций, а не общий бюджет стратегии.")
+    third = st.columns(4)
+    third[0].metric("Полная стоимость", money(values["undiscounted_cost_mln"]))
+    third[1].metric("Приведённая стоимость", money(values["discounted_cost_mln"]))
+    third[2].metric("Стоимость обслуженной тонны", money(values["cost_per_served_ton_mln"], 3))
+    third[3].metric("Минимальный запас", mass(values["minimum_inventory_t"]))
 
 
 def problems(result: dict[str, Any]) -> None:
     values = top_problems(result)
     st.subheader("Основные проблемы")
     if not values:
-        st.success("Расчёт не содержит нарушений или benchmark-сигналов.")
+        st.success("Расчёт не содержит нарушений или предупреждений.")
         return
     columns = st.columns(len(values))
     for column, item in zip(columns, values):
         with column:
-            severity = str(item.get("severity", "warning")).upper()
+            severity = SEVERITY_LABELS.get(str(item.get("severity", "warning")), "Предупреждение")
             column.markdown(
                 '<div class="problem">'
-                f'<span class="badge">{severity}</span><b>{item.get("constraint_id", item.get("code"))}</b>'
+                f'<span class="badge">{severity}</span><b>{constraint_label(item.get("constraint_id", item.get("code")))}</b>'
                 f'<div>{item.get("period", "—")} · факт {item.get("actual", "—")} {item.get("operator", "")} {item.get("limit", "—")}</div>'
-                f'<div class="muted">Разрыв: {item.get("excess_or_gap", "—")} {item.get("unit", "")}<br>{item.get("human_message", item.get("reason", ""))}</div>'
+                f'<div class="muted">Отклонение: {item.get("excess_or_gap", "—")} {item.get("unit", "")}</div>'
                 '</div>',
                 unsafe_allow_html=True,
             )
@@ -142,7 +158,7 @@ def problems(result: dict[str, Any]) -> None:
 def violations(result: dict[str, Any], key: str) -> None:
     rows = violations_view(result)
     if not rows:
-        st.success("Нарушений и benchmark-сигналов нет.")
+        st.success("Нарушений и предупреждений нет.")
         return
     frame = pd.DataFrame(rows)
     levels = sorted(frame["Уровень"].unique())

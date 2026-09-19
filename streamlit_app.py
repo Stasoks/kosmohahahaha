@@ -28,10 +28,10 @@ except Exception as exc:
 
 def recalculate() -> None:
     try:
-        with st.spinner("Авторитетное ядро рассчитывает BASE и MANDATORY_STRESS…"):
+        with st.spinner("Расчёт обычного и стрессового сценариев…"):
             result = runtime.evaluate(st.session_state.plan)
         accept_calculation(result)
-        st.toast("Оба обязательных сценария пересчитаны", icon="✅")
+        st.toast("Оба сценария пересчитаны", icon="✅")
     except Exception as exc:
         render_error(exc, "Не удалось рассчитать план")
 
@@ -49,7 +49,7 @@ PAGES = {
 
 with st.sidebar:
     st.markdown(
-        '<div class="brand">космо<b>контур</b><small>ORBITAL FUEL OPERATIONS</small></div>',
+        '<div class="brand">космо<b>контур</b><small>УПРАВЛЕНИЕ ТОПЛИВНЫМ КОНТУРОМ</small></div>',
         unsafe_allow_html=True,
     )
     page = st.radio("Рабочее пространство", list(PAGES), label_visibility="collapsed")
@@ -58,19 +58,18 @@ with st.sidebar:
     calculated_hash = st.session_state.result["plan_hash"]
     base_summary = st.session_state.result["BASE"]["summary"]
     st.markdown(f"**План:** `{st.session_state.plan.get('plan_id', '—')}`")
-    st.caption(f"Сценарий плана: {st.session_state.plan.get('scenario_id', '—')}")
     if is_dirty():
         st.warning("● Есть несчитанные изменения")
     else:
         st.success("✓ Расчёт актуален")
     st.markdown(
-        f"**BASE:** {'VALID' if base_summary['valid'] else 'INVALID'}  \n"
-        f"Hard violations: {base_summary['hard_violation_count']}"
+        f"**Обычный сценарий:** {'исполним' if base_summary['valid'] else 'неисполним'}  \n"
+        f"Критических нарушений: {base_summary['hard_violation_count']}"
     )
     if st.button("↻ Пересчитать", type="primary", width="stretch"):
         recalculate()
     cols = st.columns(2)
-    if cols[0].button("Снимок", width="stretch", help="Сохранить только в текущей browser-сессии"):
+    if cols[0].button("Снимок", width="stretch", help="Сохранить в текущем сеансе"):
         st.toast(save_snapshot(), icon="💾")
     try:
         cols[1].download_button(
@@ -81,18 +80,15 @@ with st.sidebar:
             width="stretch",
         )
     except Exception:
-        cols[1].caption("JSON после validation")
-    st.caption(f"Current hash: {current_hash}  \nCalculated hash: {calculated_hash}")
-    st.markdown("---")
-    st.caption(
-        "UI не изменяет план автоматически. Builder/Advisor создаёт отдельное явно подтверждаемое предложение."
-    )
+        cols[1].caption("Сначала проверьте план")
+    with st.expander("Версии расчёта"):
+        st.caption(f"Текущая: {current_hash}  \nРассчитанная: {calculated_hash}")
 
 
 PAGES[page]()
 
 st.markdown(
-    '<div class="footer">КОСМОКОНТУР · CASE_INPUT ≠ TEAM_DECISION ≠ TEAM_ASSUMPTION · '
-    'все физические и экономические результаты получены kosmohak.service</div>',
+    '<div class="footer">КОСМОКОНТУР · исходные данные, решения команды и расчётные предположения разделены · '
+    'физические и экономические результаты получены единым расчётным ядром</div>',
     unsafe_allow_html=True,
 )

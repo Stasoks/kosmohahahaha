@@ -7,13 +7,14 @@ import pandas as pd
 import streamlit as st
 
 from app import runtime
-from app.components import badges, note, render_error
+from app.components import render_error
 from app.kernel_bridge import case_tables, plan_bytes, plan_from_bytes
 from app.state import apply_plan, save_snapshot
+from app.view_models import constraint_label
 
 
 def _plans() -> None:
-    note("Основной portable workflow — download/upload JSON. Session snapshots исчезнут вместе с сессией Streamlit.")
+    st.caption("Файл JSON можно перенести на другой компьютер. Снимки хранятся только до закрытия текущего сеанса.")
     try:
         payload = plan_bytes(st.session_state.plan)
         st.download_button(
@@ -33,14 +34,14 @@ def _plans() -> None:
             st.rerun()
         except Exception as exc:
             render_error(exc, "План не открыт")
-    st.subheader("Снимки текущей browser-сессии")
+    st.subheader("Снимки текущего сеанса")
     cols = st.columns(2)
-    if cols[0].button("Сохранить session snapshot", width="stretch"):
+    if cols[0].button("Сохранить снимок", width="stretch"):
         st.toast(f"Сохранено: {save_snapshot()}", icon="✅")
     snapshots = st.session_state.snapshots
     if snapshots:
         selected = cols[1].selectbox("Снимок", list(snapshots))
-        if st.button("Открыть snapshot"):
+        if st.button("Открыть снимок"):
             apply_plan(copy.deepcopy(snapshots[selected]))
             st.rerun()
     else:
@@ -48,23 +49,45 @@ def _plans() -> None:
 
 
 def _case_data() -> None:
-    badges(("CASE_INPUT · ТОЛЬКО ЧТЕНИЕ", "case"))
     tables = case_tables()
     st.subheader("Спрос")
-    st.dataframe(pd.DataFrame(tables["demand"]), hide_index=True, width="stretch")
+    demand_columns = {
+        "year": "Год", "base_total_t": "Общий спрос, т", "base_critical_t": "Критический спрос, т",
+        "low_total_t": "Нижняя оценка, т", "high_total_t": "Верхняя оценка, т",
+    }
+    demand = pd.DataFrame(tables["demand"])
+    st.dataframe(demand[list(demand_columns)].rename(columns=demand_columns), hide_index=True, width="stretch")
     st.subheader("Источники")
-    st.dataframe(pd.DataFrame(tables["sources"]), hide_index=True, width="stretch")
+    sources = pd.DataFrame(tables["sources"])
+    source_columns = {
+        "source_id": "Код", "name": "Источник", "capacity_t_per_year": "Мощность, т/год",
+        "variable_cost_mln_per_t": "Цена, млн/т",
+        "reservation_rate_mln_per_t_year_capacity": "Плата за резерв",
+        "take_or_pay_share": "Минимально оплачиваемая доля",
+        "lead_time_min_value": "Мин. срок поставки", "lead_time_max_value": "Макс. срок поставки",
+        "available_from_year": "Доступен с года",
+    }
+    shown = [column for column in source_columns if column in sources]
+    st.dataframe(sources[shown].rename(columns=source_columns), hide_index=True, width="stretch")
     st.subheader("Ограничения")
-    st.dataframe(pd.DataFrame(tables["constraints"]), hide_index=True, width="stretch")
+    constraints = pd.DataFrame(tables["constraints"])
+    constraints["constraint_id"] = constraints["constraint_id"].map(constraint_label)
+    constraints["unit"] = constraints["unit"].map({
+        "share": "доля", "days": "дни", "years": "годы", "mln_units": "млн у.е.",
+    }).fillna(constraints["unit"])
+    constraints["period"] = constraints["period"].map({"annual": "ежегодно"}).fillna(constraints["period"])
+    constraint_columns = {
+        "constraint_id": "Ограничение", "value": "Значение", "operator": "Условие",
+        "unit": "Единица", "period": "Период",
+    }
+    shown = [column for column in constraint_columns if column in constraints]
+    st.dataframe(constraints[shown].rename(columns=constraint_columns), hide_index=True, width="stretch")
 
 
 def _exports() -> None:
-    note(
-        "Выгрузки создаются backend exporters из того же SimulationResult: scenario_id, plan_id, периоды, единицы и provenance не пересчитываются во frontend."
-    )
     if st.button("Подготовить CSV-файлы", type="primary"):
         try:
-            with st.spinner("Формируются BASE, STRESS и comparison CSV…"):
+            with st.spinner("Формируются таблицы обычного и стрессового расчётов…"):
                 st.session_state.export_files = runtime.csv_files(st.session_state.calculated_plan)
         except Exception as exc:
             render_error(exc, "CSV не подготовлены")
@@ -76,7 +99,7 @@ def _exports() -> None:
             )
     if st.button("Подготовить полный ZIP", type="primary"):
         try:
-            with st.spinner("План, обе среды, comparison и risk portfolio…"):
+            with st.spinner("Собираются план, результаты и риски…"):
                 st.session_state.bundle = runtime.bundle(st.session_state.calculated_plan)
         except Exception as exc:
             render_error(exc, "ZIP не подготовлен")
@@ -97,7 +120,7 @@ def _exports() -> None:
 
 def render() -> None:
     st.title("Данные и экспорт")
-    tabs = st.tabs(["Планы", "CASE_INPUT", "Результаты и ZIP"])
+    tabs = st.tabs(["Планы", "Исходные данные", "Результаты и ZIP"])
     with tabs[0]:
         _plans()
     with tabs[1]:

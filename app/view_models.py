@@ -5,6 +5,8 @@ import copy
 from collections import defaultdict
 from typing import Any
 
+from app.formatting import yes_no
+
 
 OFFICIAL_SOURCE_COLORS = {
     "A": "#242129",
@@ -22,6 +24,23 @@ RESEARCH_COLORS = (
     "#B25385",
     "#667085",
 )
+
+CONSTRAINT_LABELS = {
+    "BASE_CRITICAL_SERVICE": "Минимальный сервис критического спроса",
+    "BASE_TOTAL_SERVICE": "Минимальный общий сервис",
+    "CAPEX_2037": "Лимит инвестиций до конца 2037 года",
+    "CAPEX_2040": "Общий лимит инвестиций до 2040 года",
+    "RESERVE_45D": "Резерв на 45 дней",
+    "EMERGENCY_BASE_STREAK": "Ограничение постоянного использования аварийного канала",
+    "STRESS_LOSS_LIMIT": "Предел потерь в стрессовом сценарии",
+}
+
+SEVERITY_LABELS = {"hard": "Критическое", "benchmark": "Ориентир", "warning": "Предупреждение"}
+
+
+def constraint_label(value: Any) -> str:
+    key = str(value or "")
+    return CONSTRAINT_LABELS.get(key, key or "Неизвестное ограничение")
 
 
 def source_colors(source_ids: list[str] | tuple[str, ...]) -> dict[str, str]:
@@ -76,17 +95,15 @@ def violations_view(result: dict[str, Any]) -> list[dict[str, Any]]:
         value = copy.deepcopy(item)
         rows.append(
             {
-                "Уровень": str(value.get("severity", "warning")).upper(),
-                "Ограничение": value.get("constraint_id") or value.get("code"),
+                "Уровень": SEVERITY_LABELS.get(str(value.get("severity", "warning")), "Предупреждение"),
+                "Ограничение": constraint_label(value.get("constraint_id") or value.get("code")),
                 "Период": value.get("period", "—"),
                 "Источник": value.get("source_id") or "—",
                 "Факт": value.get("actual"),
                 "Условие": value.get("operator", ""),
                 "Лимит": value.get("limit"),
                 "Разрыв": value.get("excess_or_gap"),
-                "Единица": value.get("unit", ""),
-                "Причина": value.get("reason", ""),
-                "Сообщение": value.get("human_message", ""),
+                "Единица": {"share": "доля", "days": "дни", "years": "годы", "mln_units": "млн у.е."}.get(value.get("unit"), value.get("unit", "")),
             }
         )
     return rows
@@ -114,9 +131,9 @@ def source_mix(result: dict[str, Any]) -> dict[str, float]:
 
 def abc_comparison(payload: dict[str, Any]) -> dict[str, Any]:
     cases = {
-        "A": ("Текущий план · BASE", payload.get("A")),
-        "B": ("Тот же план · STRESS", payload.get("B")),
-        "C": ("Stress-specific · STRESS", payload.get("C")),
+        "A": ("Текущий план · обычные условия", payload.get("A")),
+        "B": ("Тот же план · стресс", payload.get("B")),
+        "C": ("Адаптированный план · стресс", payload.get("C")),
     }
     rows = []
     metrics: dict[str, dict[str, Any]] = {}
@@ -175,6 +192,31 @@ def _reservations(plan: dict[str, Any]) -> dict[tuple[str, int], float]:
     }
 
 
+def _investment_summary(value: dict[str, Any]) -> str:
+    if not value.get("enabled"):
+        return "Не выбран"
+    parts = ["Выбран"]
+    for field, label in (
+        ("option_purchase_month", "покупка опциона"),
+        ("option_exercise_month", "исполнение опциона"),
+        ("funding_month", "финансирование"),
+        ("commissioning_month", "ввод"),
+    ):
+        if value.get(field):
+            parts.append(f"{label}: {value[field]}")
+    return "; ".join(parts)
+
+
+def _decision_summary(key: str, value: dict[str, Any]) -> str:
+    if key == "inventory_policy":
+        values = value.get("reserve_strategy_by_year", value)
+        labels = {"physical": "физический запас", "emergency_contract": "аварийный контракт"}
+    else:
+        values = value
+        labels = {"reserve_only": "только резерв", "planned_supply": "плановые поставки"}
+    return "; ".join(f"{year}: {labels.get(mode, mode)}" for year, mode in sorted(values.items()))
+
+
 def decision_diff(base_plan: dict[str, Any], stress_plan: dict[str, Any]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     base_decisions = base_plan.get("decisions", {})
@@ -193,8 +235,8 @@ def decision_diff(base_plan: dict[str, Any], stress_plan: dict[str, Any]) -> lis
                 {
                     "Категория": "Инвестиции",
                     "Объект": investment_id,
-                    "BASE-план": json_compact(before),
-                    "Stress-specific": json_compact(after),
+                    "Обычный план": _investment_summary(before),
+                    "Адаптированный план": _investment_summary(after),
                     "Изменение": "Изменены решение или сроки",
                 }
             )
@@ -206,8 +248,8 @@ def decision_diff(base_plan: dict[str, Any], stress_plan: dict[str, Any]) -> lis
                 {
                     "Категория": "Заказы",
                     "Объект": f"{source_id} · {year}",
-                    "BASE-план": f"{before:.3f} т",
-                    "Stress-specific": f"{after:.3f} т",
+                    "Обычный план": f"{before:.3f} т",
+                    "Адаптированный план": f"{after:.3f} т",
                     "Изменение": f"{after - before:+.3f} т",
                 }
             )
@@ -219,14 +261,14 @@ def decision_diff(base_plan: dict[str, Any], stress_plan: dict[str, Any]) -> lis
                 {
                     "Категория": "Резерв мощности",
                     "Объект": f"{source_id} · {year}",
-                    "BASE-план": f"{before:.3f} т/год",
-                    "Stress-specific": f"{after:.3f} т/год",
+                    "Обычный план": f"{before:.3f} т/год",
+                    "Адаптированный план": f"{after:.3f} т/год",
                     "Изменение": f"{after - before:+.3f} т/год",
                 }
             )
     for key, label in (
         ("inventory_policy", "Политика резерва"),
-        ("emergency_role_by_year", "Роль Emergency"),
+        ("emergency_role_by_year", "Роль аварийного канала"),
     ):
         before, after = base_decisions.get(key, {}), stress_decisions.get(key, {})
         if before != after:
@@ -234,18 +276,12 @@ def decision_diff(base_plan: dict[str, Any], stress_plan: dict[str, Any]) -> lis
                 {
                     "Категория": label,
                     "Объект": "по годам",
-                    "BASE-план": json_compact(before),
-                    "Stress-specific": json_compact(after),
+                    "Обычный план": _decision_summary(key, before),
+                    "Адаптированный план": _decision_summary(key, after),
                     "Изменение": "Изменено",
                 }
             )
     return rows
-
-
-def json_compact(value: Any) -> str:
-    import json
-
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(", ", ": "))
 
 
 def contract_rows(
@@ -269,7 +305,10 @@ def contract_rows(
             lead = f"{source['lead_time_min_value']:g}"
             if source["lead_time_max_value"] != source["lead_time_min_value"]:
                 lead += f"–{source['lead_time_max_value']:g}"
-            lead += f" {source['lead_time_unit']}"
+            unit = {
+                "month": "мес.", "week": "нед.", "day": "дн.", "year": "г.",
+            }.get(source["lead_time_unit"], source["lead_time_unit"])
+            lead += f" {unit}"
             rows.append(
                 {
                     "Источник": f"{source_id} · {source['name']}",
@@ -277,16 +316,21 @@ def contract_rows(
                     "Резерв, т/год": reserved,
                     "Заказ, т": ordered,
                     "Доставлено, т": calculated.get("gross_delivery_t", 0.0),
-                    "Lead time": lead,
+                    "Срок поставки": lead,
                     "Цена, млн/т": calculated.get(
                         "active_variable_price_mln_per_t", source["variable_cost_mln_per_t"]
                     ),
                     "Плата резерва, млн": calculated.get("reservation_cost_mln", 0.0),
-                    "TOP": source["take_or_pay_share"],
-                    "Доступность": source.get("availability_rule", {}),
-                    "Роль": roles.get(str(year), "reserve_only") if source_id == "E" else "planned_supply",
+                    "Минимальная оплата": source["take_or_pay_share"],
+                    "Роль": {
+                        "reserve_only": "Только резерв",
+                        "planned_supply": "Плановые поставки",
+                    }.get(
+                        roles.get(str(year), "reserve_only") if source_id == "E" else "planned_supply",
+                        "Не задана",
+                    ),
                     "Утилизация": calculated.get("utilization", 0.0),
-                    "Ответственность/review": "не задано организаторами",
+                    "Ответственный": "не задан организаторами",
                 }
             )
     return rows
@@ -311,8 +355,12 @@ def investment_timeline(plan: dict[str, Any], metadata: dict[str, Any]) -> list[
                 "Инвестиция": investment_id,
                 "Решение принято": bool(item.get("enabled")),
                 "События": "; ".join(events) or "—",
-                "CAPEX, млн у.е.": case.get("total_capex_mln", 0.0) if item.get("enabled") else 0.0,
-                "Доступность / ввод": case.get("commissioning_rule", "не задано"),
+                "Инвестиции, млн у.е.": case.get("total_capex_mln", 0.0) if item.get("enabled") else 0.0,
+                "Доступность / ввод": {
+                    "EARTH_NEW": "Через 18–24 месяца после исполнения опциона",
+                    "LUNAR_ISRU": "Финансирование до 2038 года; доступность с 2038 года",
+                    "ZBO": "Опция доступна с 2036 года",
+                }.get(investment_id, "Не задано"),
                 "Зависимость": metadata["sources"].get(
                     next(
                         (
@@ -349,27 +397,27 @@ def stakeholder_scenario_rows(
                 row[case_id] = "—"
             elif stakeholder_id == "operator":
                 row[case_id] = (
-                    f"valid={item['valid']}; cost={item['undiscounted_cost_mln']:.1f}; "
-                    f"reserve={item['minimum_reserve_days']:.1f} d"
+                    f"исполним={yes_no(item['valid'])}; стоимость={item['undiscounted_cost_mln']:.1f}; "
+                    f"резерв={item['minimum_reserve_days']:.1f} дн."
                 )
             elif stakeholder_id == "critical_consumers":
                 row[case_id] = (
-                    f"min service={100*item['minimum_annual_critical_service']:.1f}%; "
-                    f"shortage={item['critical_shortage_t']:.1f} t"
+                    f"мин. сервис={100*item['minimum_annual_critical_service']:.1f}%; "
+                    f"дефицит={item['critical_shortage_t']:.1f} т"
                 )
             elif stakeholder_id == "commercial_consumers":
                 noncritical = item["total_shortage_t"] - item["critical_shortage_t"]
                 row[case_id] = (
-                    f"min total={100*item['minimum_annual_total_service']:.1f}%; "
-                    f"noncritical shortage={noncritical:.1f} t"
+                    f"мин. общий сервис={100*item['minimum_annual_total_service']:.1f}%; "
+                    f"некритический дефицит={noncritical:.1f} т"
                 )
             elif stakeholder_id == "fuel_suppliers":
                 row[case_id] = "; ".join(
-                    f"{key}={value:.1f} t" for key, value in item["source_mix_t"].items()
+                    f"{key}={value:.1f} т" for key, value in item["source_mix_t"].items()
                 )
             elif stakeholder_id == "financing":
                 row[case_id] = (
-                    f"CAPEX={item['total_capex_mln']:.1f}; PV={item['discounted_cost_mln']:.1f}"
+                    f"инвестиции={item['total_capex_mln']:.1f}; приведённая стоимость={item['discounted_cost_mln']:.1f}"
                 )
             else:
                 row[case_id] = "Последствия определяются рассчитанными сроками и поставками"
