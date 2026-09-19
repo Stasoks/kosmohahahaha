@@ -21,7 +21,7 @@ def test_builder_finds_97_99_mandatory_stress_strategy():
             objective="MIN_COST",
             stress_total_service_target=0.97,
             stress_critical_service_target=0.99,
-            max_candidates=600,
+            max_candidates=300,
             beam_width=24,
             max_iterations=8,
             max_results=1,
@@ -33,7 +33,8 @@ def test_builder_finds_97_99_mandatory_stress_strategy():
     print("EVALUATED", result.evaluated_candidate_count)
     print("ITERATIONS", result.iterations)
     print("FAILURE", result.failure_reason)
-    print("CLOSEST", result.search_metadata.get("closest_base_valid"))
+    print("CLOSEST_BASE_VALID", result.search_metadata.get("closest_base_valid"))
+    print("CLOSEST_TARGET", result.search_metadata.get("closest_to_target"))
     if result.solutions:
         solution = result.solutions[0]
         print("METRICS", solution.metrics)
