@@ -209,6 +209,156 @@ def build_stress_specific(
     return result.to_dict()
 
 
+def build_recommended_base(
+    *,
+    max_candidates: int = 1200,
+    beam_width: int = 24,
+    max_iterations: int = 8,
+    max_results: int = 80,
+    seed: int = 17,
+    total_demand_guardrail: float = 1.05,
+    critical_demand_guardrail: float = 1.05,
+    flex_delay_guardrail_months: int = 1,
+) -> dict[str, Any]:
+    """Find the cheapest BASE-valid candidate that passes declared TEAM guardrails.
+
+    Guardrails are deterministic one-factor checks and are not official CASE_INPUT
+    constraints. The search remains bounded; no global optimum is claimed.
+    """
+    ctx = application_context()
+    built = synthesize_strategy(
+        ctx.base_scenario,
+        ctx.stress_scenario,
+        ctx.case_data,
+        ctx.assumptions,
+        config=StrategyBuilderConfig(
+            planning_mode="BASE_PLAN",
+            objective="MIN_COST",
+            max_candidates=max_candidates,
+            beam_width=beam_width,
+            max_iterations=max_iterations,
+            max_results=max_results,
+            seed=seed,
+            diversity_threshold=0.0,
+        ),
+    )
+
+    candidates: list[tuple[Any, str]] = [
+        (solution.plan, "BUILDER") for solution in built.solutions
+    ]
+    for name in ("cost_focused.json", "diversified.json", "resilient.json"):
+        path = CORE_ROOT / "plans" / name
+        if path.is_file():
+            candidates.append((
+                load_plan(path, ctx.case_data, ctx.assumptions),
+                f"SAVED_ALTERNATIVE:{name}",
+            ))
+
+    seen: set[str] = set()
+    rows: list[dict[str, Any]] = []
+    passing: list[tuple[float, Any, dict[str, Any]]] = []
+    for plan, origin in candidates:
+        decision_key = canonical_json(plan.raw.get("decisions", {}))
+        if decision_key in seen:
+            continue
+        seen.add(decision_key)
+        pair = evaluate_both_scenarios(
+            plan, ctx.base_scenario, ctx.stress_scenario, ctx.case_data, ctx.assumptions
+        )
+        total_demand = run_sensitivity(
+            plan, "demand_multiplier", [total_demand_guardrail],
+            ctx.base_scenario, ctx.case_data, ctx.assumptions
+        ).points[0]
+        critical_demand = run_sensitivity(
+            plan, "critical_demand_multiplier", [critical_demand_guardrail],
+            ctx.base_scenario, ctx.case_data, ctx.assumptions
+        ).points[0]
+        flex_delay = run_sensitivity(
+            plan,
+            {"name": "lead_time_delay", "source_id": "B", "status": "TEAM_ASSUMPTION"},
+            [flex_delay_guardrail_months],
+            ctx.base_scenario, ctx.case_data, ctx.assumptions,
+        ).points[0]
+        passed = bool(
+            pair["BASE"].summary["valid"]
+            and total_demand["valid"]
+            and critical_demand["valid"]
+            and flex_delay["valid"]
+        )
+        row = {
+            "plan_id": plan.plan_id,
+            "origin": origin,
+            "base_cost_mln": pair["BASE"].summary["undiscounted_cost_mln"],
+            "base_valid": pair["BASE"].summary["valid"],
+            "stress_service": pair["MANDATORY_STRESS"].summary["total_service_level"],
+            "stress_shortage_t": pair["MANDATORY_STRESS"].summary["total_shortage_t"],
+            "total_demand_guardrail_valid": total_demand["valid"],
+            "critical_demand_guardrail_valid": critical_demand["valid"],
+            "flex_delay_guardrail_valid": flex_delay["valid"],
+            "guardrails_passed": passed,
+        }
+        rows.append(row)
+        if passed:
+            passing.append((float(row["base_cost_mln"]), plan, row))
+
+    rows.sort(key=lambda item: (not item["guardrails_passed"], item["base_cost_mln"], item["plan_id"]))
+    if not passing:
+        return {
+            "status": "no_guardrail_feasible_candidate_found",
+            "plan": None,
+            "candidates": rows,
+            "builder": {
+                "status": built.status,
+                "evaluated_candidate_count": built.evaluated_candidate_count,
+                "iterations": built.iterations,
+            },
+            "guardrails": {
+                "total_demand_multiplier": total_demand_guardrail,
+                "critical_demand_multiplier": critical_demand_guardrail,
+                "earth_flex_additional_lead_time_months": flex_delay_guardrail_months,
+                "combination": "SEPARATE_ONE_FACTOR_CHECKS",
+                "status": "TEAM_ASSUMPTION",
+            },
+            "global_optimum_claimed": False,
+        }
+
+    passing.sort(key=lambda item: (item[0], item[1].plan_id))
+    _, chosen, chosen_row = passing[0]
+    raw = copy.deepcopy(chosen.raw)
+    raw["plan_id"] = "recommended-base-robust"
+    raw.setdefault("metadata", {}).update({
+        "status": "TEAM_DECISION",
+        "strategy_role": "RECOMMENDED_BASE",
+        "source_candidate_plan_id": chosen.plan_id,
+        "selection_rule": "minimum nominal BASE cost among candidates passing declared TEAM guardrails",
+        "guardrails": {
+            "total_demand_multiplier": total_demand_guardrail,
+            "critical_demand_multiplier": critical_demand_guardrail,
+            "earth_flex_additional_lead_time_months": flex_delay_guardrail_months,
+            "combination": "SEPARATE_ONE_FACTOR_CHECKS",
+            "status": "TEAM_ASSUMPTION",
+        },
+    })
+    recommended = _validated_plan(raw)
+    pair = evaluate_both_scenarios(
+        recommended, ctx.base_scenario, ctx.stress_scenario, ctx.case_data, ctx.assumptions
+    )
+    return {
+        "status": "success",
+        "plan": copy.deepcopy(recommended.raw),
+        "selected_candidate": chosen_row,
+        "BASE": pair["BASE"].to_dict(),
+        "MANDATORY_STRESS": pair["MANDATORY_STRESS"].to_dict(),
+        "candidates": rows,
+        "builder": {
+            "status": built.status,
+            "evaluated_candidate_count": built.evaluated_candidate_count,
+            "iterations": built.iterations,
+        },
+        "guardrails": raw["metadata"]["guardrails"],
+        "global_optimum_claimed": False,
+    }
+
 def abc_results(
     base_plan_raw: dict[str, Any],
     stress_plan_raw: dict[str, Any] | None = None,
