@@ -976,7 +976,7 @@ def _target_repair_candidate(
     )
 
 
-def _target_repair_mutations(
+def _hard_repair_mutations(
     candidate: _Candidate,
     config: StrategyBuilderConfig,
     base_scenario: Scenario,
@@ -985,6 +985,14 @@ def _target_repair_mutations(
     assumptions: ModelAssumptions,
 ) -> list[tuple[dict[str, Any], str]]:
     values: list[tuple[dict[str, Any], str]] = []
+    reserve_repair = _reserve_contract_repair(
+        candidate,
+        base_scenario,
+        case_data,
+        assumptions,
+    )
+    if reserve_repair is not None:
+        values.append(reserve_repair)
     overflow_repair = _base_overflow_trim_repair(
         candidate,
         config,
@@ -1003,14 +1011,18 @@ def _target_repair_mutations(
     )
     if stock_repair is not None:
         values.append(stock_repair)
-    reserve_repair = _reserve_contract_repair(
-        candidate,
-        base_scenario,
-        case_data,
-        assumptions,
-    )
-    if reserve_repair is not None:
-        values.append(reserve_repair)
+    return values
+
+
+def _target_repair_mutations(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+    base_scenario: Scenario,
+    stress_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> list[tuple[dict[str, Any], str]]:
+    values: list[tuple[dict[str, Any], str]] = []
     for profile in ("COST", "RELIABILITY", "DIVERSIFIED"):
         item = _target_repair_candidate(
             candidate,
@@ -1420,17 +1432,39 @@ def build_strategies(
         targeted: list[tuple[dict[str, Any], int, tuple[str, ...]]] = []
         exploratory: list[tuple[dict[str, Any], int, tuple[str, ...]]] = []
         for parent in beam:
-            for raw, description in _target_repair_mutations(
-                parent,
-                config,
-                base_scenario,
-                stress_scenario,
-                case_data,
-                assumptions,
-            ):
-                targeted.append(
-                    (raw, parent.depth + 1, (*parent.history, description))
+            hard_count = (
+                parent.metrics["base_hard_violation_count"]
+                + parent.metrics["stress_hard_violation_count"]
+            )
+            service_gap = _annual_target_deficit(parent)
+            if hard_count > 0:
+                repairs = _hard_repair_mutations(
+                    parent,
+                    config,
+                    base_scenario,
+                    stress_scenario,
+                    case_data,
+                    assumptions,
                 )
+                for raw, description in repairs:
+                    targeted.append(
+                        (raw, parent.depth + 1, (*parent.history, description))
+                    )
+                continue
+            if service_gap > 1e-12:
+                repairs = _target_repair_mutations(
+                    parent,
+                    config,
+                    base_scenario,
+                    stress_scenario,
+                    case_data,
+                    assumptions,
+                )
+                for raw, description in repairs:
+                    targeted.append(
+                        (raw, parent.depth + 1, (*parent.history, description))
+                    )
+                continue
             for raw, description in _mutations(
                 parent,
                 config,
