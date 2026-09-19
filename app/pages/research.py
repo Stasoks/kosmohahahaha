@@ -49,6 +49,104 @@ def _remove_source_from_plan(raw: dict, source_id: str) -> dict:
     return updated
 
 
+def _remove_years_from_plan(raw: dict, start_year: int) -> dict:
+    updated = copy.deepcopy(raw)
+    decisions = updated.setdefault("decisions", {})
+
+    for schedule in decisions.get("supply_orders", []):
+        values = schedule.get("values", {})
+        schedule["values"] = {
+            str(period): value
+            for period, value in values.items()
+            if int(str(period)[:4]) < int(start_year)
+        }
+
+    decisions["capacity_reservations"] = [
+        item
+        for item in decisions.get("capacity_reservations", [])
+        if int(item.get("year", 0)) < int(start_year)
+    ]
+
+    inventory_policy = decisions.setdefault("inventory_policy", {})
+    reserve_policy = inventory_policy.setdefault("reserve_strategy_by_year", {})
+    inventory_policy["reserve_strategy_by_year"] = {
+        str(year): value
+        for year, value in reserve_policy.items()
+        if int(year) < int(start_year)
+    }
+
+    emergency = decisions.setdefault("emergency_role_by_year", {})
+    decisions["emergency_role_by_year"] = {
+        str(year): value
+        for year, value in emergency.items()
+        if int(year) < int(start_year)
+    }
+    return updated
+
+
+def _research_year_list(metadata: dict) -> None:
+    years = sorted(int(year) for year in metadata.get("research_years", []))
+    st.subheader("Добавленные годы")
+    if not years:
+        st.info("Горизонт пока не продлён дальше официального 2040 года.")
+        return
+
+    last_year = max(years)
+    st.caption(
+        "Расширение горизонта должно оставаться непрерывным. Поэтому удаление не последнего "
+        "года также удалит все добавленные годы после него."
+    )
+    for year in years:
+        demand = next(
+            (
+                item
+                for item in metadata.get("demand", [])
+                if int(item.get("year")) == year
+            ),
+            {},
+        )
+        cols = st.columns([1.2, 1.6, 1.6, 1.2])
+        cols[0].markdown(f"**{year}**")
+        cols[1].caption(f"спрос {float(demand.get('base_total_t', 0.0)):.1f} т")
+        cols[2].caption(
+            f"критический {float(demand.get('base_critical_t', 0.0)):.1f} т"
+        )
+        label = "Удалить" if year == last_year else f"Удалить {year}–{last_year}"
+        if cols[3].button(
+            label,
+            key=f"remove-research-year-{year}",
+            help=(
+                f"Удалить {year} год из исследовательского горизонта."
+                if year == last_year
+                else f"Удалить {year} и все более поздние добавленные годы."
+            ),
+        ):
+            try:
+                st.session_state.workspace = runtime.workspace_remove_year(
+                    st.session_state.workspace,
+                    year,
+                )
+                current_plan = (
+                    st.session_state.research_plan
+                    or st.session_state.calculated_plan
+                )
+                cleaned = _remove_years_from_plan(current_plan, year)
+                st.session_state.research_plan = research_plan_template(
+                    cleaned,
+                    st.session_state.workspace,
+                )
+                st.session_state.research_result = None
+                if year == last_year:
+                    st.success(f"{year} удалён из исследовательского горизонта.")
+                else:
+                    st.success(
+                        f"Годы {year}–{last_year} удалены, чтобы горизонт остался непрерывным."
+                    )
+                st.rerun()
+            except Exception as exc:
+                render_error(exc, "Год не удалён")
+
+
 def _research_source_list(metadata: dict) -> None:
     source_ids = list(metadata.get("research_source_ids", []))
     st.subheader("Добавленные вами источники")
@@ -389,6 +487,7 @@ def render() -> None:
     cols[1].metric("Добавлено источников", len(metadata["research_source_ids"]))
     cols[2].metric("Горизонт", f"{min(metadata['years'])}–{max(metadata['years'])}")
     _research_source_list(metadata)
+    _research_year_list(metadata)
     tabs = st.tabs(["Добавить источник", "Продлить горизонт", "План и расчёт"])
     with tabs[0]:
         _add_source()
