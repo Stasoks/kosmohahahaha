@@ -76,6 +76,25 @@ Exact orders, reservations, investment dates, reserve policy and Emergency roles
 stored in the two plan JSON files and in
 `results/final-evidence/decision_comparison.json`.
 
+## Comparison with common-strategy alternatives
+
+`results/final-evidence/alternatives/` re-evaluates the three existing distinct
+common strategies and FINAL BASE on the same BASE / MANDATORY_STRESS inputs.
+
+Relative to FINAL BASE:
+
+- `cost-focused` costs 7.85% more in BASE, but improves aggregate stress service by
+  4.02 percentage points and reduces stress shortage by 61.703 t;
+- `diversified` costs 11.23% more, improves aggregate stress service by 6.60
+  percentage points and reduces shortage by 101.223 t;
+- `resilient` costs 11.42% more, improves aggregate stress service by 7.11
+  percentage points and reduces shortage by 109.127 t.
+
+None of these comparisons turns the plan name into a verdict. They expose the
+cost-versus-fixed-plan-resilience trade-off required for management choice. The
+stress-specific adaptation remains a separate scenario plan and reaches the official
+stress service benchmarks more closely than the common BASE plans.
+
 ## Official demand sensitivity
 
 `results/final-evidence/sensitivity/official_low_base_high.*` uses the organizer LOW,
@@ -104,6 +123,25 @@ demand multiplier while keeping the strategy unchanged.
 
 This is a grid threshold, not a continuous mathematical proof.
 
+## Additional sensitivity
+
+Two additional one-factor checks are exported under
+`results/final-evidence/sensitivity/`.
+
+**Earth-Flex lead-time delay.** The fixed FINAL BASE plan is already infeasible at a
++1 month delay: annual total service in 2040 falls to 96.35%, total shortage is
+14.244 t and the 45-day reserve is also breached. The reverse-stress grid therefore
+reports 0 months as the last safe tested delay and +1 month as the first failing
+point.
+
+**ZBO loss multiplier.** The plan remains valid at the official loss value
+(multiplier 1.0), but at 1.25x the modeled ZBO throughput loss the 2040 opening
+reserve falls to 43.83 days. Service is still 100% at that point, so the test exposes
+a reserve-margin failure before a service failure.
+
+Together with LOW/HIGH demand these results identify demand, flexible-channel timing
+and storage loss as material sensitivities of the selected low-cost BASE architecture.
+
 ## Team risks and mitigation
 
 The complete portfolio is exported to `results/final-evidence/risks/`.
@@ -130,7 +168,9 @@ no probability is invented where the case provides no statistical basis.
 - stress methodology: `docs/STRESS_PROTOCOL.md`;
 - scientific evidence map: `docs/SCIENTIFIC_BASIS.md`;
 - future-period/source extension: `docs/RESEARCH_EXTENSION.md`;
-- UI backend contract: `docs/UI_INTEGRATION.md`.
+- UI backend contract: `docs/UI_INTEGRATION.md`;
+- final budget and decision gates: `docs/FINAL_ROADMAP.md`;
+- stakeholder consequences and trade-offs: `docs/STAKEHOLDER_IMPACT.md`.
 
 ## Important interpretation
 
