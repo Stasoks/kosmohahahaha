@@ -427,3 +427,207 @@ def stakeholder_scenario_rows(
                 row[case_id] = "Последствия определяются рассчитанными сроками и поставками"
         rows.append(row)
     return rows
+
+def annual_stress_impact_rows(abc: dict[str, Any]) -> list[dict[str, Any]]:
+    """Build year-by-year BASE -> stress -> adaptation consequences.
+
+    Commercial shortage is the non-critical part of total shortage because
+    critical demand is included in total demand and is served first.
+    """
+
+    indexed: dict[str, dict[int, dict[str, Any]]] = {}
+    for case_id in ("A", "B", "C"):
+        result = abc.get(case_id)
+        indexed[case_id] = {
+            int(row["year"]): row for row in (result or {}).get("annual", [])
+        }
+
+    years = sorted(
+        set(indexed["A"]) | set(indexed["B"]) | set(indexed["C"])
+    )
+    rows: list[dict[str, Any]] = []
+    for year in years:
+        a = indexed["A"].get(year, {})
+        b = indexed["B"].get(year, {})
+        c = indexed["C"].get(year, {})
+
+        def value(row: dict[str, Any], key: str) -> float:
+            return float(row.get(key, 0.0) or 0.0)
+
+        def commercial(row: dict[str, Any]) -> float:
+            return max(
+                0.0,
+                value(row, "shortage_t") - value(row, "critical_shortage_t"),
+            )
+
+        rows.append(
+            {
+                "year": year,
+                "base_total_demand_t": value(a, "demand_total_t"),
+                "stress_total_demand_t": value(b, "demand_total_t"),
+                "stress_demand_delta_t": (
+                    value(b, "demand_total_t") - value(a, "demand_total_t")
+                ),
+                "base_critical_demand_t": value(a, "demand_critical_t"),
+                "stress_critical_demand_t": value(b, "demand_critical_t"),
+                "stress_critical_demand_delta_t": (
+                    value(b, "demand_critical_t") - value(a, "demand_critical_t")
+                ),
+                "base_shortage_t": value(a, "shortage_t"),
+                "stress_shortage_t": value(b, "shortage_t"),
+                "adapted_shortage_t": value(c, "shortage_t"),
+                "base_critical_shortage_t": value(a, "critical_shortage_t"),
+                "stress_critical_shortage_t": value(b, "critical_shortage_t"),
+                "adapted_critical_shortage_t": value(c, "critical_shortage_t"),
+                "base_commercial_shortage_t": commercial(a),
+                "stress_commercial_shortage_t": commercial(b),
+                "adapted_commercial_shortage_t": commercial(c),
+                "base_total_service": value(a, "total_service_level"),
+                "stress_total_service": value(b, "total_service_level"),
+                "adapted_total_service": value(c, "total_service_level"),
+                "base_critical_service": value(a, "critical_service_level"),
+                "stress_critical_service": value(b, "critical_service_level"),
+                "adapted_critical_service": value(c, "critical_service_level"),
+                "base_cost_mln": value(a, "total_cost_mln"),
+                "stress_cost_mln": value(b, "total_cost_mln"),
+                "adapted_cost_mln": value(c, "total_cost_mln"),
+                "stress_cost_delta_mln": (
+                    value(b, "total_cost_mln") - value(a, "total_cost_mln")
+                ),
+                "adaptation_cost_delta_mln": (
+                    value(c, "total_cost_mln") - value(b, "total_cost_mln")
+                ),
+            }
+        )
+    return rows
+
+
+def stakeholder_detail_rows(
+    stakeholder_config: dict[str, Any],
+    abc: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Expose interests, obligations, cost/risk allocation and A/B/C outcomes."""
+
+    scenario_rows = {
+        row["Сторона"]: row
+        for row in stakeholder_scenario_rows(stakeholder_config, abc)
+    }
+    rows: list[dict[str, Any]] = []
+    for participant in stakeholder_config.get("participants", []):
+        source = scenario_rows.get(participant.get("name", ""), {})
+        rows.append(
+            {
+                "Сторона": participant.get("name", ""),
+                "Интересы / KPI": "; ".join(
+                    [
+                        *participant.get("interests", []),
+                        *[f"KPI: {item}" for item in participant.get("kpis", [])],
+                    ]
+                ),
+                "Обязательства": "; ".join(participant.get("obligations", []))
+                or "не заданы",
+                "Кто несёт затраты": "; ".join(participant.get("cost_bearer", []))
+                or "нет отдельной денежной аллокации в кейсе",
+                "Какой риск несёт": "; ".join(participant.get("risk_bearer", []))
+                or "не задан",
+                "A · BASE": source.get("A", "—"),
+                "B · тот же план в стрессе": source.get("B", "—"),
+                "C · адаптация в стрессе": source.get("C", "—"),
+            }
+        )
+    return rows
+
+
+def risk_stakeholder_impact_rows(
+    stakeholder_config: dict[str, Any],
+    risk_id: str,
+    baseline: dict[str, Any],
+    risk_result: dict[str, Any],
+    residual_result: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """Summarise calculated consequences of one team risk by stakeholder."""
+
+    before = minimum_annual_metrics(baseline)
+    after = minimum_annual_metrics(risk_result)
+    residual = minimum_annual_metrics(residual_result) if residual_result else None
+
+    def commercial(item: dict[str, Any]) -> float:
+        return max(0.0, item["total_shortage_t"] - item["critical_shortage_t"])
+
+    rows: list[dict[str, Any]] = []
+    for participant in stakeholder_config.get("participants", []):
+        if risk_id not in participant.get("relevant_risks", []):
+            continue
+        stakeholder_id = participant["stakeholder_id"]
+        if stakeholder_id == "operator":
+            consequence = (
+                f"стоимость {before['undiscounted_cost_mln']:.1f} → "
+                f"{after['undiscounted_cost_mln']:.1f} млн; "
+                f"мин. резерв {before['minimum_reserve_days']:.1f} → "
+                f"{after['minimum_reserve_days']:.1f} дн."
+            )
+            residual_text = (
+                f"стоимость {residual['undiscounted_cost_mln']:.1f} млн; "
+                f"мин. резерв {residual['minimum_reserve_days']:.1f} дн."
+                if residual
+                else "мера не рассчитана"
+            )
+        elif stakeholder_id == "critical_consumers":
+            consequence = (
+                f"критический дефицит {before['critical_shortage_t']:.1f} → "
+                f"{after['critical_shortage_t']:.1f} т; "
+                f"мин. сервис {100*before['minimum_annual_critical_service']:.1f}% → "
+                f"{100*after['minimum_annual_critical_service']:.1f}%"
+            )
+            residual_text = (
+                f"дефицит {residual['critical_shortage_t']:.1f} т; "
+                f"мин. сервис {100*residual['minimum_annual_critical_service']:.1f}%"
+                if residual
+                else "мера не рассчитана"
+            )
+        elif stakeholder_id == "commercial_consumers":
+            consequence = (
+                f"некритический дефицит {commercial(before):.1f} → "
+                f"{commercial(after):.1f} т"
+            )
+            residual_text = (
+                f"некритический дефицит {commercial(residual):.1f} т"
+                if residual
+                else "мера не рассчитана"
+            )
+        elif stakeholder_id == "financing":
+            consequence = (
+                f"CAPEX {before['total_capex_mln']:.1f} → "
+                f"{after['total_capex_mln']:.1f} млн; PV cost "
+                f"{before['discounted_cost_mln']:.1f} → "
+                f"{after['discounted_cost_mln']:.1f} млн"
+            )
+            residual_text = (
+                f"CAPEX {residual['total_capex_mln']:.1f} млн; "
+                f"PV cost {residual['discounted_cost_mln']:.1f} млн"
+                if residual
+                else "мера не рассчитана"
+            )
+        else:
+            consequence = (
+                "последствия отражаются в рассчитанных поставках, сроках "
+                "и загрузке контрактов"
+            )
+            residual_text = (
+                "после меры используются пересчитанные поставки и сроки"
+                if residual
+                else "мера не рассчитана"
+            )
+
+        rows.append(
+            {
+                "Сторона": participant.get("name", stakeholder_id),
+                "Интересы": "; ".join(participant.get("interests", [])),
+                "Кто несёт затраты": "; ".join(participant.get("cost_bearer", []))
+                or "нет отдельной денежной аллокации в кейсе",
+                "Риск / последствие": "; ".join(participant.get("risk_bearer", [])),
+                "До риска → в риске": consequence,
+                "После меры": residual_text,
+            }
+        )
+    return rows
