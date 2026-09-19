@@ -11,6 +11,28 @@ from app.kernel_bridge import case_metadata
 from app.state import accept_calculation
 
 
+FACTOR_LABELS = {
+    "total_demand_multiplier": "Общий спрос",
+    "critical_demand_multiplier": "Критический спрос",
+    "variable_price_multiplier": "Цена поставки",
+    "actual_delivery_share": "Фактическая доля поставки",
+    "availability_share": "Доступность канала",
+    "additional_lead_time_months": "Дополнительная задержка",
+    "source_capacity_multiplier": "Мощность источника",
+    "reservation_price_multiplier": "Плата за резервирование",
+    "storage_loss_rate_multiplier": "Потери в хранилище",
+    "storage_capacity_multiplier": "Ёмкость хранилища",
+}
+
+SOURCE_OVERRIDE_LABELS = {
+    "capacity_t_per_year": "Мощность, т/год",
+    "variable_cost_mln_per_t": "Цена, млн/т",
+    "reservation_rate_mln_per_t_year_capacity": "Плата за резерв",
+    "take_or_pay_share": "Мин. оплачиваемая доля",
+    "selected_lead_time_months": "Срок поставки, мес.",
+}
+
+
 SOURCE_COLUMNS = {
     "source_id": "Код",
     "name": "Источник",
@@ -127,7 +149,18 @@ def _source_editor() -> None:
 
     if st.session_state.get("source_overrides"):
         with st.expander("Что изменено относительно исходных данных"):
-            st.json(st.session_state.source_overrides)
+            change_rows = []
+            for source_id, patch in st.session_state.source_overrides.items():
+                source_name = official["sources"].get(source_id, {}).get("name", source_id)
+                for field, value in patch.items():
+                    change_rows.append(
+                        {
+                            "Источник": f"{source_id} · {source_name}",
+                            "Параметр": SOURCE_OVERRIDE_LABELS.get(field, field),
+                            "Новое значение": value,
+                        }
+                    )
+            st.dataframe(pd.DataFrame(change_rows), hide_index=True, width="stretch")
 
 
 def _build_custom_spec(
@@ -326,7 +359,28 @@ def _scenario_editor() -> None:
             f"{custom['period_start']} — {custom['period_end']} · изменений: {len(custom['factor_changes'])}."
         )
         with st.expander("Параметры пользовательского сценария"):
-            st.dataframe(pd.DataFrame(custom["factor_changes"]), hide_index=True, width="stretch")
+            rows = []
+            metadata = case_metadata(
+                source_overrides=st.session_state.get("source_overrides", {})
+            )
+            for change in custom["factor_changes"]:
+                source_id = change.get("source_id")
+                storage_id = change.get("storage_id")
+                target = "—"
+                if source_id:
+                    source = metadata["sources"].get(source_id, {})
+                    target = f"{source_id} · {source.get('name', source_id)}"
+                elif storage_id:
+                    target = str(storage_id)
+                rows.append(
+                    {
+                        "Параметр": FACTOR_LABELS.get(change.get("factor"), change.get("factor")),
+                        "Объект": target,
+                        "Значение": change.get("value"),
+                        "Период": f"{change.get('period_start')} — {change.get('period_end')}",
+                    }
+                )
+            st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
 
 def render() -> None:
