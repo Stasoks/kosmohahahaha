@@ -320,6 +320,36 @@ def _rebuild_reservations(
                     ),
                 }
             )
+    reserve_strategies = raw["decisions"].get("inventory_policy", {}).get(
+        "reserve_strategy_by_year", {}
+    )
+    if "E" in case_data.sources:
+        for year in case_data.official_years:
+            strategy = reserve_strategies.get(str(year), reserve_strategies.get(year))
+            if strategy != "emergency_contract":
+                continue
+            emergency_capacity = case_data.source_capacity("E", year)
+            existing = next(
+                (
+                    item
+                    for item in reservations
+                    if item["source_id"] == "E" and int(item["year"]) == year
+                ),
+                None,
+            )
+            if existing is None:
+                reservations.append(
+                    {
+                        "source_id": "E",
+                        "year": year,
+                        "reserved_capacity_t": emergency_capacity,
+                    }
+                )
+            else:
+                existing["reserved_capacity_t"] = max(
+                    float(existing["reserved_capacity_t"]),
+                    emergency_capacity,
+                )
     raw["decisions"]["capacity_reservations"] = sorted(
         reservations, key=lambda item: (item["source_id"], item["year"])
     )
@@ -566,6 +596,48 @@ def _stress_repair_requirements(
     return {month: amount for month, amount in requirements.items() if amount > 1e-10}
 
 
+def _reserve_contract_repair(
+    candidate: _Candidate,
+    base_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> tuple[dict[str, Any], str] | None:
+    """Repair stress reserve violations using the organizer-allowed Emergency contract."""
+    violating_years = sorted(
+        {
+            int(str(item.period)[:4])
+            for item in candidate.stress_result.violations
+            if item.severity == "hard" and item.code == "RESERVE_45D"
+        }
+    )
+    if not violating_years or "E" not in case_data.sources:
+        return None
+
+    value = copy.deepcopy(candidate.plan.raw)
+    strategies = value["decisions"].setdefault("inventory_policy", {}).setdefault(
+        "reserve_strategy_by_year", {}
+    )
+    roles = value["decisions"].setdefault("emergency_role_by_year", {})
+    emergency = case_data.sources["E"]
+    lead = assumptions.source_delivery_lead_months(emergency)
+    emergency_schedule = _schedule(value, "E")
+
+    for year in violating_years:
+        strategies[str(year)] = "emergency_contract"
+        roles[str(year)] = "reserve_only"
+        for order_month in list(emergency_schedule.get("values", {})):
+            arrival_month = add_months(str(order_month), lead)
+            if int(arrival_month[:4]) == year:
+                emergency_schedule["values"][order_month] = 0.0
+
+    commissions = _commissions(value, base_scenario, case_data, assumptions)
+    _rebuild_reservations(value, commissions, case_data)
+    return (
+        value,
+        "reserve_contract_repair:" + ",".join(str(year) for year in violating_years),
+    )
+
+
 def _target_repair_candidate(
     candidate: _Candidate,
     config: StrategyBuilderConfig,
@@ -724,6 +796,14 @@ def _target_repair_mutations(
     assumptions: ModelAssumptions,
 ) -> list[tuple[dict[str, Any], str]]:
     values: list[tuple[dict[str, Any], str]] = []
+    reserve_repair = _reserve_contract_repair(
+        candidate,
+        base_scenario,
+        case_data,
+        assumptions,
+    )
+    if reserve_repair is not None:
+        values.append(reserve_repair)
     for profile in ("COST", "RELIABILITY", "DIVERSIFIED"):
         item = _target_repair_candidate(
             candidate,
