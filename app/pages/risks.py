@@ -102,10 +102,10 @@ def _risk_tab() -> None:
     mitigation = definition.get("mitigation") or {}
     st.subheader("Мера и остаточный риск")
     st.write(mitigation.get("description", "Мера не задана."))
-    if mitigation.get("plan_patch"):
+    if mitigation.get("plan_patch") or mitigation.get("plan_reference"):
         if st.button("Рассчитать меру", type="primary"):
             try:
-                with st.spinner("Plan patch проверяется и пересчитывается в том же risk environment…"):
+                with st.spinner("Мера проверяется и пересчитывается в том же risk environment…"):
                     st.session_state.mitigation_result = runtime.mitigation(st.session_state.calculated_plan, selected)
             except Exception as exc:
                 render_error(exc, "Не удалось рассчитать меру")
