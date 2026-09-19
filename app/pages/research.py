@@ -252,7 +252,18 @@ def _research_plan_editor() -> None:
     reserves = []
     for source_id, source in metadata["sources"].items():
         schedule = schedules.get(source_id, {"values": {}})
-        order_row = {"Источник": source_id, "Название": source["name"]}
+        active = any(
+            float(value) > 0
+            for value in schedule.get("values", {}).values()
+        ) or any(
+            reservations.get((source_id, year), 0.0) > 0
+            for year in metadata["years"]
+        )
+        order_row = {
+            "Использовать": active,
+            "Источник": source_id,
+            "Название": source["name"],
+        }
         reserve_row = {"Источник": source_id, "Название": source["name"]}
         for year in metadata["years"]:
             order_row[str(year)] = sum(
@@ -263,23 +274,59 @@ def _research_plan_editor() -> None:
         orders.append(order_row)
         reserves.append(reserve_row)
     st.subheader("Решения расширенного плана")
-    order_frame = st.data_editor(pd.DataFrame(orders), hide_index=True, width="stretch")
+    st.caption(
+        "Чтобы исключить даже официальный источник из этого исследовательского плана, "
+        "снимите флажок «Использовать». Сам источник останется в модели и в исходных данных, "
+        "но его заказы и резервирование будут обнулены."
+    )
+    order_frame = st.data_editor(
+        pd.DataFrame(orders),
+        hide_index=True,
+        width="stretch",
+        column_config={
+            "Использовать": st.column_config.CheckboxColumn(
+                help="Снять флажок = не использовать источник в этом исследовательском плане."
+            ),
+            "Источник": st.column_config.TextColumn(disabled=True),
+            "Название": st.column_config.TextColumn(disabled=True),
+        },
+    )
     with st.expander("Резервирование мощности"):
         reserve_frame = st.data_editor(pd.DataFrame(reserves), hide_index=True, width="stretch")
     if st.button("Применить решения", width="stretch"):
         updated = copy.deepcopy(raw)
+        active_sources = {
+            str(row["Источник"])
+            for _, row in order_frame.iterrows()
+            if bool(row.get("Использовать", True))
+        }
         updated["decisions"]["supply_orders"] = [
             {
-                "source_id": str(row["Источник"]), "mode": "annual_even",
-                "values": {str(year): float(row[str(year)]) for year in metadata["years"]},
+                "source_id": str(row["Источник"]),
+                "mode": "annual_even",
+                "values": {
+                    str(year): (
+                        float(row[str(year)])
+                        if str(row["Источник"]) in active_sources
+                        else 0.0
+                    )
+                    for year in metadata["years"]
+                },
             }
             for _, row in order_frame.iterrows()
         ]
         updated["decisions"]["capacity_reservations"] = [
-            {"source_id": str(row["Источник"]), "year": year, "reserved_capacity_t": float(row[str(year)])}
+            {
+                "source_id": str(row["Источник"]),
+                "year": year,
+                "reserved_capacity_t": float(row[str(year)]),
+            }
             for _, row in reserve_frame.iterrows()
             for year in metadata["years"]
-            if float(row[str(year)]) > 0
+            if (
+                str(row["Источник"]) in active_sources
+                and float(row[str(year)]) > 0
+            )
         ]
         st.session_state.research_plan = updated
         st.session_state.research_result = None
