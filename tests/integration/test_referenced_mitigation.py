@@ -54,5 +54,5 @@ def test_plan_reference_mitigation_uses_saved_contingency(
         == "plans/resilient.json"
     )
     assert mitigation.mitigated_plan["metadata"]["mitigation_of"] == plan.plan_id
-    assert mitigation.risk_result.summary["scenario_id"] == "BASE"
+    assert mitigation.risk_result.summary["scenario_id"] == "BASE+TEST-PLAN-REFERENCE"
     assert mitigation.risk_result.summary["risk_ids"] == ["TEST-PLAN-REFERENCE"]
