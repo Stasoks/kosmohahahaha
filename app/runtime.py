@@ -72,51 +72,81 @@ def alternatives(
 
 
 @st.cache_data(show_spinner=False)
-def _risks(payload: str, source_payload: str) -> dict[str, Any]:
-    return bridge.risks(json.loads(payload), json.loads(source_payload))
+def _risks(payload: str, source_payload: str, environment_key: str) -> dict[str, Any]:
+    return bridge.risks(
+        json.loads(payload),
+        json.loads(source_payload),
+        environment_key,
+    )
 
 
 def risks(
     raw: dict[str, Any],
     source_overrides: dict[str, Any] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     return _risks(
         bridge.canonical_json(raw),
         bridge.canonical_json(source_overrides or {}),
+        environment_key,
     )
 
 
 @st.cache_data(show_spinner=False)
-def _risk_detail(payload: str, risk_id: str, source_payload: str) -> dict[str, Any]:
-    return bridge.risk_detail(json.loads(payload), risk_id, json.loads(source_payload))
+def _risk_detail(
+    payload: str,
+    risk_id: str,
+    source_payload: str,
+    environment_key: str,
+) -> dict[str, Any]:
+    return bridge.risk_detail(
+        json.loads(payload),
+        risk_id,
+        json.loads(source_payload),
+        environment_key,
+    )
 
 
 def risk_detail(
     raw: dict[str, Any],
     risk_id: str,
     source_overrides: dict[str, Any] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     return _risk_detail(
         bridge.canonical_json(raw),
         risk_id,
         bridge.canonical_json(source_overrides or {}),
+        environment_key,
     )
 
 
 @st.cache_data(show_spinner=False)
-def _mitigation(payload: str, risk_id: str, source_payload: str) -> dict[str, Any]:
-    return bridge.mitigation_detail(json.loads(payload), risk_id, json.loads(source_payload))
+def _mitigation(
+    payload: str,
+    risk_id: str,
+    source_payload: str,
+    environment_key: str,
+) -> dict[str, Any]:
+    return bridge.mitigation_detail(
+        json.loads(payload),
+        risk_id,
+        json.loads(source_payload),
+        environment_key,
+    )
 
 
 def mitigation(
     raw: dict[str, Any],
     risk_id: str,
     source_overrides: dict[str, Any] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     return _mitigation(
         bridge.canonical_json(raw),
         risk_id,
         bridge.canonical_json(source_overrides or {}),
+        environment_key,
     )
 
 
@@ -126,10 +156,15 @@ def _sensitivity(
     parameter_payload: str,
     values: tuple[Any, ...],
     source_payload: str,
+    environment_key: str,
 ) -> dict[str, Any]:
     parameter = json.loads(parameter_payload)
     return bridge.sensitivity(
-        json.loads(payload), values, parameter, json.loads(source_payload)
+        json.loads(payload),
+        values,
+        parameter,
+        json.loads(source_payload),
+        environment_key,
     )
 
 
@@ -138,12 +173,14 @@ def sensitivity(
     parameter: str | dict[str, Any],
     values: list[Any],
     source_overrides: dict[str, Any] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     return _sensitivity(
         bridge.canonical_json(raw),
         bridge.canonical_json(parameter),
         tuple(values),
         bridge.canonical_json(source_overrides or {}),
+        environment_key,
     )
 
 
@@ -172,6 +209,7 @@ def _reverse(
     stop: float,
     step: float,
     source_payload: str,
+    environment_key: str,
 ) -> dict[str, Any]:
     return bridge.reverse_stress(
         json.loads(payload),
@@ -180,6 +218,7 @@ def _reverse(
         step,
         parameter=json.loads(parameter_payload),
         source_overrides=json.loads(source_payload),
+        environment_key=environment_key,
     )
 
 
@@ -190,6 +229,7 @@ def reverse(
     stop: float,
     step: float,
     source_overrides: dict[str, Any] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     return _reverse(
         bridge.canonical_json(raw),
@@ -198,6 +238,7 @@ def reverse(
         stop,
         step,
         bridge.canonical_json(source_overrides or {}),
+        environment_key,
     )
 
 
