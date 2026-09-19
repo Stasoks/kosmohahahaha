@@ -85,6 +85,11 @@ def _case_data() -> None:
 
 
 def _exports() -> None:
+    st.caption(
+        "CSV для оператора выгружаются с единицами прямо в заголовках: "
+        "например Demand_t, CAPEX_mln, SL_total_pct. Доли service level "
+        "в CSV переводятся в проценты."
+    )
     if st.button("Подготовить выгрузки", type="primary"):
         try:
             with st.spinner("Формируются таблицы обычного, стрессового и пользовательского расчётов…"):
