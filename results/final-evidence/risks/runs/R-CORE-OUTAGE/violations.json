@@ -1,0 +1,47 @@
+[
+  {
+    "actual": 25.486343750000145,
+    "code": "RESERVE_45D",
+    "constraint_id": "RESERVE_45D",
+    "excess_or_gap": 19.513656249999855,
+    "human_message": "Reserve equivalence is 25.486 days; required 45.000 days.",
+    "limit": 45.0,
+    "operator": ">=",
+    "period": "2039-01",
+    "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+    "scenario": "BASE",
+    "severity": "hard",
+    "source_id": null,
+    "unit": "days"
+  },
+  {
+    "actual": 0.9554927994380052,
+    "code": "BASE_TOTAL_SERVICE",
+    "constraint_id": "BASE_TOTAL_SERVICE",
+    "excess_or_gap": 0.014507200561994726,
+    "human_message": "Total service is 95.55%; shortage is 17.358 t.",
+    "limit": 0.97,
+    "operator": ">=",
+    "period": "2040",
+    "reason": "total demand service minimum",
+    "scenario": "BASE",
+    "severity": "hard",
+    "source_id": null,
+    "unit": "share"
+  },
+  {
+    "actual": 20.911871794871903,
+    "code": "RESERVE_45D",
+    "constraint_id": "RESERVE_45D",
+    "excess_or_gap": 24.088128205128097,
+    "human_message": "Reserve equivalence is 20.912 days; required 45.000 days.",
+    "limit": 45.0,
+    "operator": ">=",
+    "period": "2040-01",
+    "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+    "scenario": "BASE",
+    "severity": "hard",
+    "source_id": null,
+    "unit": "days"
+  }
+]

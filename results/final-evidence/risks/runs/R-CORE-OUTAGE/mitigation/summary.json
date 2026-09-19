@@ -1,0 +1,59 @@
+{
+  "applied_overrides": [
+    {
+      "application_order": 1,
+      "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+      "factor": "availability_share",
+      "factor_order": 1,
+      "period_end": "2038-09",
+      "period_start": "2038-04",
+      "risk_id": "R-CORE-OUTAGE",
+      "risk_order": 1,
+      "source_id": "A",
+      "status": "TEAM_ASSUMPTION",
+      "value": 0
+    }
+  ],
+  "base_scenario_id": "BASE",
+  "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+  "cost_per_served_ton_mln": 7.719714725461096,
+  "critical_service_level": 0.9738984474885845,
+  "critical_shortage_t": 24.796474885844724,
+  "delayed_delivery_count": 0,
+  "delayed_delivery_t": 0,
+  "discounted_cost_mln": 9486.32187404161,
+  "discounted_cost_per_served_ton_mln": 7.034529174799713,
+  "emergency_usage_t": 34.904013961605585,
+  "environment_id": "BASE+R-CORE-OUTAGE",
+  "final_inventory_t": 0.0,
+  "hard_violation_count": 8,
+  "initial_stock_total_cost_mln": 334.81316789786985,
+  "minimum_inventory_t": 0.0,
+  "months_with_shortage": 4,
+  "official_horizon_years": [
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040
+  ],
+  "opening_inventory_t": 48.082191780821915,
+  "plan_id": "final-base-plan--mitigation-M-FLEX-2038",
+  "research_extension_years": [],
+  "research_source_ids": [],
+  "risk_ids": [
+    "R-CORE-OUTAGE"
+  ],
+  "run_id": "run-fb64e82d0cd96389",
+  "scenario_id": "BASE+R-CORE-OUTAGE",
+  "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+  "total_losses_t": 17.016267672806663,
+  "total_overflow_t": 4.56533333333342,
+  "total_service_level": 0.9701704017607832,
+  "total_shortage_t": 41.46314155251139,
+  "unavailable_requested_supply_t": 27.60458839406208,
+  "undiscounted_cost_mln": 10410.319843984124,
+  "valid": false,
+  "violation_count": 8
+}

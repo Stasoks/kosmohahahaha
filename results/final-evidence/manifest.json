@@ -1,0 +1,32 @@
+{
+  "builder_config": {
+    "beam_width": 24,
+    "max_candidates": 1200,
+    "max_iterations": 8,
+    "max_results": 3,
+    "seed": 17
+  },
+  "case_input_root": ".",
+  "plans": {
+    "BASE_PLAN": "plans/final_base.json",
+    "STRESS_ADAPTATION": "plans/final_stress_adaptation.json"
+  },
+  "provenance": {
+    "generated_plans": "TEAM_DECISION",
+    "official_inputs": "CASE_INPUT",
+    "outputs": "DIGITAL_TWIN_RESULT",
+    "stress_97_99": "RESILIENCE_BENCHMARK"
+  },
+  "purpose": "Final reproducible evidence pack for competition deliverables",
+  "run_ids": {
+    "A": "run-8690d38591556cda",
+    "B": "run-326f5bc9759327ac",
+    "C": "run-c417c7e9163c1e5f"
+  },
+  "status": "DIGITAL_TWIN_RESULT",
+  "three_way_comparison": {
+    "A": "FINAL_BASE_PLAN simulated in BASE",
+    "B": "the exact same FINAL_BASE_PLAN replayed in MANDATORY_STRESS",
+    "C": "FINAL_STRESS_ADAPTATION simulated in MANDATORY_STRESS"
+  }
+}

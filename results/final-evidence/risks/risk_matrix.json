@@ -1,0 +1,87 @@
+{
+  "axes": {
+    "impact": "ordinal 1..5",
+    "likelihood": "ordinal 1..5"
+  },
+  "cells": {
+    "1": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    },
+    "2": {
+      "1": [],
+      "2": [
+        {
+          "impact_score": 2,
+          "name": "Earth channel price shock",
+          "risk_id": "R-EARTH-PRICE"
+        }
+      ],
+      "3": [],
+      "4": [],
+      "5": []
+    },
+    "3": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    },
+    "4": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    },
+    "5": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    }
+  },
+  "note": "likelihood × impact is an ordinal prioritization score, not expected loss.",
+  "unknown_likelihood": [
+    {
+      "impact_score": 5,
+      "name": "Lunar-ISRU underdelivery",
+      "risk_id": "R-ISRU-UNDERDELIVERY"
+    },
+    {
+      "impact_score": 3,
+      "name": "Earth-Core temporary unavailability",
+      "risk_id": "R-CORE-OUTAGE"
+    },
+    {
+      "impact_score": 1,
+      "name": "Earth-New commissioning delay",
+      "risk_id": "R-EARTH-NEW-DELAY"
+    },
+    {
+      "impact_score": 2,
+      "name": "Storage degradation",
+      "risk_id": "R-STORAGE-DEGRADATION"
+    },
+    {
+      "impact_score": 5,
+      "name": "Demand upside",
+      "risk_id": "R-DEMAND-UPSIDE"
+    },
+    {
+      "impact_score": 2,
+      "name": "Launch and logistics delay",
+      "risk_id": "R-LOGISTICS-DELAY"
+    },
+    {
+      "impact_score": 1,
+      "name": "Lunar-ISRU CAPEX overrun",
+      "risk_id": "R-CAPEX-OVERRUN"
+    }
+  ]
+}
