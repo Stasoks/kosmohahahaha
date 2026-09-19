@@ -20,15 +20,17 @@ from kosmohak.loading import (
     RiskLoader,
     ScenarioLoader,
 )
-from kosmohak.reporting import export_analysis_result
+from kosmohak.reporting import export_analysis_result, export_plan_comparison
 from kosmohak.service import (
     StrategyBuilderConfig,
+    compare_plans,
     evaluate_both_scenarios,
     evaluate_risks,
     export_plan_results,
     export_risk_results,
     export_scenario_comparison,
     run_official_demand_sensitivity,
+    run_sensitivity,
     run_reverse_stress,
     save_plan,
     synthesize_strategy,
@@ -327,11 +329,58 @@ def main() -> int:
         },
     )
 
+    alternative_plans = [
+        PlanLoader.load(PLAN_DIR / "cost_focused.json", case_data, assumptions),
+        PlanLoader.load(PLAN_DIR / "diversified.json", case_data, assumptions),
+        PlanLoader.load(PLAN_DIR / "resilient.json", case_data, assumptions),
+        final_base,
+    ]
+    alternative_comparison = compare_plans(
+        alternative_plans, base, stress, case_data, assumptions
+    )
+    export_plan_comparison(
+        alternative_comparison, OUTPUT / "alternatives"
+    )
+
     demand_sensitivity = run_official_demand_sensitivity(
         final_base, base, case_data, assumptions
     )
     export_analysis_result(
         demand_sensitivity, OUTPUT / "sensitivity" / "official_low_base_high"
+    )
+
+    flex_lead_time_sensitivity = run_sensitivity(
+        final_base,
+        {
+            "name": "lead_time_delay",
+            "source_id": "B",
+            "status": "TEAM_ASSUMPTION",
+        },
+        [0, 1, 2, 3, 4, 6],
+        base,
+        case_data,
+        assumptions,
+    )
+    export_analysis_result(
+        flex_lead_time_sensitivity,
+        OUTPUT / "sensitivity" / "earth_flex_lead_time_delay_months",
+    )
+
+    zbo_loss_sensitivity = run_sensitivity(
+        final_base,
+        {
+            "name": "storage_loss_multiplier",
+            "storage_id": "ZBO",
+            "status": "TEAM_ASSUMPTION",
+        },
+        [0.5, 1.0, 1.25, 1.5, 2.0],
+        base,
+        case_data,
+        assumptions,
+    )
+    export_analysis_result(
+        zbo_loss_sensitivity,
+        OUTPUT / "sensitivity" / "zbo_loss_multiplier",
     )
 
     reverse_demand = run_reverse_stress(
@@ -345,6 +394,24 @@ def main() -> int:
     )
     export_analysis_result(
         reverse_demand, OUTPUT / "reverse_stress" / "demand_multiplier"
+    )
+
+    reverse_flex_delay = run_reverse_stress(
+        final_base,
+        {
+            "name": "lead_time_delay",
+            "source_id": "B",
+            "status": "TEAM_ASSUMPTION",
+        },
+        {"start": 0, "stop": 12, "step": 1},
+        "ANY_HARD",
+        base,
+        case_data,
+        assumptions,
+    )
+    export_analysis_result(
+        reverse_flex_delay,
+        OUTPUT / "reverse_stress" / "earth_flex_lead_time_delay_months",
     )
 
     risks = RiskLoader.load(PROJECT_ROOT / "configs" / "risks" / "team_risks.json")
@@ -378,6 +445,15 @@ def main() -> int:
             "B": base_replayed_in_stress.summary["run_id"],
             "C": adapted_stress_result.summary["run_id"],
         },
+        "additional_evidence": {
+            "alternative_comparison": "results/final-evidence/alternatives/",
+            "official_low_base_high": "results/final-evidence/sensitivity/official_low_base_high.json",
+            "earth_flex_lead_time_sensitivity": "results/final-evidence/sensitivity/earth_flex_lead_time_delay_months.json",
+            "zbo_loss_sensitivity": "results/final-evidence/sensitivity/zbo_loss_multiplier.json",
+            "reverse_demand": "results/final-evidence/reverse_stress/demand_multiplier.json",
+            "reverse_flex_delay": "results/final-evidence/reverse_stress/earth_flex_lead_time_delay_months.json",
+            "risk_portfolio": "results/final-evidence/risks/risk_portfolio.json"
+        },
         "provenance": {
             "official_inputs": "CASE_INPUT",
             "generated_plans": "TEAM_DECISION",
@@ -394,7 +470,10 @@ def main() -> int:
             "C": c,
             "deltas": deltas,
             "official_demand_first_failing_point": demand_sensitivity.first_failing_point,
+            "flex_lead_time_first_failing_point": flex_lead_time_sensitivity.first_failing_point,
+            "zbo_loss_first_failing_point": zbo_loss_sensitivity.first_failing_point,
             "reverse_demand": reverse_demand.to_dict(),
+            "reverse_flex_delay": reverse_flex_delay.to_dict(),
         },
         ensure_ascii=False,
         indent=2,
