@@ -5,6 +5,7 @@ import streamlit as st
 from app import charts
 from app.components import kpi_grid, problems, render_chart, results_status
 from app.kernel_bridge import case_metadata, plan_hash
+from app.state import is_dirty
 from app.view_models import source_names
 
 
@@ -35,6 +36,7 @@ def render() -> None:
         result,
         plan_hash(st.session_state.plan),
         result_pair["plan_hash"],
+        dirty_override=is_dirty(),
     )
     metadata = case_metadata(source_overrides=st.session_state.get("source_overrides", {}))
     limits = (
