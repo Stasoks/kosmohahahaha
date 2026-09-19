@@ -8,9 +8,9 @@ import streamlit as st
 from app import charts, runtime
 from app.components import render_chart, render_error
 from app.formatting import mass, money, percentage_points, signed
-from app.kernel_bridge import plan_hash, stress_reference_raw
+from app.kernel_bridge import plan_hash, stakeholder_data, stress_reference_raw
 from app.state import is_dirty
-from app.view_models import abc_comparison, decision_diff
+from app.view_models import (\n    abc_comparison,\n    annual_stress_impact_rows,\n    decision_diff,\n    stakeholder_detail_rows,\n)
 
 
 def _delta_cards(value: dict | None) -> None:
@@ -108,6 +108,127 @@ def render() -> None:
     )
     _delta_cards(view["stress_effect"])
     _delta_cards(view["adaptation_effect"])
+
+    st.subheader("Кто несёт последствия стресса")
+    st.caption(
+        "Критический спрос входит в общий. Поэтому коммерческий дефицит здесь "
+        "рассчитывается как общий дефицит минус критический дефицит."
+    )
+    annual_impacts = annual_stress_impact_rows(abc_payload)
+    impact_frame = pd.DataFrame(annual_impacts)
+    if not impact_frame.empty:
+        stress_years = [
+            int(year)
+            for year in impact_frame["year"].tolist()
+            if int(year) >= 2038
+        ]
+        selected_year = st.selectbox(
+            "Год для распределения последствий",
+            stress_years or impact_frame["year"].tolist(),
+            index=0,
+            key="stakeholder-stress-year",
+        )
+        selected_impact = next(
+            row for row in annual_impacts if int(row["year"]) == int(selected_year)
+        )
+        cols = st.columns(4)
+        cols[0].metric(
+            "Коммерческий дефицит",
+            mass(selected_impact["stress_commercial_shortage_t"]),
+            delta=signed(
+                selected_impact["stress_commercial_shortage_t"]
+                - selected_impact["base_commercial_shortage_t"],
+                "т",
+            ),
+        )
+        cols[1].metric(
+            "Критический дефицит",
+            mass(selected_impact["stress_critical_shortage_t"]),
+            delta=signed(
+                selected_impact["stress_critical_shortage_t"]
+                - selected_impact["base_critical_shortage_t"],
+                "т",
+            ),
+        )
+        cols[2].metric(
+            "Расходы оператора",
+            money(selected_impact["stress_cost_mln"]),
+            delta=signed(selected_impact["stress_cost_delta_mln"], "млн у.е."),
+        )
+        cols[3].metric(
+            "После адаптации: общий дефицит",
+            mass(selected_impact["adapted_shortage_t"]),
+            delta=signed(
+                selected_impact["adapted_shortage_t"]
+                - selected_impact["stress_shortage_t"],
+                "т",
+            ),
+        )
+
+        annual_display = impact_frame[
+            [
+                "year",
+                "base_total_demand_t",
+                "stress_total_demand_t",
+                "stress_commercial_shortage_t",
+                "stress_critical_shortage_t",
+                "stress_cost_delta_mln",
+                "adapted_commercial_shortage_t",
+                "adapted_critical_shortage_t",
+                "adaptation_cost_delta_mln",
+            ]
+        ].rename(
+            columns={
+                "year": "Год",
+                "base_total_demand_t": "Спрос BASE, т",
+                "stress_total_demand_t": "Спрос STRESS, т",
+                "stress_commercial_shortage_t": "Коммерческий дефицит STRESS, т",
+                "stress_critical_shortage_t": "Критический дефицит STRESS, т",
+                "stress_cost_delta_mln": "Δ стоимости STRESS − BASE, млн",
+                "adapted_commercial_shortage_t": "Коммерческий дефицит после адаптации, т",
+                "adapted_critical_shortage_t": "Критический дефицит после адаптации, т",
+                "adaptation_cost_delta_mln": "Δ стоимости адаптации, млн",
+            }
+        )
+        st.dataframe(annual_display, hide_index=True, width="stretch")
+
+        st.info(
+            f"{selected_year}: коммерческий спрос недообслужен на "
+            f"{selected_impact['stress_commercial_shortage_t']:.2f} т, "
+            f"критический — на {selected_impact['stress_critical_shortage_t']:.2f} т. "
+            f"Расчётные расходы оператора относительно BASE изменились на "
+            f"{selected_impact['stress_cost_delta_mln']:+.2f} млн у.е. "
+            "Денежная стоимость ущерба от необслуженного спроса не рассчитывается: "
+            "такого входного параметра в кейсе нет."
+        )
+        st.warning(
+            "Для обязательного стресса недопоставка Lunar-ISRU не создаёт "
+            "автоматический возврат платежей. Контур сохраняет рассчитанные "
+            "контрактные расходы; отдельные компенсации допустимы только как "
+            "явный исследовательский договорный сценарий."
+        )
+
+    st.subheader("Интересы, обязательства и распределение риска")
+    stakeholders = pd.DataFrame(
+        stakeholder_detail_rows(stakeholder_data(), abc_payload)
+    )
+    if not stakeholders.empty:
+        stakeholder_names = {
+            "Orbital fuel-node operator": "Оператор топливного узла",
+            "Critical consumers": "Критические потребители",
+            "Commercial consumers": "Коммерческие потребители",
+            "Fuel suppliers": "Поставщики топлива",
+            "Launch and logistics suppliers": "Пусковые и логистические подрядчики",
+            "Financing and investor side": "Финансирующая сторона / инвесторы",
+        }
+        stakeholders["Сторона"] = stakeholders["Сторона"].map(
+            lambda value: stakeholder_names.get(value, value)
+        )
+        st.dataframe(stakeholders, hide_index=True, width="stretch")
+        st.caption(
+            "Столбцы «Кто несёт затраты» и «Какой риск несёт» взяты из явной "
+            "карты сторон. Они не превращают недопоставку в выдуманный денежный ущерб."
+        )
 
     if "CUSTOM" in st.session_state.result:
         st.subheader("Текущий план в пользовательском сценарии")
