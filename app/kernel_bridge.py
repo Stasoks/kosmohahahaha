@@ -123,6 +123,81 @@ def default_plan_path() -> Path:
     return final if final.is_file() else CORE_ROOT / "configs" / "operator_plan_example.json"
 
 
+PLAN_PRESETS: dict[str, dict[str, str]] = {
+    "final_base": {
+        "label": "Финальный BASE · минимум стоимости",
+        "path": "plans/final_base.json",
+        "description": "Основной номинальный план для обычного сценария.",
+    },
+    "stress_adaptation": {
+        "label": "Адаптированный под стресс",
+        "path": "plans/final_stress_adaptation.json",
+        "description": "Отдельный заранее подготовленный план для обязательного стресс-сценария.",
+    },
+    "cost_focused": {
+        "label": "Альтернатива · экономичная",
+        "path": "plans/cost_focused.json",
+        "description": "Сравнительный вариант с акцентом на стоимость.",
+    },
+    "diversified": {
+        "label": "Альтернатива · диверсифицированная",
+        "path": "plans/diversified.json",
+        "description": "Сравнительный вариант с более распределёнными поставками.",
+    },
+    "resilient": {
+        "label": "Альтернатива · устойчивая",
+        "path": "plans/resilient.json",
+        "description": "Сравнительный вариант с большим запасом устойчивости.",
+    },
+}
+
+
+def plan_presets() -> list[dict[str, str]]:
+    """Return saved operator strategies available for explicit UI switching."""
+
+    ctx = application_context()
+    output: list[dict[str, str]] = []
+    for key, item in PLAN_PRESETS.items():
+        path = CORE_ROOT / item["path"]
+        if not path.is_file():
+            continue
+        plan = load_plan(path, ctx.case_data, ctx.assumptions)
+        output.append({
+            "key": key,
+            "label": item["label"],
+            "description": item["description"],
+            "plan_id": plan.plan_id,
+            "scenario_id": plan.scenario_id,
+        })
+    return output
+
+
+def plan_preset_raw(key: str) -> dict[str, Any]:
+    """Load one saved plan without changing session state or recalculating it."""
+
+    if key not in PLAN_PRESETS:
+        raise BridgeError("UNKNOWN_PLAN_PRESET", f"Неизвестная сохранённая стратегия: {key}")
+    path = CORE_ROOT / PLAN_PRESETS[key]["path"]
+    if not path.is_file():
+        raise BridgeError("PLAN_PRESET_NOT_FOUND", f"Файл стратегии не найден: {path.name}")
+    ctx = application_context()
+    return copy.deepcopy(load_plan(path, ctx.case_data, ctx.assumptions).raw)
+
+
+def plan_preset_key(raw: dict[str, Any]) -> str | None:
+    """Identify a saved preset by plan_id and decisions, if the current plan matches one."""
+
+    current_id = str(raw.get("plan_id", ""))
+    current_decisions = raw.get("decisions")
+    for item in plan_presets():
+        if item["plan_id"] != current_id:
+            continue
+        candidate = plan_preset_raw(item["key"])
+        if candidate.get("decisions") == current_decisions:
+            return item["key"]
+    return None
+
+
 def default_plan_raw() -> dict[str, Any]:
     ctx = application_context()
     return copy.deepcopy(load_plan(default_plan_path(), ctx.case_data, ctx.assumptions).raw)
