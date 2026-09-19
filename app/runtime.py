@@ -129,6 +129,23 @@ def reverse(
 
 
 @st.cache_data(show_spinner=False)
+def recommended_base(
+    max_candidates: int = 1200,
+    beam_width: int = 24,
+    iterations: int = 8,
+    max_results: int = 80,
+    seed: int = 17,
+) -> dict[str, Any]:
+    return bridge.build_recommended_base(
+        max_candidates=max_candidates,
+        beam_width=beam_width,
+        max_iterations=iterations,
+        max_results=max_results,
+        seed=seed,
+    )
+
+
+@st.cache_data(show_spinner=False)
 def builder(max_candidates: int, beam_width: int, iterations: int, seed: int) -> dict[str, Any]:
     return bridge.build_stress_specific(
         max_candidates=max_candidates,
