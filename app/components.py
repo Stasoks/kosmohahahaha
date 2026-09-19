@@ -142,29 +142,159 @@ def results_status(
     )
 
 
-def kpi_grid(result: dict[str, Any], capex_limits: tuple[float, float] = (1800, 2800)) -> None:
-    values = minimum_annual_metrics(result)
-    first = st.columns(4)
-    first[0].metric(
-        "Статус",
-        "Исполним" if values["valid"] else "Неисполним",
-        f"Нарушений: {values['hard_violation_count']}",
-        delta_color="inverse",
-    )
-    first[1].metric("Мин. общий сервис", percent(values["minimum_annual_total_service"]))
-    first[2].metric("Мин. критический сервис", percent(values["minimum_annual_critical_service"]))
-    first[3].metric("Общий дефицит", mass(values["total_shortage_t"]))
-    second = st.columns(4)
-    second[0].metric("Критический дефицит", mass(values["critical_shortage_t"]))
-    second[1].metric("Минимальный резерв", f"{values['minimum_reserve_days']:.1f} дней")
-    second[2].metric("Инвестиции до 2037", f"{values['capex_through_2037_mln']:.0f} / {capex_limits[0]:.0f}", help="Официальный лимит инвестиций до конца 2037 года.")
-    second[3].metric("Инвестиции всего", f"{values['total_capex_mln']:.0f} / {capex_limits[1]:.0f}", help="2 800 — лимит инвестиций, а не общий бюджет стратегии.")
-    third = st.columns(4)
-    third[0].metric("Полная стоимость", money(values["undiscounted_cost_mln"]))
-    third[1].metric("Приведённая стоимость", money(values["discounted_cost_mln"]))
-    third[2].metric("Стоимость обслуженной тонны", money(values["cost_per_served_ton_mln"], 3))
-    third[3].metric("Минимальный запас", mass(values["minimum_inventory_t"]))
+def kpi_grid(
+    result: dict[str, Any],
+    capex_limits: tuple[float, float] = (1800, 2800),
+    *,
+    baseline: dict[str, Any] | None = None,
+    scenario_id: str = "BASE",
+) -> None:
+    """Decision-oriented KPI summary with optional deltas to a baseline result."""
 
+    values = minimum_annual_metrics(result)
+    base = minimum_annual_metrics(baseline) if baseline is not None else None
+
+    def delta(key: str, *, scale: float = 1.0, suffix: str = "") -> str | None:
+        if base is None:
+            return None
+        value = scale * (float(values[key]) - float(base[key]))
+        sign = "+" if value > 0 else ""
+        return f"{sign}{value:.1f}{suffix}"
+
+    is_base = scenario_id == "BASE"
+    service_label = "требование" if is_base else "ориентир устойчивости"
+    status_text = "План исполним" if values["valid"] else "План требует изменений"
+    if values["valid"]:
+        st.success(
+            f"✓ {status_text}. Критических нарушений: {values['hard_violation_count']}."
+        )
+    else:
+        st.error(
+            f"⚠ {status_text}. Критических нарушений: {values['hard_violation_count']}."
+        )
+
+    st.markdown("#### Обслуживание спроса")
+    service = st.columns(4)
+    service[0].metric(
+        "Минимальный общий сервис",
+        percent(values["minimum_annual_total_service"]),
+        delta(
+            "minimum_annual_total_service",
+            scale=100,
+            suffix=" п.п. к BASE",
+        ),
+        help=(
+            f"Худший год по доле обслуженного общего спроса. "
+            f"Для BASE {service_label}: не ниже 97%."
+        ),
+    )
+    service[1].metric(
+        "Минимальный критический сервис",
+        percent(values["minimum_annual_critical_service"]),
+        delta(
+            "minimum_annual_critical_service",
+            scale=100,
+            suffix=" п.п. к BASE",
+        ),
+        help=(
+            f"Худший год по обслуживанию критических миссий. "
+            f"Для BASE {service_label}: не ниже 99%."
+        ),
+    )
+    service[2].metric(
+        "Общий дефицит",
+        mass(values["total_shortage_t"]),
+        delta("total_shortage_t", suffix=" т к BASE"),
+        delta_color="inverse",
+        help="Суммарный спрос, который план не смог обслужить за весь горизонт.",
+    )
+    service[3].metric(
+        "Критический дефицит",
+        mass(values["critical_shortage_t"]),
+        delta("critical_shortage_t", suffix=" т к BASE"),
+        delta_color="inverse",
+        help="Необслуженный критический спрос. Для оператора это наиболее приоритетный дефицит.",
+    )
+
+    st.markdown("#### Запас и устойчивость")
+    resilience = st.columns(3)
+    resilience[0].metric(
+        "Минимальный резерв",
+        f"{values['minimum_reserve_days']:.1f} дней",
+        delta("minimum_reserve_days", suffix=" дн. к BASE"),
+        help="Минимальное покрытие спроса запасом. Контрольное значение кейса: 45 дней.",
+    )
+    resilience[1].metric(
+        "Минимальный физический запас",
+        mass(values["minimum_inventory_t"]),
+        delta("minimum_inventory_t", suffix=" т к BASE"),
+        help="Самая низкая величина физического остатка на протяжении горизонта.",
+    )
+    resilience[2].metric(
+        "Критические нарушения",
+        str(values["hard_violation_count"]),
+        (
+            delta("hard_violation_count", suffix=" к BASE")
+            if base is not None
+            else None
+        ),
+        delta_color="inverse",
+        help="Количество нарушений обязательных ограничений модели.",
+    )
+
+    violation_rows = violations_view(result)
+    if violation_rows:
+        with st.expander(
+            f"Показать нарушения и понять, что менять ({len(violation_rows)})",
+            expanded=not values["valid"],
+        ):
+            st.dataframe(
+                pd.DataFrame(violation_rows),
+                hide_index=True,
+                width="stretch",
+            )
+            st.caption(
+                "Смотрите на период, фактическое значение, лимит и разрыв. "
+                "Нарушения сервиса обычно исправляются объёмом/структурой поставок; "
+                "резерва — запасом или аварийным контрактом; CAPEX — инвестиционными решениями."
+            )
+    else:
+        st.caption("Ограничения: нарушений нет.")
+
+    st.markdown("#### Экономика")
+    economics = st.columns(4)
+    economics[0].metric(
+        "Полная стоимость",
+        money(values["undiscounted_cost_mln"]),
+        delta("undiscounted_cost_mln", suffix=" млн к BASE"),
+        delta_color="inverse",
+        help="Все учитываемые расходы стратегии в постоянных ценах кейса.",
+    )
+    economics[1].metric(
+        "Приведённая стоимость",
+        money(values["discounted_cost_mln"]),
+        delta("discounted_cost_mln", suffix=" млн к BASE"),
+        delta_color="inverse",
+        help="Стоимость с учётом выбранной ставки дисконтирования.",
+    )
+    economics[2].metric(
+        "CAPEX до 2037",
+        f"{values['capex_through_2037_mln']:.0f} / {capex_limits[0]:.0f} млн",
+        delta("capex_through_2037_mln", suffix=" млн к BASE"),
+        delta_color="inverse",
+        help="Инвестиции до конца 2037 года относительно официального лимита.",
+    )
+    economics[3].metric(
+        "CAPEX всего",
+        f"{values['total_capex_mln']:.0f} / {capex_limits[1]:.0f} млн",
+        delta("total_capex_mln", suffix=" млн к BASE"),
+        delta_color="inverse",
+        help="Суммарные инвестиции до 2040 года относительно официального лимита 2 800 млн.",
+    )
+
+    st.caption(
+        f"Сервис: {'обязательные пороги 97%/99%' if is_base else '97%/99% показаны как ориентиры устойчивости, не новые hard-ограничения'}."
+    )
 
 def problems(result: dict[str, Any]) -> None:
     values = top_problems(result)
