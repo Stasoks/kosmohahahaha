@@ -452,6 +452,172 @@ def _transfer_mutations(
     return output
 
 
+def _investment_timing_mutations(
+    candidate: _Candidate,
+    case_data: CaseData,
+) -> list[tuple[dict[str, Any], str]]:
+    """Explore operator-controlled investment timing without changing CASE_INPUT."""
+    raw = candidate.plan.raw
+    output: list[tuple[dict[str, Any], str]] = []
+
+    for item in raw["decisions"].get("investments", []):
+        if not item.get("enabled"):
+            continue
+        investment_id = str(item.get("investment_id"))
+
+        if investment_id == "ZBO" and item.get("commissioning_month"):
+            current = str(item["commissioning_month"])
+            earliest = max(
+                case_data.start_month,
+                f"{case_data.storage['ZBO'].available_from_year:04d}-01",
+            )
+            for delta in (-12, 12):
+                target_month = add_months(current, delta)
+                if not earliest <= target_month <= case_data.end_month:
+                    continue
+                value = copy.deepcopy(raw)
+                target = next(
+                    investment
+                    for investment in value["decisions"]["investments"]
+                    if investment["investment_id"] == investment_id
+                )
+                target["commissioning_month"] = target_month
+                output.append(
+                    (
+                        value,
+                        f"investment_timing:{investment_id}:{current}->{target_month}",
+                    )
+                )
+
+        elif (
+            investment_id == "EARTH_NEW"
+            and item.get("buy_option")
+            and item.get("exercise_option")
+            and item.get("option_purchase_month")
+            and item.get("option_exercise_month")
+        ):
+            purchase = str(item["option_purchase_month"])
+            exercise = str(item["option_exercise_month"])
+            for delta in (-12, 12):
+                target_purchase = add_months(purchase, delta)
+                target_exercise = add_months(exercise, delta)
+                if not (
+                    case_data.start_month
+                    <= target_purchase
+                    < target_exercise
+                    <= case_data.end_month
+                ):
+                    continue
+                value = copy.deepcopy(raw)
+                target = next(
+                    investment
+                    for investment in value["decisions"]["investments"]
+                    if investment["investment_id"] == investment_id
+                )
+                target["option_purchase_month"] = target_purchase
+                target["option_exercise_month"] = target_exercise
+                output.append(
+                    (
+                        value,
+                        "investment_timing:"
+                        f"{investment_id}:{purchase}/{exercise}->"
+                        f"{target_purchase}/{target_exercise}",
+                    )
+                )
+
+        elif investment_id == "LUNAR_ISRU" and item.get("funding_month"):
+            current = str(item["funding_month"])
+            linked_sources = [
+                source
+                for source in case_data.sources.values()
+                if str(source.availability_rule.get("investment_id", ""))
+                == investment_id
+                and source.available_from_year is not None
+            ]
+            if not linked_sources:
+                continue
+            latest_available_year = min(
+                int(source.available_from_year) for source in linked_sources
+            )
+            latest = f"{latest_available_year - 1:04d}-12"
+            for delta in (-12, 12):
+                target_month = add_months(current, delta)
+                if not case_data.start_month <= target_month <= latest:
+                    continue
+                value = copy.deepcopy(raw)
+                target = next(
+                    investment
+                    for investment in value["decisions"]["investments"]
+                    if investment["investment_id"] == investment_id
+                )
+                target["funding_month"] = target_month
+                output.append(
+                    (
+                        value,
+                        f"investment_timing:{investment_id}:{current}->{target_month}",
+                    )
+                )
+
+    return output
+
+
+def _policy_mutations(
+    candidate: _Candidate,
+    case_data: CaseData,
+) -> list[tuple[dict[str, Any], str]]:
+    """Explore reserve and Emergency policy choices that belong to TEAM_DECISION."""
+    raw = candidate.plan.raw
+    output: list[tuple[dict[str, Any], str]] = []
+
+    strategies = raw["decisions"].setdefault("inventory_policy", {}).setdefault(
+        "reserve_strategy_by_year", {}
+    )
+    emergency_roles = raw["decisions"].setdefault("emergency_role_by_year", {})
+
+    for year in case_data.official_years:
+        year_key = str(year)
+
+        current_strategy = str(
+            strategies.get(year_key, strategies.get(year, "physical"))
+        )
+        target_strategy = (
+            "emergency_contract"
+            if current_strategy == "physical"
+            else "physical"
+        )
+        value = copy.deepcopy(raw)
+        value["decisions"]["inventory_policy"]["reserve_strategy_by_year"][
+            year_key
+        ] = target_strategy
+        output.append(
+            (
+                value,
+                f"reserve_policy:{year}:{current_strategy}->{target_strategy}",
+            )
+        )
+
+        current_role = str(
+            emergency_roles.get(year_key, emergency_roles.get(year, "reserve_only"))
+        )
+        target_role = (
+            "planned_supply"
+            if current_role == "reserve_only"
+            else "reserve_only"
+        )
+        value = copy.deepcopy(raw)
+        value["decisions"].setdefault("emergency_role_by_year", {})[
+            year_key
+        ] = target_role
+        output.append(
+            (
+                value,
+                f"emergency_role:{year}:{current_role}->{target_role}",
+            )
+        )
+
+    return output
+
+
 def _mutations(
     candidate: _Candidate,
     config: StrategyBuilderConfig,
@@ -473,6 +639,8 @@ def _mutations(
             assumptions,
         )
     )
+    values.extend(_investment_timing_mutations(candidate, case_data))
+    values.extend(_policy_mutations(candidate, case_data))
     return values
 
 

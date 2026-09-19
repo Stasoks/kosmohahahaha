@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from kosmohak.domain.assumptions import ModelAssumptions
+from kosmohak.builder import StrategyBuilderConfig, StrategyBuilderResult, build_strategies
 from kosmohak.domain.case import CaseData
 from kosmohak.domain.plan import OperatorPlan
 from kosmohak.domain.result import SimulationResult
@@ -447,6 +448,29 @@ def run_reverse_stress(
     )
 
 
+def synthesize_strategy(
+    base_scenario: Scenario,
+    stress_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+    *,
+    config: StrategyBuilderConfig | None = None,
+) -> StrategyBuilderResult:
+    """Build new strategies from CASE_INPUT and operator search targets.
+
+    Unlike the Strategy Advisor, this does not require or modify an existing
+    OperatorPlan. Every accepted candidate is validated and evaluated by the
+    normal digital-twin path inside the Strategy Builder.
+    """
+    return build_strategies(
+        base_scenario=base_scenario,
+        stress_scenario=stress_scenario,
+        case_data=case_data,
+        assumptions=assumptions,
+        config=config,
+    )
+
+
 def repair_strategy(
     plan: OperatorPlan,
     base_scenario: Scenario,
@@ -746,6 +770,8 @@ __all__ = [
     "ValidationResult",
     "DecisionLocks",
     "OptimizerConfig",
+    "StrategyBuilderConfig",
+    "StrategyBuilderResult",
     "CaseWorkspace",
     "ResearchSourceSpec",
     "FutureYearSpec",
@@ -763,6 +789,7 @@ __all__ = [
     "run_sensitivity",
     "run_official_demand_sensitivity",
     "run_reverse_stress",
+    "synthesize_strategy",
     "repair_strategy",
     "improve_strategy",
     "improve_strategy_resilience",
