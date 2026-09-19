@@ -184,12 +184,43 @@ def _target_deficit(candidate: _Candidate) -> float:
     return total
 
 
+def _annual_target_deficit(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+) -> float:
+    """Measure annual service-target gap in served tons, normalized by demand."""
+    total = 0.0
+    for row in candidate.stress_result.annual:
+        if config.stress_total_service_target is not None:
+            required = float(config.stress_total_service_target) * float(row["demand_total_t"])
+            total += max(0.0, required - float(row["served_total_t"])) / max(
+                1.0, float(row["demand_total_t"])
+            )
+        if config.stress_critical_service_target is not None:
+            required = float(config.stress_critical_service_target) * float(
+                row["demand_critical_t"]
+            )
+            total += 4.0 * max(
+                0.0, required - float(row["served_critical_t"])
+            ) / max(1.0, float(row["demand_critical_t"]))
+    return total
+
+
 def _rank(candidate: _Candidate, objective: str) -> tuple:
     metrics = candidate.metrics
+    has_targets = any(
+        value is not None
+        for value in (
+            candidate.target_satisfaction["stress_total_service"]["target"],
+            candidate.target_satisfaction["stress_critical_service"]["target"],
+            candidate.target_satisfaction["maximum_total_cost_mln"]["target"],
+        )
+    )
     feasibility = (
         metrics["base_hard_violation_count"],
-        metrics["base_total_shortage_t"],
+        _annual_target_deficit(candidate, config) if has_targets else 0.0,
         _target_deficit(candidate),
+        metrics["base_total_shortage_t"],
     )
     resilience = (
         -metrics["minimum_annual_stress_critical_service"],
