@@ -1244,6 +1244,23 @@ def build_strategies(
         else None
     )
 
+    closest_to_target = (
+        min(
+            all_candidates,
+            key=lambda item: (
+                _annual_target_deficit(item),
+                item.metrics["base_hard_violation_count"]
+                + item.metrics["stress_hard_violation_count"],
+                _target_deficit(item),
+                item.metrics["stress_total_shortage_t"],
+                item.metrics["total_cost_mln"],
+                item.canonical_key,
+            ),
+        )
+        if all_candidates
+        else None
+    )
+
     return StrategyBuilderResult(
         status=status,
         config=config.to_dict(),
@@ -1280,6 +1297,32 @@ def build_strategies(
                     ),
                 }
                 if closest_base_valid is not None
+                else None
+            ),
+            "closest_to_target": (
+                {
+                    "plan_id": closest_to_target.plan.plan_id,
+                    "metrics": copy.deepcopy(closest_to_target.metrics),
+                    "annual_target_deficit": _annual_target_deficit(
+                        closest_to_target
+                    ),
+                    "search_depth": closest_to_target.depth,
+                    "mutation_history": list(closest_to_target.history),
+                    "base_violations": [
+                        item.to_dict()
+                        for item in closest_to_target.base_result.violations
+                        if item.severity == "hard"
+                    ],
+                    "stress_violations": [
+                        item.to_dict()
+                        for item in closest_to_target.stress_result.violations
+                        if item.severity == "hard"
+                    ],
+                    "stress_annual": copy.deepcopy(
+                        closest_to_target.stress_result.annual
+                    ),
+                }
+                if closest_to_target is not None
                 else None
             ),
         },
