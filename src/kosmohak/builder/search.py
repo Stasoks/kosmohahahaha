@@ -123,6 +123,7 @@ def _metrics(
             row["reserve_actual_days"] for row in stress.annual
         ),
         "base_hard_violation_count": base.summary["hard_violation_count"],
+        "stress_hard_violation_count": stress.summary["hard_violation_count"],
         "base_total_shortage_t": base.summary["total_shortage_t"],
         "source_mix_t": _source_mix(base, case_data),
         "enabled_investments": enabled,
@@ -215,6 +216,7 @@ def _rank(candidate: _Candidate, objective: str) -> tuple:
     )
     feasibility = (
         metrics["base_hard_violation_count"],
+        metrics["stress_hard_violation_count"],
         _annual_target_deficit(candidate) if has_targets else 0.0,
         _target_deficit(candidate),
         metrics["base_total_shortage_t"],
@@ -933,6 +935,7 @@ def _dominates(first: _Candidate, second: _Candidate) -> bool:
     a, b = first.metrics, second.metrics
     first_vector = (
         a["base_hard_violation_count"],
+        a["stress_hard_violation_count"],
         _annual_target_deficit(first),
         _target_deficit(first),
         a["base_total_shortage_t"],
@@ -943,6 +946,7 @@ def _dominates(first: _Candidate, second: _Candidate) -> bool:
     )
     second_vector = (
         b["base_hard_violation_count"],
+        b["stress_hard_violation_count"],
         _annual_target_deficit(second),
         _target_deficit(second),
         b["base_total_shortage_t"],
@@ -1186,6 +1190,7 @@ def build_strategies(
         candidate
         for candidate in all_candidates
         if candidate.base_result.summary["valid"]
+        and candidate.stress_result.summary["valid"]
         and candidate.target_satisfaction["all_satisfied"]
     ]
     eligible.sort(key=lambda item: _solution_rank(item, config.objective))
@@ -1219,7 +1224,9 @@ def build_strategies(
         )
 
     base_valid_candidates = [
-        item for item in all_candidates if item.base_result.summary["valid"]
+        item
+        for item in all_candidates
+        if item.base_result.summary["valid"] and item.stress_result.summary["valid"]
     ]
     closest_base_valid = (
         min(
