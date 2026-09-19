@@ -13,6 +13,8 @@
 
 ---
 
+- Recommended BASE policy and quantified mitigations: [`docs/RECOMMENDED_BASE.md`](docs/RECOMMENDED_BASE.md)
+
 ## Содержание
 
 1. [Что нужно сделать](#1-что-нужно-сделать)
