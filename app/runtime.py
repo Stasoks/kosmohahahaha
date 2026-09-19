@@ -284,6 +284,13 @@ def workspace_evaluate(plan: dict[str, Any], workspace: dict[str, Any]) -> dict[
     return _workspace_evaluate(bridge.canonical_json(plan), bridge.canonical_json(workspace))
 
 
+def workspace_remove_source(
+    workspace: dict[str, Any],
+    source_id: str,
+) -> dict[str, Any]:
+    return bridge.workspace_remove_source(workspace, source_id)
+
+
 @st.cache_data(show_spinner=False)
 def _csv(payload: str, source_payload: str, scenario_payload: str) -> dict[str, bytes]:
     return bridge.result_csv_bytes(
