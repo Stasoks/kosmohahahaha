@@ -33,8 +33,7 @@ class _Candidate:
     stress_result: SimulationResult
     metrics: dict[str, Any]
     target_satisfaction: dict[str, Any]
-    benchmark_satisfaction: dict[str, Any]
-    feasibility: dict[str, Any]
+    benchmark_status: dict[str, Any]
     depth: int
     history: tuple[str, ...]
 
@@ -98,12 +97,15 @@ def _metrics(
     base: SimulationResult,
     stress: SimulationResult,
     case_data: CaseData,
+    config: StrategyBuilderConfig,
 ) -> dict[str, Any]:
     enabled = sorted(
         str(item["investment_id"])
         for item in plan.investments
         if item.get("enabled")
     )
+    base_mix = _source_mix(base, case_data)
+    stress_mix = _source_mix(stress, case_data)
     return {
         "minimum_annual_base_total_service": min(
             row["total_service_level"] for row in base.annual
@@ -117,31 +119,60 @@ def _metrics(
         "minimum_annual_stress_critical_service": min(
             row["critical_service_level"] for row in stress.annual
         ),
-        "total_cost_mln": base.summary["undiscounted_cost_mln"],
         "base_total_cost_mln": base.summary["undiscounted_cost_mln"],
         "stress_total_cost_mln": stress.summary["undiscounted_cost_mln"],
-        "stress_total_shortage_t": stress.summary["total_shortage_t"],
-        "stress_critical_shortage_t": stress.summary["critical_shortage_t"],
-        "minimum_stress_inventory_t": stress.summary["minimum_inventory_t"],
-        "minimum_annual_stress_reserve_days": min(
-            row["reserve_actual_days"] for row in stress.annual
+        "total_cost_mln": (
+            base.summary["undiscounted_cost_mln"]
+            if config.planning_mode == "BASE_PLAN"
+            else stress.summary["undiscounted_cost_mln"]
         ),
         "base_hard_violation_count": base.summary["hard_violation_count"],
         "stress_hard_violation_count": stress.summary["hard_violation_count"],
         "base_total_shortage_t": base.summary["total_shortage_t"],
-        "source_mix_t": _source_mix(base, case_data),
+        "base_critical_shortage_t": base.summary["critical_shortage_t"],
+        "stress_total_shortage_t": stress.summary["total_shortage_t"],
+        "stress_critical_shortage_t": stress.summary["critical_shortage_t"],
+        "minimum_base_inventory_t": base.summary["minimum_inventory_t"],
+        "minimum_stress_inventory_t": stress.summary["minimum_inventory_t"],
+        "minimum_annual_base_reserve_days": min(
+            row["reserve_actual_days"] for row in base.annual
+        ),
+        "minimum_annual_stress_reserve_days": min(
+            row["reserve_actual_days"] for row in stress.annual
+        ),
+        "base_source_mix_t": base_mix,
+        "stress_source_mix_t": stress_mix,
+        "source_mix_t": base_mix if config.planning_mode == "BASE_PLAN" else stress_mix,
         "enabled_investments": enabled,
     }
 
 
-def _planning_cost(metrics: dict[str, Any], config: StrategyBuilderConfig) -> float:
-    return float(
-        metrics[
-            "stress_total_cost_mln"
-            if config.planning_mode == "STRESS_ADAPTATION"
-            else "base_total_cost_mln"
-        ]
-    )
+def _benchmark_status(
+    metrics: dict[str, Any],
+    case_data: CaseData,
+) -> dict[str, Any]:
+    total_benchmark = float(case_data.constraints["BASE_TOTAL_SERVICE"].value)
+    critical_benchmark = float(case_data.constraints["BASE_CRITICAL_SERVICE"].value)
+    total_actual = float(metrics["minimum_annual_stress_total_service"])
+    critical_actual = float(metrics["minimum_annual_stress_critical_service"])
+    return {
+        "stress_total_service": {
+            "benchmark": total_benchmark,
+            "actual": total_actual,
+            "gap": max(0.0, total_benchmark - total_actual),
+            "met": total_actual >= total_benchmark - 1e-12,
+            "severity": "benchmark",
+            "provenance": "CASE_INPUT",
+        },
+        "stress_critical_service": {
+            "benchmark": critical_benchmark,
+            "actual": critical_actual,
+            "gap": max(0.0, critical_benchmark - critical_actual),
+            "met": critical_actual >= critical_benchmark - 1e-12,
+            "severity": "benchmark",
+            "provenance": "CASE_INPUT",
+        },
+    }
 
 
 def _target_satisfaction(
@@ -153,121 +184,53 @@ def _target_satisfaction(
             config.stress_total_service_target,
             metrics["minimum_annual_stress_total_service"],
             ">=",
+            config.stress_target_policy,
         ),
         "stress_critical_service": (
             config.stress_critical_service_target,
             metrics["minimum_annual_stress_critical_service"],
             ">=",
+            config.stress_target_policy,
         ),
         "maximum_total_cost_mln": (
             config.max_total_cost_mln,
-            _planning_cost(metrics, config),
+            metrics["total_cost_mln"],
             "<=",
+            "HARD",
         ),
     }
     values: dict[str, Any] = {}
-    for name, (target, actual, operator) in definitions.items():
+    hard_satisfied = True
+    for name, (target, actual, operator, policy) in definitions.items():
         if target is None:
             satisfied = True
         elif operator == ">=":
             satisfied = actual >= target - 1e-12
         else:
             satisfied = actual <= target + 1e-12
+        if target is not None and policy == "HARD":
+            hard_satisfied = hard_satisfied and satisfied
         values[name] = {
             "target": target,
             "actual": actual,
             "operator": operator,
             "satisfied": satisfied,
+            "policy": policy,
             "provenance": "OPERATOR_PREFERENCE",
         }
     values["all_satisfied"] = all(
         item["satisfied"] for item in values.values() if isinstance(item, dict)
     )
+    values["all_hard_satisfied"] = hard_satisfied
     return values
 
 
-def _benchmark_satisfaction(
-    stress: SimulationResult,
-    case_data: CaseData,
-) -> dict[str, Any]:
-    total_benchmark = float(case_data.constraints["BASE_TOTAL_SERVICE"].value)
-    critical_benchmark = float(case_data.constraints["BASE_CRITICAL_SERVICE"].value)
-    annual = []
-    for row in stress.annual:
-        total_actual = float(row["total_service_level"])
-        critical_actual = float(row["critical_service_level"])
-        annual.append(
-            {
-                "year": int(row["year"]),
-                "total": {
-                    "benchmark": total_benchmark,
-                    "actual": total_actual,
-                    "gap": max(0.0, total_benchmark - total_actual),
-                    "met": total_actual >= total_benchmark - 1e-12,
-                    "status": "RESILIENCE_BENCHMARK",
-                },
-                "critical": {
-                    "benchmark": critical_benchmark,
-                    "actual": critical_actual,
-                    "gap": max(0.0, critical_benchmark - critical_actual),
-                    "met": critical_actual >= critical_benchmark - 1e-12,
-                    "status": "RESILIENCE_BENCHMARK",
-                },
-            }
-        )
-    return {
-        "total_service": {
-            "benchmark": total_benchmark,
-            "actual_minimum": min(
-                item["total"]["actual"] for item in annual
-            ),
-            "gap": max(item["total"]["gap"] for item in annual),
-            "met_all_years": all(item["total"]["met"] for item in annual),
-            "status": "RESILIENCE_BENCHMARK",
-        },
-        "critical_service": {
-            "benchmark": critical_benchmark,
-            "actual_minimum": min(
-                item["critical"]["actual"] for item in annual
-            ),
-            "gap": max(item["critical"]["gap"] for item in annual),
-            "met_all_years": all(item["critical"]["met"] for item in annual),
-            "status": "RESILIENCE_BENCHMARK",
-        },
-        "annual": annual,
-        "hard_constraint": False,
-    }
-
-
-def _feasibility(
-    base: SimulationResult,
-    stress: SimulationResult,
-    config: StrategyBuilderConfig,
-) -> dict[str, Any]:
-    planning_result = (
-        stress if config.planning_mode == "STRESS_ADAPTATION" else base
-    )
-    return {
-        "planning_mode": config.planning_mode,
-        "planning_scenario": planning_result.summary["scenario_id"],
-        "valid": bool(planning_result.summary["valid"]),
-        "hard_violation_count": int(
-            planning_result.summary["hard_violation_count"]
-        ),
-        "base_valid": bool(base.summary["valid"]),
-        "stress_valid": bool(stress.summary["valid"]),
-        "service_rule": (
-            "BASE service 97% total / 99% critical are hard constraints"
-            if config.planning_mode == "BASE_PLAN"
-            else "Stress 97% total / 99% critical are resilience benchmarks, not hard constraints"
-        ),
-    }
-
-
-def _target_deficit(candidate: _Candidate) -> float:
+def _target_deficit(candidate: _Candidate, *, hard_only: bool = False) -> float:
     total = 0.0
     for item in candidate.target_satisfaction.values():
         if not isinstance(item, dict) or item["target"] is None:
+            continue
+        if hard_only and item.get("policy") != "HARD":
             continue
         if item["operator"] == ">=":
             total += max(0.0, float(item["target"]) - float(item["actual"]))
@@ -277,68 +240,84 @@ def _target_deficit(candidate: _Candidate) -> float:
     return total
 
 
-def _benchmark_rank(candidate: _Candidate) -> tuple:
-    benchmark = candidate.benchmark_satisfaction
-    critical = benchmark["critical_service"]
-    total = benchmark["total_service"]
+def _planning_valid(candidate: _Candidate, config: StrategyBuilderConfig) -> bool:
+    result = (
+        candidate.base_result
+        if config.planning_mode == "BASE_PLAN"
+        else candidate.stress_result
+    )
+    return bool(result.summary["valid"]) and bool(
+        candidate.target_satisfaction["all_hard_satisfied"]
+    )
+
+
+def _benchmark_vector(candidate: _Candidate) -> tuple[float, float]:
+    critical = candidate.benchmark_status["stress_critical_service"]["gap"]
+    total = candidate.benchmark_status["stress_total_service"]["gap"]
+    return float(critical), float(total)
+
+
+def _resilience_vector(candidate: _Candidate) -> tuple:
+    metrics = candidate.metrics
     return (
-        float(critical["gap"]),
-        float(total["gap"]),
-        candidate.metrics["stress_critical_shortage_t"],
-        candidate.metrics["stress_total_shortage_t"],
-        -candidate.metrics["minimum_annual_stress_reserve_days"],
-        -candidate.metrics["minimum_stress_inventory_t"],
+        -metrics["minimum_annual_stress_critical_service"],
+        -metrics["minimum_annual_stress_total_service"],
+        metrics["stress_critical_shortage_t"],
+        metrics["stress_total_shortage_t"],
+        -metrics["minimum_annual_stress_reserve_days"],
+        -metrics["minimum_stress_inventory_t"],
     )
 
 
 def _rank(candidate: _Candidate, config: StrategyBuilderConfig) -> tuple:
     metrics = candidate.metrics
-    hard = int(candidate.feasibility["hard_violation_count"])
-    target_gap = _target_deficit(candidate)
-    planning_cost = _planning_cost(metrics, config)
+    hard_target_gap = _target_deficit(candidate, hard_only=True)
 
     if config.planning_mode == "STRESS_ADAPTATION":
-        # Official stress-service levels are benchmarks. Search first preserves
-        # hard feasibility, then minimizes benchmark gaps. Cost is optimized only
-        # after resilience, so the Builder cannot "win" by cheaply dropping demand.
-        benchmark = _benchmark_rank(candidate)
-        if config.objective == "MIN_COST":
+        critical_gap, total_gap = _benchmark_vector(candidate)
+        feasibility = (
+            metrics["stress_hard_violation_count"],
+            hard_target_gap,
+        )
+        if config.objective == "MAX_RESILIENCE":
             return (
-                hard,
-                target_gap,
-                *benchmark[:2],
-                planning_cost,
-                *benchmark[2:],
+                *feasibility,
+                *_resilience_vector(candidate),
+                metrics["stress_total_cost_mln"],
                 candidate.canonical_key,
             )
         return (
-            hard,
-            target_gap,
-            *benchmark,
-            planning_cost,
+            *feasibility,
+            critical_gap,
+            total_gap,
+            metrics["stress_total_cost_mln"],
+            *_resilience_vector(candidate),
             candidate.canonical_key,
         )
 
-    # Standard plan: BASE hard constraints, including annual 97%/99% service,
-    # define feasibility. Stress performance is an explicit resilience tie-break.
     feasibility = (
-        hard,
-        target_gap,
+        metrics["base_hard_violation_count"],
         metrics["base_total_shortage_t"],
+        hard_target_gap,
     )
-    resilience = _benchmark_rank(candidate)
     if config.objective == "MAX_RESILIENCE":
-        return (*feasibility, *resilience, planning_cost, candidate.canonical_key)
+        return (
+            *feasibility,
+            *_resilience_vector(candidate),
+            metrics["base_total_cost_mln"],
+            candidate.canonical_key,
+        )
     return (
         *feasibility,
-        planning_cost,
-        *resilience,
+        metrics["base_total_cost_mln"],
+        *_resilience_vector(candidate),
         candidate.canonical_key,
     )
 
 
 def _solution_rank(candidate: _Candidate, config: StrategyBuilderConfig) -> tuple:
     return _rank(candidate, config)
+
 
 
 def _schedule(raw: dict[str, Any], source_id: str) -> dict[str, Any]:
@@ -752,29 +731,45 @@ def _mutations(
     return values
 
 
+def _dominance_vector(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+) -> tuple:
+    metrics = candidate.metrics
+    hard_target_gap = _target_deficit(candidate, hard_only=True)
+    if config.planning_mode == "STRESS_ADAPTATION":
+        critical_gap, total_gap = _benchmark_vector(candidate)
+        return (
+            metrics["stress_hard_violation_count"],
+            hard_target_gap,
+            critical_gap,
+            total_gap,
+            metrics["stress_total_cost_mln"],
+            metrics["stress_critical_shortage_t"],
+            metrics["stress_total_shortage_t"],
+            -metrics["minimum_stress_inventory_t"],
+        )
+    return (
+        metrics["base_hard_violation_count"],
+        hard_target_gap,
+        metrics["base_total_shortage_t"],
+        metrics["base_total_cost_mln"],
+        metrics["stress_critical_shortage_t"],
+        metrics["stress_total_shortage_t"],
+        -metrics["minimum_stress_inventory_t"],
+    )
+
+
 def _dominates(
     first: _Candidate,
     second: _Candidate,
     config: StrategyBuilderConfig,
 ) -> bool:
-    a, b = first.metrics, second.metrics
-    first_vector = (
-        first.feasibility["hard_violation_count"],
-        _target_deficit(first),
-        *_benchmark_rank(first)[:2],
-        _planning_cost(a, config),
-        a["stress_critical_shortage_t"],
-        a["stress_total_shortage_t"],
-    )
-    second_vector = (
-        second.feasibility["hard_violation_count"],
-        _target_deficit(second),
-        *_benchmark_rank(second)[:2],
-        _planning_cost(b, config),
-        b["stress_critical_shortage_t"],
-        b["stress_total_shortage_t"],
-    )
-    return all(x <= y + 1e-12 for x, y in zip(first_vector, second_vector)) and any(
+    first_vector = _dominance_vector(first, config)
+    second_vector = _dominance_vector(second, config)
+    return all(
+        x <= y + 1e-12 for x, y in zip(first_vector, second_vector)
+    ) and any(
         x < y - 1e-12 for x, y in zip(first_vector, second_vector)
     )
 
@@ -839,23 +834,26 @@ def _is_diverse(
     return True
 
 
-def _solution(candidate: _Candidate, config: StrategyBuilderConfig) -> StrategyBuilderSolution:
+def _solution(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+) -> StrategyBuilderSolution:
     return StrategyBuilderSolution(
         plan=candidate.plan,
         base_result=candidate.base_result,
         stress_result=candidate.stress_result,
         metrics=copy.deepcopy(candidate.metrics),
         target_satisfaction=copy.deepcopy(candidate.target_satisfaction),
-        benchmark_satisfaction=copy.deepcopy(candidate.benchmark_satisfaction),
-        feasibility=copy.deepcopy(candidate.feasibility),
+        benchmark_status=copy.deepcopy(candidate.benchmark_status),
         provenance={
             "official_inputs": "CASE_INPUT",
             "plan_decisions": "TEAM_DECISION",
             "search_targets": "OPERATOR_PREFERENCE",
             "simulation_outputs": "DIGITAL_TWIN_RESULT",
-            "objective": config.objective,
             "planning_mode": config.planning_mode,
-            "stress_service_levels": "RESILIENCE_BENCHMARK",
+            "planning_scenario_id": config.planning_scenario_id,
+            "objective": config.objective,
+            "stress_service_levels": "CASE_INPUT_RESILIENCE_BENCHMARKS",
             "global_optimum_claimed": False,
         },
         search_depth=candidate.depth,
@@ -871,7 +869,13 @@ def build_strategies(
     assumptions: ModelAssumptions,
     config: StrategyBuilderConfig | None = None,
 ) -> StrategyBuilderResult:
-    """Run deterministic bounded construction and beam search on official inputs."""
+    """Build a standard plan or a separate mandatory-stress adaptation plan.
+
+    The normal digital twin remains authoritative. BASE_PLAN accepts only plans valid
+    in BASE, where the official 97% total / 99% critical service levels are hard
+    constraints. STRESS_ADAPTATION accepts only plans valid in MANDATORY_STRESS; the
+    same service levels are reported and optimized as resilience benchmarks.
+    """
     config = config or StrategyBuilderConfig()
     if case_data.research_source_ids or case_data.research_years:
         raise ValueError(
@@ -884,6 +888,11 @@ def build_strategies(
             "Strategy Builder requires the official MANDATORY_STRESS scenario"
         )
 
+    planning_scenario = (
+        base_scenario
+        if config.planning_mode == "BASE_PLAN"
+        else stress_scenario
+    )
     rng = random.Random(config.seed)
     cache: dict[str, _Candidate] = {}
     seen: set[str] = set()
@@ -917,15 +926,28 @@ def build_strategies(
         if len(cache) >= config.max_candidates:
             budget_exhausted = True
             return None
+
         raw["plan_id"] = _plan_id(canonical, config.seed)
+        raw["scenario_id"] = config.planning_scenario_id
+        metadata = raw.setdefault("metadata", {})
+        metadata["builder_planning_mode"] = config.planning_mode
+        metadata["planning_scenario"] = config.planning_scenario_id
+
         try:
             plan = PlanLoader.from_dict(raw, case_data, assumptions)
         except (KeyError, TypeError, ValueError, PlanValidationError):
             structural_rejections += 1
             return None
+
         base_result = simulate(plan, base_scenario, case_data, assumptions)
         stress_result = simulate(plan, stress_scenario, case_data, assumptions)
-        metrics = _metrics(plan, base_result, stress_result, case_data)
+        metrics = _metrics(
+            plan,
+            base_result,
+            stress_result,
+            case_data,
+            config,
+        )
         candidate = _Candidate(
             canonical_key=canonical,
             plan=plan,
@@ -933,12 +955,7 @@ def build_strategies(
             stress_result=stress_result,
             metrics=metrics,
             target_satisfaction=_target_satisfaction(metrics, config),
-            benchmark_satisfaction=_benchmark_satisfaction(
-                stress_result, case_data
-            ),
-            feasibility=_feasibility(
-                base_result, stress_result, config
-            ),
+            benchmark_status=_benchmark_status(metrics, case_data),
             depth=depth,
             history=history,
         )
@@ -947,23 +964,19 @@ def build_strategies(
         return candidate
 
     seed_candidates: list[_Candidate] = []
-    planning_scenario = (
-        stress_scenario
-        if config.planning_mode == "STRESS_ADAPTATION"
-        else base_scenario
-    )
     for raw in constructive_seeds(
         case_data,
         assumptions,
         base_scenario,
         stress_scenario,
-        planning_scenario=planning_scenario,
+        planning_mode=config.planning_mode,
     ):
         candidate = evaluate(raw, 0, ())
         if candidate is not None:
             seed_candidates.append(candidate)
         if budget_exhausted:
             break
+
     seed_candidates.sort(key=lambda item: _rank(item, config))
     beam = seed_candidates[: config.beam_width]
 
@@ -971,12 +984,13 @@ def build_strategies(
     for iteration in range(1, config.max_iterations + 1):
         if budget_exhausted or not beam:
             break
+
         generated: list[tuple[dict[str, Any], int, tuple[str, ...]]] = []
         for parent in beam:
             for raw, description in _mutations(
                 parent,
                 config,
-                base_scenario,
+                planning_scenario,
                 stress_scenario,
                 case_data,
                 assumptions,
@@ -984,15 +998,18 @@ def build_strategies(
                 generated.append(
                     (raw, parent.depth + 1, (*parent.history, description))
                 )
+
         generated.sort(
             key=lambda item: (item[2][-1], _canonical_decisions(item[0]))
         )
         rng.shuffle(generated)
+
         evaluated_this_round: list[_Candidate] = []
         remaining_iterations = config.max_iterations - iteration + 1
         remaining_budget = config.max_candidates - len(cache)
         round_budget = max(1, remaining_budget // remaining_iterations)
         cache_size_before_round = len(cache)
+
         for raw, depth, history in generated:
             candidate = evaluate(raw, depth, history)
             if candidate is not None:
@@ -1001,8 +1018,12 @@ def build_strategies(
                 break
             if len(cache) - cache_size_before_round >= round_budget:
                 break
+
         pool = sorted(
-            {item.canonical_key: item for item in [*beam, *evaluated_this_round]}.values(),
+            {
+                item.canonical_key: item
+                for item in [*beam, *evaluated_this_round]
+            }.values(),
             key=lambda item: _rank(item, config),
         )
         pool, pruned = _dominance_prune(pool, config)
@@ -1014,10 +1035,10 @@ def build_strategies(
     eligible = [
         candidate
         for candidate in all_candidates
-        if candidate.feasibility["valid"]
-        and candidate.target_satisfaction["all_satisfied"]
+        if _planning_valid(candidate, config)
     ]
     eligible.sort(key=lambda item: _solution_rank(item, config))
+
     selected: list[_Candidate] = []
     for candidate in eligible:
         if _is_diverse(candidate, selected, config.diversity_threshold):
@@ -1028,35 +1049,42 @@ def build_strategies(
     if selected:
         status = "success"
         failure_reason = ""
-    elif not any(item.feasibility["valid"] for item in all_candidates):
-        status = (
-            "no_stress_feasible_plan_found"
-            if config.planning_mode == "STRESS_ADAPTATION"
-            else "no_base_feasible_plan_found"
-        )
-        failure_reason = (
-            f"No {config.planning_mode} feasible strategy was found in the explored "
-            "bounded search space. This is not a proof of global infeasibility."
-        )
-    elif budget_exhausted and any(
-        not item.target_satisfaction["all_satisfied"]
-        for item in all_candidates
-        if item.feasibility["valid"]
-    ):
-        status = "search_budget_exhausted"
-        failure_reason = (
-            "The candidate budget was exhausted before every explicit operator "
-            "target was satisfied; global infeasibility is not claimed."
-        )
     else:
-        status = "no_target_satisfying_plan_found"
-        failure_reason = (
-            "Feasible strategies were found, but none met every explicit operator "
-            "target inside the explored bounded search space. Stress 97%/99% "
-            "benchmarks are not treated as hard constraints unless the operator "
-            "explicitly supplies them as targets."
+        planning_valid_exists = any(
+            (
+                item.base_result.summary["valid"]
+                if config.planning_mode == "BASE_PLAN"
+                else item.stress_result.summary["valid"]
+            )
+            for item in all_candidates
         )
+        if not planning_valid_exists:
+            status = (
+                "no_base_feasible_plan_found"
+                if config.planning_mode == "BASE_PLAN"
+                else "no_stress_feasible_plan_found"
+            )
+            failure_reason = (
+                f"No {config.planning_scenario_id}-valid strategy was found in the "
+                "explored bounded search space. This is not a proof of global "
+                "infeasibility."
+            )
+        elif budget_exhausted:
+            status = "search_budget_exhausted"
+            failure_reason = (
+                "The candidate budget was exhausted before all hard operator search "
+                "requirements were satisfied; global infeasibility is not claimed."
+            )
+        else:
+            status = "no_target_satisfying_plan_found"
+            failure_reason = (
+                f"{config.planning_scenario_id}-valid strategies were found, but none "
+                "met every HARD operator target inside the explored bounded search "
+                "space. Stress service benchmarks themselves are not hard targets."
+            )
 
+    total_benchmark = float(case_data.constraints["BASE_TOTAL_SERVICE"].value)
+    critical_benchmark = float(case_data.constraints["BASE_CRITICAL_SERVICE"].value)
     return StrategyBuilderResult(
         status=status,
         config=config.to_dict(),
@@ -1064,11 +1092,21 @@ def build_strategies(
         iterations=completed_iterations,
         solutions=[_solution(item, config) for item in selected],
         search_metadata={
-            "algorithm": "CASE_ALIGNED_DETERMINISTIC_BOUNDED_BEAM_SEARCH",
+            "algorithm": "SCENARIO_AWARE_DETERMINISTIC_BOUNDED_BEAM_SEARCH",
             "planning_mode": config.planning_mode,
-            "planning_scenario": planning_scenario.scenario_id,
-            "stress_service_semantics": "RESILIENCE_BENCHMARK",
-            "base_service_semantics": "HARD_CONSTRAINT",
+            "planning_scenario_id": config.planning_scenario_id,
+            "official_service_interpretation": {
+                "BASE": {
+                    "total_service_minimum": total_benchmark,
+                    "critical_service_minimum": critical_benchmark,
+                    "severity": "hard",
+                },
+                "MANDATORY_STRESS": {
+                    "total_service_benchmark": total_benchmark,
+                    "critical_service_benchmark": critical_benchmark,
+                    "severity": "benchmark",
+                },
+            },
             "constructive_seed_count": len(seed_candidates),
             "generated_candidate_count": generated_count,
             "duplicate_decision_sets_pruned": duplicate_count,
