@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Any
+import textwrap
 
 import pandas as pd
 import plotly.express as px
@@ -13,21 +14,74 @@ from app.view_models import source_colors
 CASE_COLORS = {"A": "#5B4BFF", "B": "#FDAEAD", "C": "#278D8D"}
 
 
+def _wrapped_title(value: str | None, width: int = 54) -> str | None:
+    if not value:
+        return value
+    plain = str(value).replace("<br>", " ")
+    return "<br>".join(textwrap.wrap(plain, width=width, break_long_words=False))
+
+
 def style(fig: go.Figure, height: int = 360) -> go.Figure:
+    """Apply a layout that stays readable in both full-width and two-column cards."""
+
+    title_text = _wrapped_title(getattr(fig.layout.title, "text", None))
+    title_lines = (title_text.count("<br>") + 1) if title_text else 0
+    trace_count = len(fig.data)
+
+    top_margin = 54 + max(0, title_lines - 1) * 20
+    bottom_margin = 86 if trace_count <= 3 else 112
+    effective_height = max(
+        height + max(0, title_lines - 1) * 18,
+        390 if trace_count > 4 else height,
+    )
+
     fig.update_layout(
-        height=height,
-        margin=dict(l=54, r=22, t=58, b=62),
+        height=effective_height,
+        margin=dict(l=58, r=34, t=top_margin, b=bottom_margin),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#ffffff",
-        font=dict(family="Inter, system-ui, sans-serif", color="#332e37", size=12),
-        title=dict(x=0.02, xanchor="left", y=0.97, font=dict(size=17)),
-        legend=dict(orientation="h", yanchor="top", y=-0.18, x=0, title_text=""),
+        font=dict(
+            family="Inter, system-ui, sans-serif",
+            color="#332e37",
+            size=12,
+        ),
+        title=dict(
+            text=title_text,
+            x=0.02,
+            xanchor="left",
+            y=0.98,
+            yanchor="top",
+            font=dict(size=16),
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.16,
+            x=0,
+            xanchor="left",
+            title_text="",
+            font=dict(size=10),
+            itemsizing="constant",
+            traceorder="normal",
+        ),
         hoverlabel=dict(bgcolor="#17151a", font_color="white"),
+        hovermode="closest",
     )
-    fig.update_xaxes(gridcolor="#eeeaf1", zeroline=False, automargin=True)
-    fig.update_yaxes(gridcolor="#eeeaf1", zeroline=False, automargin=True)
+    fig.update_xaxes(
+        gridcolor="#eeeaf1",
+        zeroline=False,
+        automargin=True,
+        title_standoff=10,
+        tickfont=dict(size=11),
+    )
+    fig.update_yaxes(
+        gridcolor="#eeeaf1",
+        zeroline=False,
+        automargin=True,
+        title_standoff=10,
+        tickfont=dict(size=11),
+    )
     return fig
-
 
 def demand_service(result: dict[str, Any]) -> go.Figure:
     df = pd.DataFrame(result["annual"])
@@ -126,15 +180,15 @@ def inventory(result: dict[str, Any]) -> go.Figure:
     zero_rows = monthly[monthly.closing_inventory_t.astype(float) <= 1e-9]
     if not zero_rows.empty:
         first_zero = zero_rows.iloc[0]
-        fig.add_annotation(
-            x=first_zero.month,
-            y=0,
-            text="запас исчерпан",
-            showarrow=True,
-            arrowhead=2,
-            ax=0,
-            ay=-45,
-            font=dict(color="#9A3E1A"),
+        fig.add_trace(
+            go.Scatter(
+                x=[first_zero.month],
+                y=[0],
+                name="Первое исчерпание запаса",
+                mode="markers",
+                marker=dict(color="#D06B6B", symbol="x", size=12),
+                hovertemplate="%{x}<br>Физический запас впервые достиг нуля<extra></extra>",
+            )
         )
 
     fig.update_layout(
@@ -209,9 +263,27 @@ def service(result: dict[str, Any], scenario_id: str) -> go.Figure:
             hovertemplate="%{x}: %{y:.2f}%<extra></extra>",
         )
     )
-    label = "обязательный минимум" if scenario_id == "BASE" else "ориентир устойчивости"
-    fig.add_hline(y=97, line_dash="dash", line_color="#9B72FF", annotation_text=f"97% · {label}")
-    fig.add_hline(y=99, line_dash="dot", line_color="#D06B6B", annotation_text=f"99% · {label}")
+    label = "минимум" if scenario_id == "BASE" else "ориентир"
+    fig.add_hline(y=97, line_dash="dash", line_color="#9B72FF")
+    fig.add_hline(y=99, line_dash="dot", line_color="#D06B6B")
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="lines",
+            name=f"97% · общий {label}",
+            line=dict(color="#9B72FF", dash="dash"),
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="lines",
+            name=f"99% · критический {label}",
+            line=dict(color="#D06B6B", dash="dot"),
+        )
+    )
     fig.update_layout(title="Выполняются ли требования по сервису каждый год?", yaxis_title="%")
     return style(fig)
 
@@ -229,8 +301,6 @@ def abc_metric(rows: list[dict[str, Any]], field: str, title: str, unit: str) ->
             x=df.display_case,
             y=df[field],
             marker_color=[CASE_COLORS[item] for item in df.case],
-            text=[f"{value:.2f}" for value in df[field]],
-            textposition="outside",
             customdata=df.label,
             hovertemplate=f"%{{customdata}}<br>%{{y:.2f}} {unit}<extra></extra>",
         )
@@ -297,12 +367,30 @@ def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figu
     service_fig.add_hline(
         y=97,
         line_dash="dash",
-        annotation_text="97% · общий минимум BASE",
+        line_color="#9B72FF",
     )
     service_fig.add_hline(
         y=99,
         line_dash="dot",
-        annotation_text="99% · критический минимум BASE",
+        line_color="#D06B6B",
+    )
+    service_fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="lines",
+            name="Порог общего сервиса 97%",
+            line=dict(color="#9B72FF", dash="dash"),
+        )
+    )
+    service_fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="lines",
+            name="Порог критического сервиса 99%",
+            line=dict(color="#D06B6B", dash="dot"),
+        )
     )
 
     if numeric_axis:
@@ -311,7 +399,6 @@ def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figu
                 x=1.0,
                 line_dash="dot",
                 line_color="#6D6673",
-                annotation_text="исходное значение",
             )
         failing = df[df.valid == False]  # noqa: E712
         if not failing.empty:
@@ -319,7 +406,16 @@ def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figu
                 x=float(failing.iloc[0].plot_value),
                 line_dash="dash",
                 line_color="#D06B6B",
-                annotation_text="первое нарушение",
+            )
+            service_fig.add_trace(
+                go.Scatter(
+                    x=[float(failing.iloc[0].plot_value)],
+                    y=[float(failing.iloc[0].total_service_level) * 100],
+                    mode="markers",
+                    name="Первое нарушение",
+                    marker=dict(color="#D06B6B", symbol="x", size=12),
+                    hovertemplate="Первое нарушение на %{x}<br>Общий сервис %{y:.2f}%<extra></extra>",
+                )
             )
     else:
         failing = df[df.valid == False]  # noqa: E712
@@ -398,15 +494,12 @@ def reverse_zone(data: dict[str, Any]) -> go.Figure:
             fillcolor="#278D8D",
             opacity=0.08,
             line_width=0,
-            annotation_text="проверенная безопасная зона",
-            annotation_position="top left",
         )
     if first_fail is not None:
         fig.add_vline(
             x=first_fail,
             line_dash="dash",
             line_color="#D06B6B",
-            annotation_text="первый отказ",
         )
         if not df.empty:
             fig.add_vrect(
@@ -415,8 +508,6 @@ def reverse_zone(data: dict[str, Any]) -> go.Figure:
                 fillcolor="#FDAEAD",
                 opacity=0.10,
                 line_width=0,
-                annotation_text="зона нарушений",
-                annotation_position="top right",
             )
     fig.update_layout(
         title="Где план впервые перестаёт выполнять ограничения?",
@@ -435,19 +526,16 @@ def alternatives(rows: list[dict[str, Any]]) -> go.Figure:
         y="Дефицит в стрессе, т",
         size="base_capex_mln",
         hover_name="plan_id",
-        text="plan_id",
         labels={
-            "Стоимость, млн": "Стоимость в BASE, млн у.е.",
-            "Дефицит в стрессе, т": "Дефицит того же плана в обязательном стрессе, т",
+            "Стоимость, млн": "Стоимость BASE, млн",
+            "Дефицит в стрессе, т": "Дефицит в стрессе, т",
         },
         title="Сколько стоит устойчивость альтернатив?",
     )
-    fig.update_traces(textposition="top center")
     fig.add_hline(
         y=0,
         line_dash="dot",
         line_color="#278D8D",
-        annotation_text="без дефицита",
     )
     return style(fig, 430)
 
@@ -480,7 +568,7 @@ def risk_impact(rows: list[dict[str, Any]]) -> go.Figure:
     fig.update_layout(
         barmode="group",
         title="Какие риски сильнее всего ухудшают физическое снабжение?",
-        xaxis_title="Изменение дефицита относительно выбранной среды, т",
+        xaxis_title="Дополнительный дефицит, т",
         yaxis_title="",
     )
     return style(fig, max(360, 44 * len(df) + 120))
