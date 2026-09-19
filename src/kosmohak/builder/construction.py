@@ -95,10 +95,11 @@ def _plan_shell(
     case_data: CaseData,
     enabled_ids: set[str],
     profile: str,
+    scenario_id: str,
 ) -> dict[str, Any]:
     return {
         "plan_id": "strategy-builder-seed",
-        "scenario_id": "BASE",
+        "scenario_id": scenario_id,
         "decisions": {
             "supply_orders": [],
             "capacity_reservations": [],
@@ -237,14 +238,18 @@ def construct_seed(
     stress_scenario: Scenario,
     enabled_ids: set[str],
     profile: str,
+    planning_scenario: Scenario | None = None,
 ) -> dict[str, Any]:
-    raw = _plan_shell(case_data, enabled_ids, profile)
+    planning_scenario = planning_scenario or base_scenario
+    raw = _plan_shell(
+        case_data, enabled_ids, profile, planning_scenario.scenario_id
+    )
     provisional = OperatorPlan.from_dict(copy.deepcopy(raw))
     commissions = source_commissioning_dates(
         provisional,
         case_data,
         assumptions,
-        ensure_environment(base_scenario),
+        ensure_environment(planning_scenario),
     )
     _initial_stock(raw, commissions, case_data, assumptions)
     provisional = OperatorPlan.from_dict(copy.deepcopy(raw))
@@ -260,8 +265,14 @@ def construct_seed(
     for delivery_month in month_range(case_data.start_month, case_data.end_month):
         year = int(delivery_month[:4])
         storage = _storage_for_month(raw, delivery_month, case_data)
-        needed = (case_data.demand[year].base_total_t / 12.0) / (
-            1.0 - storage.loss_rate_on_throughput
+        demand_multiplier = ensure_environment(
+            planning_scenario
+        ).demand_multiplier_for_month(delivery_month)
+        needed = (
+            case_data.demand[year].base_total_t
+            * demand_multiplier
+            / 12.0
+            / (1.0 - storage.loss_rate_on_throughput)
         )
         while needed > 1e-10:
             choices: list[dict[str, Any]] = []
@@ -355,6 +366,7 @@ def constructive_seeds(
     assumptions: ModelAssumptions,
     base_scenario: Scenario,
     stress_scenario: Scenario,
+    planning_scenario: Scenario | None = None,
 ) -> list[dict[str, Any]]:
     seeds: list[dict[str, Any]] = []
     for enabled_ids in _investment_sets(case_data):
@@ -367,6 +379,7 @@ def constructive_seeds(
                     stress_scenario,
                     enabled_ids,
                     profile,
+                    planning_scenario=planning_scenario,
                 )
             )
     return seeds
