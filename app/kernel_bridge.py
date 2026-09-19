@@ -15,6 +15,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable
 
+from app.export_csv import csv_with_unit_headers
+
 
 ROOT = Path(__file__).resolve().parent.parent
 CORE_ROOT = ROOT / "core" if (ROOT / "core" / "src" / "kosmohak").exists() else ROOT
@@ -875,7 +877,10 @@ def result_csv_bytes(
             )
         for path in sorted(root.rglob("*")):
             if path.is_file() and path.suffix in {".csv", ".json"}:
-                files[path.relative_to(root).as_posix()] = path.read_bytes()
+                payload = path.read_bytes()
+                if path.suffix == ".csv":
+                    payload = csv_with_unit_headers(payload)
+                files[path.relative_to(root).as_posix()] = payload
     return files
 
 
