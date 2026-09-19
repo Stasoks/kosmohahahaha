@@ -1,0 +1,17 @@
+[
+  {
+    "actual": 33.596401709401796,
+    "code": "RESERVE_45D",
+    "constraint_id": "RESERVE_45D",
+    "excess_or_gap": 11.403598290598204,
+    "human_message": "Reserve equivalence is 33.596 days; required 45.000 days.",
+    "limit": 45.0,
+    "operator": ">=",
+    "period": "2040-01",
+    "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+    "scenario": "BASE",
+    "severity": "hard",
+    "source_id": null,
+    "unit": "days"
+  }
+]

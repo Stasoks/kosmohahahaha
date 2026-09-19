@@ -52,6 +52,22 @@
 
 ---
 
+## Финальные воспроизводимые материалы команды
+
+После сборки конкурсного решения ключевые рассчитанные артефакты находятся здесь:
+
+- `plans/final_base.json` — выбранный стандартный план;
+- `plans/final_stress_adaptation.json` — отдельный план для MANDATORY_STRESS;
+- `results/final-evidence/` — BASE → stress replay → stress adaptation, sensitivity,
+  reverse stress, альтернативы и риск-портфель;
+- `docs/FINAL_EVIDENCE.md` — карта финальных чисел и их интерпретация;
+- `docs/FINAL_ROADMAP.md` — бюджет и дорожная карта 2035–2040;
+- `docs/STAKEHOLDER_IMPACT.md` — влияние выбранной стратегии и рисков на стороны;
+- `docs/STRATEGY_BUILDER.md` — границы и алгоритм Builder.
+
+Все итоговые числа должны переноситься в UI, управленческую записку и презентацию из
+этих воспроизводимых расчётов, а не пересчитываться вручную.
+
 ## 1. Что нужно сделать
 
 Задача — не нарисовать статичный dashboard и не написать отчёт, а связать управленческие решения с пересчитываемой моделью.
@@ -618,6 +634,8 @@ risk_register
 
 Export должен позволять понять scenario, периоды, units и assumptions. Числа должны совпадать с UI.
 
+В Streamlit-выгрузке измеряемые CSV-колонки имеют единицы прямо в заголовках, например `Demand_t`, `CAPEX_mln`, `SL_total_pct`; service level переводится из доли в проценты именно для операторского CSV.
+
 ---
 
 ## 26. Ошибки и нарушения
@@ -681,6 +699,8 @@ closing_inventory = 13
 ### Добавление источника
 
 На **копии** набора добавьте синтетический `Source-X` и покажите, что система подхватывает новую строку через data/configuration, а не требует переписывать формулу специально под шестой источник.
+
+Готовая демонстрационная копия: [`data/supply_sources_with_X.csv`](data/supply_sources_with_X.csv). Официальный `data/supply_sources.csv` при этом не изменён.
 
 ### Добавление будущего периода
 
@@ -882,55 +902,3 @@ python3 scripts/evaluate_risks.py \
   --scenario BASE
 
 python3 scripts/run_sensitivity.py \
-  --plan configs/operator_plan_example.json \
-  --parameter demand_multiplier --values 1.0,1.05,1.10
-
-python3 scripts/run_reverse_stress.py \
-  --plan configs/operator_plan_example.json \
-  --parameter demand_multiplier \
-  --start 1.0 --stop 1.5 --step 0.01 \
-  --target-constraint BASE_TOTAL_SERVICE
-```
-
-Подробная архитектура, provenance и ограничения описаны в
-[`docs/TEAM_IMPLEMENTATION.md`](docs/TEAM_IMPLEMENTATION.md).
-
----
-
-## 36. Research extension, Strategy Advisor и Strategy Builder (v0.4)
-
-Текущая версия добавляет неразрушающий `CaseWorkspace`, произвольные research sources,
-явное продолжение горизонта после 2040, отдельный Strategy Advisor и отдельный
-Strategy Builder. Цифровой двойник остаётся единственным расчётчиком физики,
-экономики и constraints; Advisor локально улучшает существующий `OperatorPlan`, а
-Builder умеет отдельно синтезировать стандартный `BASE_PLAN` и
-`STRESS_ADAPTATION`. Для BASE официальные 97% общего / 99% критического сервиса
-являются hard constraints; в mandatory stress те же уровни показываются как
-resilience benchmarks. Оба режима проверяются тем же расчётным ядром.
-
-```bash
-# Три содержательно разные BASE-valid стратегии, BASE + mandatory stress + 8 risks
-python3 scripts/compare_plans.py \
-  plans/cost_focused.json plans/diversified.json plans/resilient.json \
-  --risks configs/risks/team_risks.json
-
-# Локальный детерминированный advisor
-python3 scripts/advise_plan.py \
-  --plan examples/invalid_plan_examples/repair_overcapacity.json \
-  --mode repair --seed 17
-```
-
-Публичный backend API:
-
-```text
-add_research_source / extend_horizon
-evaluate_plan / evaluate_both_scenarios / compare_plans
-repair_plan / improve_plan / improve_resilience / explore_alternatives
-synthesize_strategy / StrategyBuilderConfig / StrategyBuilderResult
-```
-
-Документы: [`RESEARCH_EXTENSION.md`](docs/RESEARCH_EXTENSION.md),
-[`STRATEGY_ADVISOR.md`](docs/STRATEGY_ADVISOR.md),
-[`STRATEGY_BUILDER.md`](docs/STRATEGY_BUILDER.md),
-[`UI_INTEGRATION.md`](docs/UI_INTEGRATION.md),
-[`TEST_PROTOCOL.md`](docs/TEST_PROTOCOL.md).

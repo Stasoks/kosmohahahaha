@@ -58,7 +58,7 @@ guard explicitly.
 
 ```text
 python3 -m pytest
-96 passed, 0 failed
+116 passed, 0 failed
 
 python3 -m pytest tests/official
 10 passed, 0 failed
@@ -83,8 +83,8 @@ python3 -m pytest tests/service/test_ui_service_api.py
 10 passed, 0 failed
 ```
 
-`python3 tools/validate_participant_repo.py` passed all 10 applicable organizer
-integrity checks with zero failures. `bash operator_tests/run_all.sh` exited 0 and ran
+`python3 tools/validate_participant_repo.py` passed all applicable organizer
+integrity checks with zero failures. The latest full participant CI on the final-evidence branch reports `116 passed`. `bash operator_tests/run_all.sh` exited 0 and ran
 all ten operator fixtures. The original reference validator passed those same content
 checks but, as designed, returned 1 only for `check_no_ready_solution` because this is
 now a participant repository containing `src/`, `configs/`, `results/`, and

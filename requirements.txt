@@ -1,0 +1,5 @@
+streamlit==1.50.0
+plotly==6.3.0
+pandas==2.3.2
+jsonschema==4.25.1
+PyYAML==6.0.3

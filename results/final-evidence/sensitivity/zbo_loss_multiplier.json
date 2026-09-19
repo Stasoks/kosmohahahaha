@@ -1,0 +1,182 @@
+{
+  "base_scenario_id": "BASE",
+  "first_failing_point": {
+    "critical_demand_t": 950.0,
+    "critical_service_level": 1.0,
+    "critical_shortage_t": 0.0,
+    "discounted_cost_mln": 9673.750758369242,
+    "final_inventory_t": 6.0638044663820665,
+    "hard_violation_count": 1,
+    "minimum_inventory_t": 6.0638044663820665,
+    "run_id": "run-f6f481ce33b1eed5",
+    "total_cost_mln": 10603.225435116443,
+    "total_demand_t": 1390.0,
+    "total_service_level": 1.0,
+    "total_shortage_t": 0.0,
+    "valid": false,
+    "value": 1.25,
+    "violations": [
+      {
+        "actual": 43.82757374822668,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 1.1724262517733166,
+        "human_message": "Reserve equivalence is 43.828 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2040-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      }
+    ]
+  },
+  "parameter": {
+    "name": "storage_loss_multiplier",
+    "status": "TEAM_ASSUMPTION",
+    "storage_id": "ZBO"
+  },
+  "plan_id": "final-base-plan",
+  "points": [
+    {
+      "critical_demand_t": 950.0,
+      "critical_service_level": 1.0,
+      "critical_shortage_t": 0.0,
+      "discounted_cost_mln": 9688.182934292694,
+      "final_inventory_t": 17.61896640970187,
+      "hard_violation_count": 0,
+      "minimum_inventory_t": 17.61896640970187,
+      "run_id": "run-183197f5cfe340ea",
+      "total_cost_mln": 10620.703659387696,
+      "total_demand_t": 1390.0,
+      "total_service_level": 1.0,
+      "total_shortage_t": 0.0,
+      "valid": true,
+      "value": 0.5,
+      "violations": []
+    },
+    {
+      "critical_demand_t": 950.0,
+      "critical_service_level": 1.0,
+      "critical_shortage_t": 0.0,
+      "discounted_cost_mln": 9678.56148367706,
+      "final_inventory_t": 9.915525114155358,
+      "hard_violation_count": 0,
+      "minimum_inventory_t": 9.915525114155358,
+      "run_id": "run-87d3c99ec3e96fc4",
+      "total_cost_mln": 10609.051509873529,
+      "total_demand_t": 1390.0,
+      "total_service_level": 1.0,
+      "total_shortage_t": 0.0,
+      "valid": true,
+      "value": 1.0,
+      "violations": []
+    },
+    {
+      "critical_demand_t": 950.0,
+      "critical_service_level": 1.0,
+      "critical_shortage_t": 0.0,
+      "discounted_cost_mln": 9673.750758369242,
+      "final_inventory_t": 6.0638044663820665,
+      "hard_violation_count": 1,
+      "minimum_inventory_t": 6.0638044663820665,
+      "run_id": "run-f6f481ce33b1eed5",
+      "total_cost_mln": 10603.225435116443,
+      "total_demand_t": 1390.0,
+      "total_service_level": 1.0,
+      "total_shortage_t": 0.0,
+      "valid": false,
+      "value": 1.25,
+      "violations": [
+        {
+          "actual": 43.82757374822668,
+          "code": "RESERVE_45D",
+          "constraint_id": "RESERVE_45D",
+          "excess_or_gap": 1.1724262517733166,
+          "human_message": "Reserve equivalence is 43.828 days; required 45.000 days.",
+          "limit": 45.0,
+          "operator": ">=",
+          "period": "2040-01",
+          "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "days"
+        }
+      ]
+    },
+    {
+      "critical_demand_t": 950.0,
+      "critical_service_level": 1.0,
+      "critical_shortage_t": 0.0,
+      "discounted_cost_mln": 9668.940033061424,
+      "final_inventory_t": 2.212083818608619,
+      "hard_violation_count": 1,
+      "minimum_inventory_t": 2.212083818608619,
+      "run_id": "run-8dab3bc8dd1a080e",
+      "total_cost_mln": 10597.399360359357,
+      "total_demand_t": 1390.0,
+      "total_service_level": 1.0,
+      "total_shortage_t": 0.0,
+      "valid": false,
+      "value": 1.5,
+      "violations": [
+        {
+          "actual": 41.218232966538594,
+          "code": "RESERVE_45D",
+          "constraint_id": "RESERVE_45D",
+          "excess_or_gap": 3.7817670334614064,
+          "human_message": "Reserve equivalence is 41.218 days; required 45.000 days.",
+          "limit": 45.0,
+          "operator": ">=",
+          "period": "2040-01",
+          "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "days"
+        }
+      ]
+    },
+    {
+      "critical_demand_t": 950.0,
+      "critical_service_level": 1.0,
+      "critical_shortage_t": 0.0,
+      "discounted_cost_mln": 9659.447661113967,
+      "final_inventory_t": 0.0,
+      "hard_violation_count": 1,
+      "minimum_inventory_t": 0.0,
+      "run_id": "run-08df8676ce1fba17",
+      "total_cost_mln": 10585.911951569495,
+      "total_demand_t": 1390.0,
+      "total_service_level": 0.9960493831101166,
+      "total_shortage_t": 5.4913574769378535,
+      "valid": false,
+      "value": 2.0,
+      "violations": [
+        {
+          "actual": 35.999551403162755,
+          "code": "RESERVE_45D",
+          "constraint_id": "RESERVE_45D",
+          "excess_or_gap": 9.000448596837245,
+          "human_message": "Reserve equivalence is 36.000 days; required 45.000 days.",
+          "limit": 45.0,
+          "operator": ">=",
+          "period": "2040-01",
+          "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "days"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "operator_plan_mutated": false,
+    "outputs": "DIGITAL_TWIN_RESULT",
+    "parameter_values": "TEAM_ASSUMPTION"
+  }
+}

@@ -167,7 +167,7 @@ class CaseData:
             sorted(
                 source_id
                 for source_id, source in self.sources.items()
-                if source.status != "CASE_INPUT"
+                if source.provenance.get("scope") == "RESEARCH_EXTENSION"
             )
         )
 

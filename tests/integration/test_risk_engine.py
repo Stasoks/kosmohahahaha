@@ -7,6 +7,7 @@ import pytest
 
 from kosmohak.loading import RiskLoader
 from kosmohak.risk import evaluate_risk, evaluate_risk_set
+from kosmohak.risk.engine import apply_plan_patch
 from kosmohak.reporting import export_risk_portfolio
 from kosmohak.simulation import simulate
 from kosmohak.simulation.environment import SimulationEnvironment
@@ -257,6 +258,39 @@ def test_risk_consequence_scoring_matrix_and_unknown_likelihood(
     assert portfolio.evaluations[0].ordinal_risk_score is None
     assert portfolio.evaluations[1].ordinal_risk_score == 3 * portfolio.evaluations[1].impact["impact_score"]
     assert any(item["risk_id"] == "R-UNKNOWN" for item in portfolio.risk_matrix["unknown_likelihood"])
+
+
+def test_mitigation_schedule_mode_change_replaces_incompatible_values(
+    plan, case_data, assumptions
+):
+    original = next(
+        item for item in plan.raw["decisions"]["supply_orders"]
+        if item["source_id"] == "C"
+    )
+    assert original["mode"] == "monthly"
+    assert any("-" in key for key in original["values"])
+
+    mitigated = apply_plan_patch(
+        plan,
+        {
+            "supply_orders": [
+                {
+                    "source_id": "C",
+                    "mode": "annual_even",
+                    "values": {"2038": 60.0},
+                }
+            ]
+        },
+        case_data,
+        assumptions,
+        mitigation_id="TEST-MODE-REPLACE",
+    )
+    changed = next(
+        item for item in mitigated.raw["decisions"]["supply_orders"]
+        if item["source_id"] == "C"
+    )
+    assert changed["mode"] == "annual_even"
+    assert changed["values"] == {"2038": 60.0}
 
 
 def test_mitigation_is_rerun_and_has_cost_and_residual_risk(

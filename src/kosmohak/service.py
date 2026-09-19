@@ -11,7 +11,7 @@ import json
 import tempfile
 import zipfile
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -67,6 +67,7 @@ from kosmohak.risk import (
 from kosmohak.risk.reverse_stress import ReverseStressResult
 from kosmohak.risk.sensitivity import SensitivityResult
 from kosmohak.simulation.engine import simulate
+from kosmohak.simulation.environment import SimulationEnvironment
 from kosmohak.workspace import (
     CaseWorkspace,
     FutureYearSpec,
@@ -261,6 +262,120 @@ def evaluate_plan(
     assumptions: ModelAssumptions,
 ) -> SimulationResult:
     return simulate(plan, environment, case_data, assumptions)
+
+
+EDITABLE_SOURCE_FIELDS = {
+    "capacity_t_per_year",
+    "variable_cost_mln_per_t",
+    "reservation_rate_mln_per_t_year_capacity",
+    "take_or_pay_share",
+    "selected_lead_time_months",
+}
+
+
+def build_case_with_source_overrides(
+    case_data: CaseData,
+    overrides: dict[str, dict[str, Any]] | None,
+) -> CaseData:
+    """Return a non-destructive case copy with explicit source assumptions.
+
+    Source identifiers and names stay immutable so official scenario mappings keep
+    working. Edited values are TEAM_ASSUMPTION inputs and never mutate CASE_INPUT.
+    """
+
+    if not overrides:
+        return case_data
+    sources = dict(case_data.sources)
+    for source_id, raw_patch in overrides.items():
+        if source_id not in sources:
+            raise ValueError(f"Unknown source_id in source overrides: {source_id}")
+        unknown = set(raw_patch) - EDITABLE_SOURCE_FIELDS
+        if unknown:
+            raise ValueError(
+                f"Unsupported source override fields for {source_id}: {sorted(unknown)}"
+            )
+        source = sources[source_id]
+        patch: dict[str, Any] = {}
+        for field in (
+            "capacity_t_per_year",
+            "variable_cost_mln_per_t",
+            "reservation_rate_mln_per_t_year_capacity",
+        ):
+            if field in raw_patch:
+                value = float(raw_patch[field])
+                if value < 0:
+                    raise ValueError(f"{source_id}.{field} cannot be negative")
+                patch[field] = value
+        if "take_or_pay_share" in raw_patch:
+            value = float(raw_patch["take_or_pay_share"])
+            if not 0 <= value <= 1:
+                raise ValueError(f"{source_id}.take_or_pay_share must be within 0..1")
+            patch["take_or_pay_share"] = value
+        if "selected_lead_time_months" in raw_patch:
+            value = raw_patch["selected_lead_time_months"]
+            if value in (None, ""):
+                patch["selected_lead_time_months"] = None
+            else:
+                months = int(value)
+                if months < 0:
+                    raise ValueError(
+                        f"{source_id}.selected_lead_time_months cannot be negative"
+                    )
+                patch["selected_lead_time_months"] = months
+        patch["status"] = "TEAM_ASSUMPTION"
+        patch["provenance"] = {
+            **source.provenance,
+            "status": "TEAM_ASSUMPTION",
+            "scope": "USER_EDITED_SOURCE_COPY",
+            "basis": "operator-edited source assumption",
+        }
+        sources[source_id] = replace(source, **patch)
+
+    return replace(
+        case_data,
+        sources=sources,
+        status="TEAM_ASSUMPTION",
+        workspace_provenance={
+            **case_data.workspace_provenance,
+            "source_overrides": copy.deepcopy(overrides),
+            "status": "TEAM_ASSUMPTION",
+        },
+    )
+
+
+def build_custom_environment(
+    base_scenario: Scenario,
+    spec: dict[str, Any],
+) -> SimulationEnvironment:
+    """Build a deterministic user scenario on top of an official scenario."""
+
+    changes = copy.deepcopy(spec.get("factor_changes", []))
+    if not isinstance(changes, list) or not changes:
+        raise ValueError("Custom scenario requires at least one changed parameter")
+    start = str(spec.get("period_start", "2035-01"))
+    end = str(spec.get("period_end", "2040-12"))
+    raw = {
+        "risk_id": "CUSTOM-SCENARIO",
+        "name": str(spec.get("name", "Пользовательский сценарий")),
+        "description": "User-defined deterministic scenario for digital-twin analysis.",
+        "event": "User-defined scenario overrides",
+        "cause": "Operator what-if analysis",
+        "period_start": start,
+        "period_end": end,
+        "affected_parameters": [str(item.get("factor", "")) for item in changes],
+        "factor_changes": changes,
+        "dependencies": [],
+        "owner": "operator",
+        "likelihood": {"likelihood_type": "unknown"},
+        "combination_policy": "apply_after_base",
+        "anticipated_consequence": "Computed by digital twin.",
+        "residual_consequence": "Not applicable.",
+        "stakeholder_ids": [],
+        "status": "TEAM_ASSUMPTION",
+        "metadata": {"status": "TEAM_ASSUMPTION", "kind": "CUSTOM_SCENARIO"},
+    }
+    definition = RiskLoader.from_dict(raw)
+    return SimulationEnvironment.with_risks(base_scenario, [definition])
 
 
 def evaluate_both_scenarios(
@@ -778,6 +893,8 @@ __all__ = [
     "ResearchSourceSpec",
     "FutureYearSpec",
     "load_application_context",
+    "build_case_with_source_overrides",
+    "build_custom_environment",
     "build_plan",
     "load_plan",
     "save_plan",

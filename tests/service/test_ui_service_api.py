@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 import json
 import zipfile
+
+import pytest
 from pathlib import Path
 
 from kosmohak.service import (
@@ -10,6 +12,8 @@ from kosmohak.service import (
     OptimizerConfig,
     add_workspace_source,
     apply_strategy_suggestion,
+    build_case_with_source_overrides,
+    build_custom_environment,
     build_download_bundle,
     build_effective_case,
     build_future_year_spec,
@@ -228,3 +232,64 @@ def test_ui_api_10_download_bundle_contains_observable_contract(
     assert manifest["plan_id"] == plan.plan_id
     assert manifest["run_ids"]["BASE"] == pair["BASE"].summary["run_id"]
     assert "export_timestamp" in manifest
+
+
+def test_ui_api_11_source_overrides_are_non_destructive(
+    case_data, assumptions, plan, base_scenario
+):
+    original_capacity = case_data.sources["B"].capacity_t_per_year
+    edited = build_case_with_source_overrides(
+        case_data,
+        {
+            "B": {
+                "capacity_t_per_year": 95,
+                "variable_cost_mln_per_t": 9.4,
+                "selected_lead_time_months": 6,
+            }
+        },
+    )
+    assert case_data.sources["B"].capacity_t_per_year == original_capacity
+    assert edited.sources["B"].capacity_t_per_year == 95
+    assert edited.sources["B"].variable_cost_mln_per_t == 9.4
+    assert assumptions.source_delivery_lead_months(edited.sources["B"]) == 6
+    assert edited.sources["B"].status == "TEAM_ASSUMPTION"
+    result = evaluate_plan(plan, base_scenario, edited, assumptions)
+    assert result.summary["run_id"]
+
+
+def test_ui_api_12_custom_scenario_composes_over_official_base(
+    case_data, assumptions, plan, base_scenario
+):
+    environment = build_custom_environment(
+        base_scenario,
+        {
+            "name": "Demand and price what-if",
+            "period_start": "2038-01",
+            "period_end": "2040-12",
+            "factor_changes": [
+                {
+                    "factor": "total_demand_multiplier",
+                    "value": 1.1,
+                    "status": "TEAM_ASSUMPTION",
+                },
+                {
+                    "factor": "critical_demand_multiplier",
+                    "value": 1.1,
+                    "status": "TEAM_ASSUMPTION",
+                },
+                {
+                    "factor": "variable_price_multiplier",
+                    "source_id": "A",
+                    "value": 1.2,
+                    "status": "TEAM_ASSUMPTION",
+                },
+            ],
+        },
+    )
+    result = evaluate_plan(plan, environment, case_data, assumptions)
+    row_2038 = next(row for row in result.annual if row["year"] == 2038)
+    assert environment.base_scenario_id == "BASE"
+    assert environment.environment_id == "BASE+CUSTOM-SCENARIO"
+    assert row_2038["demand_total_t"] == pytest.approx(
+        case_data.demand[2038].base_total_t * 1.1
+    )

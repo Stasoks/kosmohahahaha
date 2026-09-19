@@ -1,0 +1,2790 @@
+{
+  "BASE_PLAN": {
+    "config": {
+      "beam_width": 24,
+      "diversity_threshold": 0.08,
+      "max_candidates": 1200,
+      "max_iterations": 8,
+      "max_results": 3,
+      "max_total_cost_mln": null,
+      "mutation_fractions": [
+        0.1,
+        0.25
+      ],
+      "objective": "MIN_COST",
+      "planning_mode": "BASE_PLAN",
+      "planning_scenario_id": "BASE",
+      "seed": 17,
+      "stress_critical_service_target": null,
+      "stress_target_policy": "SOFT",
+      "stress_total_service_target": null
+    },
+    "evaluated_candidate_count": 1200,
+    "failure_reason": "",
+    "iterations": 8,
+    "search_metadata": {
+      "algorithm": "SCENARIO_AWARE_DETERMINISTIC_BOUNDED_BEAM_SEARCH",
+      "beam_width": 24,
+      "budget_exhausted": false,
+      "candidate_budget": 1200,
+      "constructive_seed_count": 20,
+      "dominance_pruned": 541,
+      "duplicate_decision_sets_pruned": 49,
+      "generated_candidate_count": 1249,
+      "global_optimum_claimed": false,
+      "official_service_interpretation": {
+        "BASE": {
+          "critical_service_minimum": 0.99,
+          "severity": "hard",
+          "total_service_minimum": 0.97
+        },
+        "MANDATORY_STRESS": {
+          "critical_service_benchmark": 0.99,
+          "severity": "benchmark",
+          "total_service_benchmark": 0.97
+        }
+      },
+      "planning_mode": "BASE_PLAN",
+      "planning_scenario_id": "BASE",
+      "simulation_cache_entries": 1200,
+      "simulation_cache_hits": 49,
+      "structural_rejections": 0
+    },
+    "solutions": [
+      {
+        "base_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "BASE",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 7.632411158182395,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 9678.56148367706,
+          "discounted_cost_per_served_ton_mln": 6.962993873148964,
+          "emergency_usage_t": 34.904013961605585,
+          "environment_id": "BASE",
+          "final_inventory_t": 9.915525114155358,
+          "hard_violation_count": 0,
+          "initial_stock_total_cost_mln": 334.81316789786985,
+          "minimum_inventory_t": 9.915525114155358,
+          "months_with_shortage": 0,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 48.082191780821915,
+          "plan_id": "strategy-builder-17-87f44b811731",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-d0fccfedca08cb2d",
+          "scenario_id": "BASE",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+          "total_losses_t": 19.333584161773747,
+          "total_overflow_t": 0.0,
+          "total_service_level": 1.0,
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 2.4868995751603507e-14,
+          "undiscounted_cost_mln": 10609.051509873529,
+          "valid": true,
+          "violation_count": 0
+        },
+        "benchmark_status": {
+          "stress_critical_service": {
+            "actual": 0.965377664109122,
+            "benchmark": 0.99,
+            "gap": 0.024622335890878033,
+            "met": false,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          },
+          "stress_total_service": {
+            "actual": 0.7810434782608697,
+            "benchmark": 0.97,
+            "gap": 0.18895652173913025,
+            "met": false,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          }
+        },
+        "metrics": {
+          "base_critical_shortage_t": 0.0,
+          "base_hard_violation_count": 0,
+          "base_source_mix_t": {
+            "A": 844.7368421052631,
+            "B": 131.5260614282383,
+            "C": 0,
+            "D": 360.0,
+            "E": 34.904013961605585
+          },
+          "base_total_cost_mln": 10609.051509873529,
+          "base_total_shortage_t": 0.0,
+          "enabled_investments": [
+            "LUNAR_ISRU",
+            "ZBO"
+          ],
+          "minimum_annual_base_critical_service": 1.0,
+          "minimum_annual_base_reserve_days": 46.436914529914624,
+          "minimum_annual_base_total_service": 1.0,
+          "minimum_annual_stress_critical_service": 0.965377664109122,
+          "minimum_annual_stress_reserve_days": 0.0,
+          "minimum_annual_stress_total_service": 0.7810434782608697,
+          "minimum_base_inventory_t": 9.915525114155358,
+          "minimum_stress_inventory_t": 0.0,
+          "source_mix_t": {
+            "A": 844.7368421052631,
+            "B": 131.5260614282383,
+            "C": 0,
+            "D": 360.0,
+            "E": 34.904013961605585
+          },
+          "stress_critical_shortage_t": 7.268666666666643,
+          "stress_hard_violation_count": 2,
+          "stress_source_mix_t": {
+            "A": 844.7368421052631,
+            "B": 131.5260614282383,
+            "C": 0,
+            "D": 276.0,
+            "E": 34.904013961605585
+          },
+          "stress_total_cost_mln": 11111.764072193975,
+          "stress_total_shortage_t": 217.0764748858446,
+          "total_cost_mln": 10609.051509873529
+        },
+        "mutation_history": [
+          "increase:A:2035:0.1000",
+          "decrease:A:2039:0.1000",
+          "decrease:B:2037:0.2500",
+          "decrease:B:2035:0.2500",
+          "decrease:B:2040:0.2500"
+        ],
+        "plan": {
+          "decisions": {
+            "capacity_reservations": [
+              {
+                "reserved_capacity_t": 160.7004048583996,
+                "source_id": "A",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2036
+              },
+              {
+                "reserved_capacity_t": 133.0364372470635,
+                "source_id": "A",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 171.0000000001,
+                "source_id": "A",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 52.35602094250838,
+                "source_id": "B",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 1.7307692308692224,
+                "source_id": "B",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 13.886639676213369,
+                "source_id": "B",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 63.55263157904734,
+                "source_id": "B",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 34.90401396170559,
+                "source_id": "E",
+                "year": 2035
+              }
+            ],
+            "emergency_role_by_year": {
+              "2035": "reserve_only",
+              "2036": "reserve_only",
+              "2037": "reserve_only",
+              "2038": "reserve_only",
+              "2039": "reserve_only",
+              "2040": "reserve_only"
+            },
+            "initial_stock_acquisition": {
+              "contract_period_end": "2034-12",
+              "contract_period_start": "2034-01",
+              "notes": "Constructive opening stock generated from official storage and lead-time data.",
+              "order_date": "2034-01",
+              "ordered_volume_t": 50.34784479667216,
+              "planned_delivery_date": "2035-01",
+              "reserved_capacity_t_per_year": 50.34784479667216,
+              "source_id": "A",
+              "status": "TEAM_DECISION"
+            },
+            "inventory_policy": {
+              "reserve_strategy_by_year": {
+                "2035": "physical",
+                "2036": "physical",
+                "2037": "physical",
+                "2038": "physical",
+                "2039": "physical",
+                "2040": "physical"
+              }
+            },
+            "investments": [
+              {
+                "buy_option": false,
+                "enabled": false,
+                "exercise_option": false,
+                "investment_id": "EARTH_NEW"
+              },
+              {
+                "enabled": true,
+                "funding_month": "2035-01",
+                "investment_id": "LUNAR_ISRU"
+              },
+              {
+                "commissioning_month": "2036-01",
+                "enabled": true,
+                "investment_id": "ZBO"
+              }
+            ],
+            "supply_orders": [
+              {
+                "mode": "monthly",
+                "source_id": "A",
+                "values": {
+                  "2035-01": 13.3917004048583,
+                  "2035-02": 13.3917004048583,
+                  "2035-03": 13.3917004048583,
+                  "2035-04": 13.3917004048583,
+                  "2035-05": 13.3917004048583,
+                  "2035-06": 13.3917004048583,
+                  "2035-07": 13.3917004048583,
+                  "2035-08": 13.3917004048583,
+                  "2035-09": 13.3917004048583,
+                  "2035-10": 13.3917004048583,
+                  "2035-11": 13.3917004048583,
+                  "2035-12": 13.3917004048583,
+                  "2036-01": 16.025641025641026,
+                  "2036-02": 16.025641025641026,
+                  "2036-03": 16.025641025641026,
+                  "2036-04": 16.025641025641026,
+                  "2036-05": 16.025641025641026,
+                  "2036-06": 16.025641025641026,
+                  "2036-07": 16.025641025641026,
+                  "2036-08": 16.025641025641026,
+                  "2036-09": 16.025641025641026,
+                  "2036-10": 16.025641025641026,
+                  "2036-11": 16.025641025641026,
+                  "2036-12": 13.71794871794873,
+                  "2037-01": 21.086369770580294,
+                  "2037-02": 21.086369770580294,
+                  "2037-08": 6.518218623481763,
+                  "2037-09": 21.086369770580294,
+                  "2037-10": 21.086369770580294,
+                  "2037-11": 21.086369770580294,
+                  "2037-12": 21.086369770580294,
+                  "2038-01": 26.990553306342782,
+                  "2038-02": 26.990553306342782,
+                  "2038-07": 14.95276653171391,
+                  "2038-08": 26.990553306342782,
+                  "2038-09": 26.990553306342782,
+                  "2038-10": 26.990553306342782,
+                  "2038-11": 26.990553306342782,
+                  "2038-12": 13.103913630229414,
+                  "2039-01": 29.605263157894736,
+                  "2039-02": 29.605263157894736,
+                  "2039-06": 10.421052631578938,
+                  "2039-07": 29.605263157894736,
+                  "2039-08": 29.605263157894736,
+                  "2039-09": 29.605263157894736,
+                  "2039-10": 12.552631578947393
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "B",
+                "values": {
+                  "2035-01": 6.544502617801047,
+                  "2035-02": 6.544502617801047,
+                  "2035-03": 6.544502617801047,
+                  "2035-04": 6.544502617801047,
+                  "2035-05": 6.544502617801047,
+                  "2035-06": 6.544502617801047,
+                  "2035-07": 6.544502617801047,
+                  "2035-08": 6.544502617801047,
+                  "2037-08": 1.7307692307692224,
+                  "2039-08": 13.886639676113369,
+                  "2040-06": 14.210526315789455,
+                  "2040-07": 24.671052631578945,
+                  "2040-08": 24.671052631578945
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "C",
+                "values": {}
+              },
+              {
+                "mode": "monthly",
+                "source_id": "D",
+                "values": {
+                  "2038-01": 21.086369770580294,
+                  "2038-02": 21.086369770580294,
+                  "2038-03": 21.086369770580294,
+                  "2038-04": 21.086369770580294,
+                  "2038-05": 21.086369770580294,
+                  "2038-06": 14.568151147098533,
+                  "2039-01": 26.990553306342782,
+                  "2039-02": 26.990553306342782,
+                  "2039-03": 26.990553306342782,
+                  "2039-04": 26.990553306342782,
+                  "2039-05": 12.03778677462887,
+                  "2040-01": 32.89473684210526,
+                  "2040-02": 32.89473684210526,
+                  "2040-03": 32.89473684210526,
+                  "2040-04": 21.31578947368422
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "E",
+                "values": {
+                  "2035-01": 26.17801047120419,
+                  "2035-02": 8.726003490401396
+                }
+              }
+            ]
+          },
+          "metadata": {
+            "builder_planning_mode": "BASE_PLAN",
+            "generated_by": "STRATEGY_BUILDER",
+            "planning_scenario": "BASE",
+            "provenance": {
+              "case": "CASE_INPUT",
+              "decisions": "TEAM_DECISION"
+            },
+            "seed_profile": "MIN_COST",
+            "status": "TEAM_DECISION"
+          },
+          "plan_id": "strategy-builder-17-87f44b811731",
+          "scenario_id": "BASE"
+        },
+        "provenance": {
+          "global_optimum_claimed": false,
+          "objective": "MIN_COST",
+          "official_inputs": "CASE_INPUT",
+          "plan_decisions": "TEAM_DECISION",
+          "planning_mode": "BASE_PLAN",
+          "planning_scenario_id": "BASE",
+          "search_targets": "OPERATOR_PREFERENCE",
+          "simulation_outputs": "DIGITAL_TWIN_RESULT",
+          "stress_service_levels": "CASE_INPUT_RESILIENCE_BENCHMARKS"
+        },
+        "search_depth": 5,
+        "stress_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "MANDATORY_STRESS",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 8.437668444893768,
+          "critical_service_level": 0.993041008456997,
+          "critical_shortage_t": 7.268666666666643,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 10104.24520953114,
+          "discounted_cost_per_served_ton_mln": 7.672613494132296,
+          "emergency_usage_t": 34.904013961605585,
+          "environment_id": "MANDATORY_STRESS",
+          "final_inventory_t": 0.0,
+          "hard_violation_count": 2,
+          "initial_stock_total_cost_mln": 334.81316789786985,
+          "minimum_inventory_t": 0.0,
+          "months_with_shortage": 31,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 48.082191780821915,
+          "plan_id": "strategy-builder-17-87f44b811731",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-34f366e5635df9c1",
+          "scenario_id": "MANDATORY_STRESS",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/mandatory_stress.yaml",
+          "total_losses_t": 18.325584161773747,
+          "total_overflow_t": 0.0,
+          "total_service_level": 0.8584899120692017,
+          "total_shortage_t": 217.0764748858446,
+          "unavailable_requested_supply_t": 84.00000000000003,
+          "undiscounted_cost_mln": 11111.764072193975,
+          "valid": false,
+          "violation_count": 6
+        },
+        "target_satisfaction": {
+          "all_hard_satisfied": true,
+          "all_satisfied": true,
+          "maximum_total_cost_mln": {
+            "actual": 10609.051509873529,
+            "operator": "<=",
+            "policy": "HARD",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_critical_service": {
+            "actual": 0.965377664109122,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_total_service": {
+            "actual": 0.7810434782608697,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          }
+        }
+      },
+      {
+        "base_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "BASE",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 7.757339958827294,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 9820.640331897022,
+          "discounted_cost_per_served_ton_mln": 7.065208871868362,
+          "emergency_usage_t": 26.17801047120419,
+          "environment_id": "BASE",
+          "final_inventory_t": 3.686858447488632,
+          "hard_violation_count": 0,
+          "initial_stock_total_cost_mln": 334.81316789786985,
+          "minimum_inventory_t": 3.686858447488632,
+          "months_with_shortage": 0,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 48.082191780821915,
+          "plan_id": "strategy-builder-17-d56e097e0aeb",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-3e81ec161e935668",
+          "scenario_id": "BASE",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+          "total_losses_t": 19.549387922080676,
+          "total_overflow_t": 0.0,
+          "total_service_level": 1.0,
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 2.4868995751603507e-14,
+          "undiscounted_cost_mln": 10782.70254276994,
+          "valid": true,
+          "violation_count": 0
+        },
+        "benchmark_status": {
+          "stress_critical_service": {
+            "actual": 0.9746427962489344,
+            "benchmark": 0.99,
+            "gap": 0.01535720375106564,
+            "met": false,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          },
+          "stress_total_service": {
+            "actual": 0.7649275362318843,
+            "benchmark": 0.97,
+            "gap": 0.20507246376811572,
+            "met": false,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          }
+        },
+        "metrics": {
+          "base_critical_shortage_t": 0.0,
+          "base_hard_violation_count": 0,
+          "base_source_mix_t": {
+            "A": 797.2368421052631,
+            "B": 211.73920201227997,
+            "C": 0,
+            "D": 330.0,
+            "E": 26.17801047120419
+          },
+          "base_total_cost_mln": 10782.70254276994,
+          "base_total_shortage_t": 0.0,
+          "enabled_investments": [
+            "LUNAR_ISRU",
+            "ZBO"
+          ],
+          "minimum_annual_base_critical_service": 1.0,
+          "minimum_annual_base_reserve_days": 47.372188034188085,
+          "minimum_annual_base_total_service": 1.0,
+          "minimum_annual_stress_critical_service": 0.9746427962489344,
+          "minimum_annual_stress_reserve_days": 0.0,
+          "minimum_annual_stress_total_service": 0.7649275362318843,
+          "minimum_base_inventory_t": 3.686858447488632,
+          "minimum_stress_inventory_t": 0.0,
+          "source_mix_t": {
+            "A": 797.2368421052631,
+            "B": 211.73920201227997,
+            "C": 0,
+            "D": 330.0,
+            "E": 26.17801047120419
+          },
+          "stress_critical_shortage_t": 5.207333333333326,
+          "stress_hard_violation_count": 2,
+          "stress_source_mix_t": {
+            "A": 797.2368421052631,
+            "B": 211.73920201227997,
+            "C": 0,
+            "D": 259.5,
+            "E": 26.17801047120419
+          },
+          "stress_total_cost_mln": 11278.724125090386,
+          "stress_total_shortage_t": 209.9671415525113,
+          "total_cost_mln": 10782.70254276994
+        },
+        "mutation_history": [
+          "increase:B:2038:0.1000",
+          "transfer:2038:D->B:30.000000",
+          "decrease:A:2039:0.2500",
+          "decrease:E:2035:0.2500"
+        ],
+        "plan": {
+          "decisions": {
+            "capacity_reservations": [
+              {
+                "reserved_capacity_t": 141.70040485839957,
+                "source_id": "A",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2036
+              },
+              {
+                "reserved_capacity_t": 133.0364372470635,
+                "source_id": "A",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 142.5000000001,
+                "source_id": "A",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 69.80802792331117,
+                "source_id": "B",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 32.3076923077923,
+                "source_id": "B",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 11.0000000001,
+                "source_id": "B",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 13.886639676213369,
+                "source_id": "B",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 84.73684210536312,
+                "source_id": "B",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 90.0000000001,
+                "source_id": "D",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 26.178010471304187,
+                "source_id": "E",
+                "year": 2035
+              }
+            ],
+            "emergency_role_by_year": {
+              "2035": "reserve_only",
+              "2036": "reserve_only",
+              "2037": "reserve_only",
+              "2038": "reserve_only",
+              "2039": "reserve_only",
+              "2040": "reserve_only"
+            },
+            "initial_stock_acquisition": {
+              "contract_period_end": "2034-12",
+              "contract_period_start": "2034-01",
+              "notes": "Constructive opening stock generated from official storage and lead-time data.",
+              "order_date": "2034-01",
+              "ordered_volume_t": 50.34784479667216,
+              "planned_delivery_date": "2035-01",
+              "reserved_capacity_t_per_year": 50.34784479667216,
+              "source_id": "A",
+              "status": "TEAM_DECISION"
+            },
+            "inventory_policy": {
+              "reserve_strategy_by_year": {
+                "2035": "physical",
+                "2036": "physical",
+                "2037": "physical",
+                "2038": "physical",
+                "2039": "physical",
+                "2040": "physical"
+              }
+            },
+            "investments": [
+              {
+                "buy_option": false,
+                "enabled": false,
+                "exercise_option": false,
+                "investment_id": "EARTH_NEW"
+              },
+              {
+                "enabled": true,
+                "funding_month": "2035-01",
+                "investment_id": "LUNAR_ISRU"
+              },
+              {
+                "commissioning_month": "2036-01",
+                "enabled": true,
+                "investment_id": "ZBO"
+              }
+            ],
+            "supply_orders": [
+              {
+                "mode": "monthly",
+                "source_id": "A",
+                "values": {
+                  "2035-01": 11.808367071524966,
+                  "2035-02": 11.808367071524966,
+                  "2035-03": 11.808367071524966,
+                  "2035-04": 11.808367071524966,
+                  "2035-05": 11.808367071524966,
+                  "2035-06": 11.808367071524966,
+                  "2035-07": 11.808367071524966,
+                  "2035-08": 11.808367071524966,
+                  "2035-09": 11.808367071524966,
+                  "2035-10": 11.808367071524966,
+                  "2035-11": 11.808367071524966,
+                  "2035-12": 11.808367071524966,
+                  "2036-01": 16.025641025641026,
+                  "2036-02": 16.025641025641026,
+                  "2036-03": 16.025641025641026,
+                  "2036-04": 16.025641025641026,
+                  "2036-05": 16.025641025641026,
+                  "2036-06": 16.025641025641026,
+                  "2036-07": 16.025641025641026,
+                  "2036-08": 16.025641025641026,
+                  "2036-09": 16.025641025641026,
+                  "2036-10": 16.025641025641026,
+                  "2036-11": 16.025641025641026,
+                  "2036-12": 13.71794871794873,
+                  "2037-01": 21.086369770580294,
+                  "2037-02": 21.086369770580294,
+                  "2037-08": 6.518218623481763,
+                  "2037-09": 21.086369770580294,
+                  "2037-10": 21.086369770580294,
+                  "2037-11": 21.086369770580294,
+                  "2037-12": 21.086369770580294,
+                  "2038-01": 26.990553306342782,
+                  "2038-02": 26.990553306342782,
+                  "2038-07": 14.95276653171391,
+                  "2038-08": 26.990553306342782,
+                  "2038-09": 26.990553306342782,
+                  "2038-10": 26.990553306342782,
+                  "2038-11": 26.990553306342782,
+                  "2038-12": 13.103913630229414,
+                  "2039-01": 24.671052631578945,
+                  "2039-02": 24.671052631578945,
+                  "2039-06": 8.684210526315782,
+                  "2039-07": 24.671052631578945,
+                  "2039-08": 24.671052631578945,
+                  "2039-09": 24.671052631578945,
+                  "2039-10": 10.460526315789494
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "B",
+                "values": {
+                  "2035-01": 8.726003490401396,
+                  "2035-02": 8.726003490401396,
+                  "2035-03": 8.726003490401396,
+                  "2035-04": 8.726003490401396,
+                  "2035-05": 8.726003490401396,
+                  "2035-06": 8.726003490401396,
+                  "2035-07": 8.726003490401396,
+                  "2035-08": 8.726003490401396,
+                  "2037-08": 2.3076923076922964,
+                  "2037-11": 21.086369770580294,
+                  "2037-12": 8.913630229419706,
+                  "2038-01": 0.9166666666666666,
+                  "2038-02": 0.9166666666666666,
+                  "2038-03": 0.9166666666666666,
+                  "2038-04": 0.9166666666666666,
+                  "2038-05": 0.9166666666666666,
+                  "2038-06": 0.9166666666666666,
+                  "2038-07": 0.9166666666666666,
+                  "2038-08": 0.9166666666666666,
+                  "2038-09": 0.9166666666666666,
+                  "2038-10": 0.9166666666666666,
+                  "2038-11": 0.9166666666666666,
+                  "2038-12": 0.9166666666666666,
+                  "2039-08": 13.886639676113369,
+                  "2040-06": 18.947368421052605,
+                  "2040-07": 32.89473684210526,
+                  "2040-08": 32.89473684210526
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "C",
+                "values": {}
+              },
+              {
+                "mode": "monthly",
+                "source_id": "D",
+                "values": {
+                  "2038-01": 0.0,
+                  "2038-02": 12.172739541160588,
+                  "2038-03": 21.086369770580294,
+                  "2038-04": 21.086369770580294,
+                  "2038-05": 21.086369770580294,
+                  "2038-06": 14.568151147098533,
+                  "2039-01": 26.990553306342782,
+                  "2039-02": 26.990553306342782,
+                  "2039-03": 26.990553306342782,
+                  "2039-04": 26.990553306342782,
+                  "2039-05": 12.03778677462887,
+                  "2040-01": 32.89473684210526,
+                  "2040-02": 32.89473684210526,
+                  "2040-03": 32.89473684210526,
+                  "2040-04": 21.31578947368422
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "E",
+                "values": {
+                  "2035-01": 19.63350785340314,
+                  "2035-02": 6.544502617801047
+                }
+              }
+            ]
+          },
+          "metadata": {
+            "builder_planning_mode": "BASE_PLAN",
+            "generated_by": "STRATEGY_BUILDER",
+            "planning_scenario": "BASE",
+            "provenance": {
+              "case": "CASE_INPUT",
+              "decisions": "TEAM_DECISION"
+            },
+            "seed_profile": "MIN_COST",
+            "status": "TEAM_DECISION"
+          },
+          "plan_id": "strategy-builder-17-d56e097e0aeb",
+          "scenario_id": "BASE"
+        },
+        "provenance": {
+          "global_optimum_claimed": false,
+          "objective": "MIN_COST",
+          "official_inputs": "CASE_INPUT",
+          "plan_decisions": "TEAM_DECISION",
+          "planning_mode": "BASE_PLAN",
+          "planning_scenario_id": "BASE",
+          "search_targets": "OPERATOR_PREFERENCE",
+          "simulation_outputs": "DIGITAL_TWIN_RESULT",
+          "stress_service_levels": "CASE_INPUT_RESILIENCE_BENCHMARKS"
+        },
+        "search_depth": 4,
+        "stress_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "MANDATORY_STRESS",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 8.518462403051988,
+          "critical_service_level": 0.9950145205042286,
+          "critical_shortage_t": 5.207333333333326,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 10241.652882968696,
+          "discounted_cost_per_served_ton_mln": 7.735195405178746,
+          "emergency_usage_t": 26.17801047120419,
+          "environment_id": "MANDATORY_STRESS",
+          "final_inventory_t": 0.0,
+          "hard_violation_count": 2,
+          "initial_stock_total_cost_mln": 334.81316789786985,
+          "minimum_inventory_t": 0.0,
+          "months_with_shortage": 31,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 48.082191780821915,
+          "plan_id": "strategy-builder-17-d56e097e0aeb",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-0f573b7cb976f6c6",
+          "scenario_id": "MANDATORY_STRESS",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/mandatory_stress.yaml",
+          "total_losses_t": 18.703387922080676,
+          "total_overflow_t": 0.0,
+          "total_service_level": 0.8631244188054034,
+          "total_shortage_t": 209.9671415525113,
+          "unavailable_requested_supply_t": 70.50000000000003,
+          "undiscounted_cost_mln": 11278.724125090386,
+          "valid": false,
+          "violation_count": 6
+        },
+        "target_satisfaction": {
+          "all_hard_satisfied": true,
+          "all_satisfied": true,
+          "maximum_total_cost_mln": {
+            "actual": 10782.70254276994,
+            "operator": "<=",
+            "policy": "HARD",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_critical_service": {
+            "actual": 0.9746427962489344,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_total_service": {
+            "actual": 0.7649275362318843,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          }
+        }
+      },
+      {
+        "base_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "BASE",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 7.795870485548334,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 9934.640285398078,
+          "discounted_cost_per_served_ton_mln": 7.147223226905092,
+          "emergency_usage_t": 34.904013961605585,
+          "environment_id": "BASE",
+          "final_inventory_t": 1.1521917808220081,
+          "hard_violation_count": 0,
+          "initial_stock_total_cost_mln": 334.81316789786985,
+          "minimum_inventory_t": 1.1521917808220081,
+          "months_with_shortage": 0,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 48.082191780821915,
+          "plan_id": "strategy-builder-17-dba18b62cb08",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-8002a7c48962140b",
+          "scenario_id": "BASE",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+          "total_losses_t": 19.810058079148735,
+          "total_overflow_t": 0.0,
+          "total_service_level": 1.0,
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 2.4868995751603507e-14,
+          "undiscounted_cost_mln": 10836.259974912184,
+          "valid": true,
+          "violation_count": 0
+        },
+        "benchmark_status": {
+          "stress_critical_service": {
+            "actual": 0.9628142802088082,
+            "benchmark": 0.99,
+            "gap": 0.027185719791191776,
+            "met": false,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          },
+          "stress_total_service": {
+            "actual": 0.7649275362318843,
+            "benchmark": 0.97,
+            "gap": 0.20507246376811572,
+            "met": false,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          }
+        },
+        "metrics": {
+          "base_critical_shortage_t": 0.0,
+          "base_hard_violation_count": 0,
+          "base_source_mix_t": {
+            "A": 797.2368421052631,
+            "B": 69.80802792321117,
+            "C": 100.93117408906879,
+            "D": 360.0,
+            "E": 34.904013961605585
+          },
+          "base_total_cost_mln": 10836.259974912184,
+          "base_total_shortage_t": 0.0,
+          "enabled_investments": [
+            "EARTH_NEW",
+            "LUNAR_ISRU",
+            "ZBO"
+          ],
+          "minimum_annual_base_critical_service": 1.0,
+          "minimum_annual_base_reserve_days": 45.000000000000085,
+          "minimum_annual_base_total_service": 1.0,
+          "minimum_annual_stress_critical_service": 0.9628142802088082,
+          "minimum_annual_stress_reserve_days": 0.0,
+          "minimum_annual_stress_total_service": 0.7649275362318843,
+          "minimum_base_inventory_t": 1.1521917808220081,
+          "minimum_stress_inventory_t": 0.0,
+          "source_mix_t": {
+            "A": 797.2368421052631,
+            "B": 69.80802792321117,
+            "C": 100.93117408906879,
+            "D": 360.0,
+            "E": 34.904013961605585
+          },
+          "stress_critical_shortage_t": 7.769808219177978,
+          "stress_hard_violation_count": 2,
+          "stress_source_mix_t": {
+            "A": 797.2368421052631,
+            "B": 69.80802792321117,
+            "C": 100.93117408906879,
+            "D": 276.0,
+            "E": 34.904013961605585
+          },
+          "stress_total_cost_mln": 11276.395463953279,
+          "stress_total_shortage_t": 225.83980821917797,
+          "total_cost_mln": 10836.259974912184
+        },
+        "mutation_history": [
+          "decrease:A:2039:0.2500",
+          "emergency_role:2038:reserve_only->planned_supply",
+          "reserve_policy:2035:physical->emergency_contract",
+          "emergency_role:2035:reserve_only->planned_supply"
+        ],
+        "plan": {
+          "decisions": {
+            "capacity_reservations": [
+              {
+                "reserved_capacity_t": 141.70040485839957,
+                "source_id": "A",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2036
+              },
+              {
+                "reserved_capacity_t": 133.0364372470635,
+                "source_id": "A",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 142.5000000001,
+                "source_id": "A",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 69.80802792331117,
+                "source_id": "B",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 2.517482517582505,
+                "source_id": "C",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 13.886639676213369,
+                "source_id": "C",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 84.73684210536312,
+                "source_id": "C",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 34.90401396170559,
+                "source_id": "E",
+                "year": 2035
+              }
+            ],
+            "emergency_role_by_year": {
+              "2035": "planned_supply",
+              "2036": "reserve_only",
+              "2037": "reserve_only",
+              "2038": "planned_supply",
+              "2039": "reserve_only",
+              "2040": "reserve_only"
+            },
+            "initial_stock_acquisition": {
+              "contract_period_end": "2034-12",
+              "contract_period_start": "2034-01",
+              "notes": "Constructive opening stock generated from official storage and lead-time data.",
+              "order_date": "2034-01",
+              "ordered_volume_t": 50.34784479667216,
+              "planned_delivery_date": "2035-01",
+              "reserved_capacity_t_per_year": 50.34784479667216,
+              "source_id": "A",
+              "status": "TEAM_DECISION"
+            },
+            "inventory_policy": {
+              "reserve_strategy_by_year": {
+                "2035": "emergency_contract",
+                "2036": "physical",
+                "2037": "physical",
+                "2038": "physical",
+                "2039": "physical",
+                "2040": "physical"
+              }
+            },
+            "investments": [
+              {
+                "buy_option": true,
+                "enabled": true,
+                "exercise_option": true,
+                "investment_id": "EARTH_NEW",
+                "option_exercise_month": "2035-02",
+                "option_purchase_month": "2035-01"
+              },
+              {
+                "enabled": true,
+                "funding_month": "2035-01",
+                "investment_id": "LUNAR_ISRU"
+              },
+              {
+                "commissioning_month": "2036-01",
+                "enabled": true,
+                "investment_id": "ZBO"
+              }
+            ],
+            "supply_orders": [
+              {
+                "mode": "monthly",
+                "source_id": "A",
+                "values": {
+                  "2035-01": 11.808367071524966,
+                  "2035-02": 11.808367071524966,
+                  "2035-03": 11.808367071524966,
+                  "2035-04": 11.808367071524966,
+                  "2035-05": 11.808367071524966,
+                  "2035-06": 11.808367071524966,
+                  "2035-07": 11.808367071524966,
+                  "2035-08": 11.808367071524966,
+                  "2035-09": 11.808367071524966,
+                  "2035-10": 11.808367071524966,
+                  "2035-11": 11.808367071524966,
+                  "2035-12": 11.808367071524966,
+                  "2036-01": 16.025641025641026,
+                  "2036-02": 16.025641025641026,
+                  "2036-03": 16.025641025641026,
+                  "2036-04": 16.025641025641026,
+                  "2036-05": 16.025641025641026,
+                  "2036-06": 16.025641025641026,
+                  "2036-07": 16.025641025641026,
+                  "2036-08": 16.025641025641026,
+                  "2036-09": 16.025641025641026,
+                  "2036-10": 16.025641025641026,
+                  "2036-11": 16.025641025641026,
+                  "2036-12": 13.71794871794873,
+                  "2037-01": 21.086369770580294,
+                  "2037-02": 21.086369770580294,
+                  "2037-08": 6.518218623481763,
+                  "2037-09": 21.086369770580294,
+                  "2037-10": 21.086369770580294,
+                  "2037-11": 21.086369770580294,
+                  "2037-12": 21.086369770580294,
+                  "2038-01": 26.990553306342782,
+                  "2038-02": 26.990553306342782,
+                  "2038-07": 14.95276653171391,
+                  "2038-08": 26.990553306342782,
+                  "2038-09": 26.990553306342782,
+                  "2038-10": 26.990553306342782,
+                  "2038-11": 26.990553306342782,
+                  "2038-12": 13.103913630229414,
+                  "2039-01": 24.671052631578945,
+                  "2039-02": 24.671052631578945,
+                  "2039-06": 8.684210526315782,
+                  "2039-07": 24.671052631578945,
+                  "2039-08": 24.671052631578945,
+                  "2039-09": 24.671052631578945,
+                  "2039-10": 10.460526315789494
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "B",
+                "values": {
+                  "2035-01": 8.726003490401396,
+                  "2035-02": 8.726003490401396,
+                  "2035-03": 8.726003490401396,
+                  "2035-04": 8.726003490401396,
+                  "2035-05": 8.726003490401396,
+                  "2035-06": 8.726003490401396,
+                  "2035-07": 8.726003490401396,
+                  "2035-08": 8.726003490401396
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "C",
+                "values": {
+                  "2037-12": 2.3076923076922964,
+                  "2039-12": 13.886639676113369,
+                  "2040-10": 18.947368421052605,
+                  "2040-11": 32.89473684210526,
+                  "2040-12": 32.89473684210526
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "D",
+                "values": {
+                  "2038-01": 21.086369770580294,
+                  "2038-02": 21.086369770580294,
+                  "2038-03": 21.086369770580294,
+                  "2038-04": 21.086369770580294,
+                  "2038-05": 21.086369770580294,
+                  "2038-06": 14.568151147098533,
+                  "2039-01": 26.990553306342782,
+                  "2039-02": 26.990553306342782,
+                  "2039-03": 26.990553306342782,
+                  "2039-04": 26.990553306342782,
+                  "2039-05": 12.03778677462887,
+                  "2040-01": 32.89473684210526,
+                  "2040-02": 32.89473684210526,
+                  "2040-03": 32.89473684210526,
+                  "2040-04": 21.31578947368422
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "E",
+                "values": {
+                  "2035-01": 26.17801047120419,
+                  "2035-02": 8.726003490401396
+                }
+              }
+            ]
+          },
+          "metadata": {
+            "builder_planning_mode": "BASE_PLAN",
+            "generated_by": "STRATEGY_BUILDER",
+            "planning_scenario": "BASE",
+            "provenance": {
+              "case": "CASE_INPUT",
+              "decisions": "TEAM_DECISION"
+            },
+            "seed_profile": "MIN_COST",
+            "status": "TEAM_DECISION"
+          },
+          "plan_id": "strategy-builder-17-dba18b62cb08",
+          "scenario_id": "BASE"
+        },
+        "provenance": {
+          "global_optimum_claimed": false,
+          "objective": "MIN_COST",
+          "official_inputs": "CASE_INPUT",
+          "plan_decisions": "TEAM_DECISION",
+          "planning_mode": "BASE_PLAN",
+          "planning_scenario_id": "BASE",
+          "search_targets": "OPERATOR_PREFERENCE",
+          "simulation_outputs": "DIGITAL_TWIN_RESULT",
+          "stress_service_levels": "CASE_INPUT_RESILIENCE_BENCHMARKS"
+        },
+        "search_depth": 4,
+        "stress_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "MANDATORY_STRESS",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 8.62004174626543,
+          "critical_service_level": 0.9925612175977233,
+          "critical_shortage_t": 7.769808219177978,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 10308.443558741648,
+          "discounted_cost_per_served_ton_mln": 7.880107974168346,
+          "emergency_usage_t": 34.904013961605585,
+          "environment_id": "MANDATORY_STRESS",
+          "final_inventory_t": 0.0,
+          "hard_violation_count": 2,
+          "initial_stock_total_cost_mln": 334.81316789786985,
+          "minimum_inventory_t": 0.0,
+          "months_with_shortage": 31,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 48.082191780821915,
+          "plan_id": "strategy-builder-17-dba18b62cb08",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-3ce7aaac1574fa7c",
+          "scenario_id": "MANDATORY_STRESS",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/mandatory_stress.yaml",
+          "total_losses_t": 18.802058079148736,
+          "total_overflow_t": 0.0,
+          "total_service_level": 0.8527771784751121,
+          "total_shortage_t": 225.83980821917797,
+          "unavailable_requested_supply_t": 84.00000000000003,
+          "undiscounted_cost_mln": 11276.395463953279,
+          "valid": false,
+          "violation_count": 6
+        },
+        "target_satisfaction": {
+          "all_hard_satisfied": true,
+          "all_satisfied": true,
+          "maximum_total_cost_mln": {
+            "actual": 10836.259974912184,
+            "operator": "<=",
+            "policy": "HARD",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_critical_service": {
+            "actual": 0.9628142802088082,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_total_service": {
+            "actual": 0.7649275362318843,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          }
+        }
+      }
+    ],
+    "status": "success"
+  },
+  "STRESS_ADAPTATION": {
+    "config": {
+      "beam_width": 24,
+      "diversity_threshold": 0.08,
+      "max_candidates": 1200,
+      "max_iterations": 8,
+      "max_results": 3,
+      "max_total_cost_mln": null,
+      "mutation_fractions": [
+        0.1,
+        0.25
+      ],
+      "objective": "MIN_COST",
+      "planning_mode": "STRESS_ADAPTATION",
+      "planning_scenario_id": "MANDATORY_STRESS",
+      "seed": 17,
+      "stress_critical_service_target": null,
+      "stress_target_policy": "SOFT",
+      "stress_total_service_target": null
+    },
+    "evaluated_candidate_count": 1200,
+    "failure_reason": "",
+    "iterations": 8,
+    "search_metadata": {
+      "algorithm": "SCENARIO_AWARE_DETERMINISTIC_BOUNDED_BEAM_SEARCH",
+      "beam_width": 24,
+      "budget_exhausted": false,
+      "candidate_budget": 1200,
+      "constructive_seed_count": 20,
+      "dominance_pruned": 868,
+      "duplicate_decision_sets_pruned": 60,
+      "generated_candidate_count": 1260,
+      "global_optimum_claimed": false,
+      "official_service_interpretation": {
+        "BASE": {
+          "critical_service_minimum": 0.99,
+          "severity": "hard",
+          "total_service_minimum": 0.97
+        },
+        "MANDATORY_STRESS": {
+          "critical_service_benchmark": 0.99,
+          "severity": "benchmark",
+          "total_service_benchmark": 0.97
+        }
+      },
+      "planning_mode": "STRESS_ADAPTATION",
+      "planning_scenario_id": "MANDATORY_STRESS",
+      "simulation_cache_entries": 1200,
+      "simulation_cache_hits": 60,
+      "structural_rejections": 0
+    },
+    "solutions": [
+      {
+        "base_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "BASE",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 8.840980851547746,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 10901.358605750876,
+          "discounted_cost_per_served_ton_mln": 7.842704032914299,
+          "emergency_usage_t": 43.58087627445572,
+          "environment_id": "BASE",
+          "final_inventory_t": 59.497999999999976,
+          "hard_violation_count": 15,
+          "initial_stock_total_cost_mln": 385.03514308255035,
+          "minimum_inventory_t": 38.62785388127854,
+          "months_with_shortage": 0,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 55.2945205479452,
+          "plan_id": "strategy-builder-17-422b61e9ea2f",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-abfb9829ac1f43ab",
+          "scenario_id": "BASE",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+          "total_losses_t": 20.79687315853064,
+          "total_overflow_t": 72.10818721461177,
+          "total_service_level": 1.0,
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 0.0,
+          "undiscounted_cost_mln": 12288.963383651368,
+          "valid": false,
+          "violation_count": 15
+        },
+        "benchmark_status": {
+          "stress_critical_service": {
+            "actual": 1.0,
+            "benchmark": 0.99,
+            "gap": 0.0,
+            "met": true,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          },
+          "stress_total_service": {
+            "actual": 0.9723660807460693,
+            "benchmark": 0.97,
+            "gap": 0.0,
+            "met": true,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          }
+        },
+        "metrics": {
+          "base_critical_shortage_t": 0.0,
+          "base_hard_violation_count": 15,
+          "base_source_mix_t": {
+            "A": 858.9504048582996,
+            "B": 221.27766355074155,
+            "C": 363.2995951417004,
+            "D": 0,
+            "E": 43.58087627445572
+          },
+          "base_total_cost_mln": 12288.963383651368,
+          "base_total_shortage_t": 0.0,
+          "enabled_investments": [
+            "EARTH_NEW",
+            "ZBO"
+          ],
+          "minimum_annual_base_critical_service": 1.0,
+          "minimum_annual_base_reserve_days": 86.8454533333335,
+          "minimum_annual_base_total_service": 1.0,
+          "minimum_annual_stress_critical_service": 1.0,
+          "minimum_annual_stress_reserve_days": 48.40883686361958,
+          "minimum_annual_stress_total_service": 0.9723660807460693,
+          "minimum_base_inventory_t": 38.62785388127854,
+          "minimum_stress_inventory_t": 0.0,
+          "source_mix_t": {
+            "A": 858.9504048582996,
+            "B": 221.27766355074155,
+            "C": 363.2995951417004,
+            "D": 0,
+            "E": 43.58087627445572
+          },
+          "stress_critical_shortage_t": 0.0,
+          "stress_hard_violation_count": 0,
+          "stress_source_mix_t": {
+            "A": 858.9504048582996,
+            "B": 221.27766355074155,
+            "C": 363.2995951417004,
+            "D": 0,
+            "E": 43.58087627445572
+          },
+          "stress_total_cost_mln": 12830.503947580159,
+          "stress_total_shortage_t": 12.39381278538798,
+          "total_cost_mln": 12830.503947580159
+        },
+        "mutation_history": [
+          "decrease:A:2039:0.2500",
+          "increase:A:2035:0.1000",
+          "decrease:E:2035:0.2500",
+          "decrease:B:2040:0.1000",
+          "decrease:E:2035:0.2500",
+          "decrease:A:2039:0.1000"
+        ],
+        "plan": {
+          "decisions": {
+            "capacity_reservations": [
+              {
+                "reserved_capacity_t": 160.7004048583996,
+                "source_id": "A",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2036
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 128.2500000001,
+                "source_id": "A",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 69.80802792331117,
+                "source_id": "B",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 52.46963562763039,
+                "source_id": "B",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 99.0000000001,
+                "source_id": "B",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 2.517482517582505,
+                "source_id": "C",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 100.9919028341081,
+                "source_id": "C",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 130.0,
+                "source_id": "C",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 130.0,
+                "source_id": "C",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 19.63350785350314,
+                "source_id": "E",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 23.947368421152575,
+                "source_id": "E",
+                "year": 2040
+              }
+            ],
+            "emergency_role_by_year": {
+              "2035": "reserve_only",
+              "2036": "reserve_only",
+              "2037": "reserve_only",
+              "2038": "reserve_only",
+              "2039": "reserve_only",
+              "2040": "reserve_only"
+            },
+            "initial_stock_acquisition": {
+              "contract_period_end": "2034-12",
+              "contract_period_start": "2034-01",
+              "notes": "Constructive opening stock generated from official storage and lead-time data.",
+              "order_date": "2034-01",
+              "ordered_volume_t": 57.900021516172984,
+              "planned_delivery_date": "2035-01",
+              "reserved_capacity_t_per_year": 57.900021516172984,
+              "source_id": "A",
+              "status": "TEAM_DECISION"
+            },
+            "inventory_policy": {
+              "reserve_strategy_by_year": {
+                "2035": "physical",
+                "2036": "physical",
+                "2037": "physical",
+                "2038": "physical",
+                "2039": "physical",
+                "2040": "physical"
+              }
+            },
+            "investments": [
+              {
+                "buy_option": true,
+                "enabled": true,
+                "exercise_option": true,
+                "investment_id": "EARTH_NEW",
+                "option_exercise_month": "2035-02",
+                "option_purchase_month": "2035-01"
+              },
+              {
+                "enabled": false,
+                "investment_id": "LUNAR_ISRU"
+              },
+              {
+                "commissioning_month": "2036-01",
+                "enabled": true,
+                "investment_id": "ZBO"
+              }
+            ],
+            "supply_orders": [
+              {
+                "mode": "monthly",
+                "source_id": "A",
+                "values": {
+                  "2035-01": 13.3917004048583,
+                  "2035-02": 13.3917004048583,
+                  "2035-03": 13.3917004048583,
+                  "2035-04": 13.3917004048583,
+                  "2035-05": 13.3917004048583,
+                  "2035-06": 13.3917004048583,
+                  "2035-07": 13.3917004048583,
+                  "2035-08": 13.3917004048583,
+                  "2035-09": 13.3917004048583,
+                  "2035-10": 13.3917004048583,
+                  "2035-11": 13.3917004048583,
+                  "2035-12": 13.3917004048583,
+                  "2036-01": 16.025641025641026,
+                  "2036-02": 16.025641025641026,
+                  "2036-03": 16.025641025641026,
+                  "2036-04": 16.025641025641026,
+                  "2036-05": 16.025641025641026,
+                  "2036-06": 16.025641025641026,
+                  "2036-07": 16.025641025641026,
+                  "2036-08": 16.025641025641026,
+                  "2036-09": 16.025641025641026,
+                  "2036-10": 16.025641025641026,
+                  "2036-11": 16.025641025641026,
+                  "2036-12": 13.71794871794873,
+                  "2037-01": 24.24932523616734,
+                  "2037-02": 24.24932523616734,
+                  "2037-03": 24.24932523616734,
+                  "2037-04": 24.24932523616734,
+                  "2037-05": 24.24932523616734,
+                  "2037-06": 24.24932523616734,
+                  "2037-07": 24.24932523616734,
+                  "2037-08": 20.254723346828598,
+                  "2038-05": 25.195681511470998,
+                  "2038-06": 31.0391363022942,
+                  "2038-07": 31.0391363022942,
+                  "2038-08": 31.0391363022942,
+                  "2038-09": 31.0391363022942,
+                  "2038-10": 31.0391363022942,
+                  "2038-11": 9.608636977058012,
+                  "2039-04": 14.388157894736832,
+                  "2039-05": 25.53453947368421,
+                  "2039-06": 25.53453947368421,
+                  "2039-07": 25.53453947368421,
+                  "2039-08": 25.53453947368421,
+                  "2039-09": 11.723684210526342
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "B",
+                "values": {
+                  "2035-01": 8.726003490401396,
+                  "2035-02": 8.726003490401396,
+                  "2035-03": 8.726003490401396,
+                  "2035-04": 8.726003490401396,
+                  "2035-05": 8.726003490401396,
+                  "2035-06": 8.726003490401396,
+                  "2035-07": 8.726003490401396,
+                  "2035-08": 8.726003490401396,
+                  "2039-07": 21.430499325236188,
+                  "2039-08": 31.0391363022942,
+                  "2040-05": 18.414473684210485,
+                  "2040-06": 34.046052631578945,
+                  "2040-07": 34.046052631578945,
+                  "2040-08": 12.493421052631621
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "C",
+                "values": {
+                  "2037-12": 2.3076923076922964,
+                  "2038-08": 3.994601889338741,
+                  "2038-09": 24.24932523616734,
+                  "2038-10": 24.24932523616734,
+                  "2038-11": 24.24932523616734,
+                  "2038-12": 24.24932523616734,
+                  "2039-01": 31.0391363022942,
+                  "2039-02": 31.0391363022942,
+                  "2039-03": 31.0391363022942,
+                  "2039-04": 31.0391363022942,
+                  "2039-05": 5.843454790823202,
+                  "2040-01": 37.82894736842105,
+                  "2040-02": 37.82894736842105,
+                  "2040-03": 37.82894736842105,
+                  "2040-04": 16.51315789473685
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "D",
+                "values": {}
+              },
+              {
+                "mode": "monthly",
+                "source_id": "E",
+                "values": {
+                  "2035-01": 14.725130890052355,
+                  "2035-02": 4.908376963350785,
+                  "2040-10": 23.947368421052577
+                }
+              }
+            ]
+          },
+          "metadata": {
+            "builder_planning_mode": "STRESS_ADAPTATION",
+            "generated_by": "STRATEGY_BUILDER",
+            "planning_scenario": "MANDATORY_STRESS",
+            "provenance": {
+              "case": "CASE_INPUT",
+              "decisions": "TEAM_DECISION"
+            },
+            "seed_profile": "MIN_COST",
+            "status": "TEAM_DECISION"
+          },
+          "plan_id": "strategy-builder-17-422b61e9ea2f",
+          "scenario_id": "MANDATORY_STRESS"
+        },
+        "provenance": {
+          "global_optimum_claimed": false,
+          "objective": "MIN_COST",
+          "official_inputs": "CASE_INPUT",
+          "plan_decisions": "TEAM_DECISION",
+          "planning_mode": "STRESS_ADAPTATION",
+          "planning_scenario_id": "MANDATORY_STRESS",
+          "search_targets": "OPERATOR_PREFERENCE",
+          "simulation_outputs": "DIGITAL_TWIN_RESULT",
+          "stress_service_levels": "CASE_INPUT_RESILIENCE_BENCHMARKS"
+        },
+        "search_depth": 6,
+        "stress_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "MANDATORY_STRESS",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 8.432210683282733,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 11359.639617587758,
+          "discounted_cost_per_served_ton_mln": 7.465558245647144,
+          "emergency_usage_t": 43.58087627445572,
+          "environment_id": "MANDATORY_STRESS",
+          "final_inventory_t": 0.0,
+          "hard_violation_count": 0,
+          "initial_stock_total_cost_mln": 385.03514308255035,
+          "minimum_inventory_t": 0.0,
+          "months_with_shortage": 4,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 55.2945205479452,
+          "plan_id": "strategy-builder-17-422b61e9ea2f",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-19b018b138d54b23",
+          "scenario_id": "MANDATORY_STRESS",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/mandatory_stress.yaml",
+          "total_losses_t": 20.79687315853064,
+          "total_overflow_t": 0.0,
+          "total_service_level": 0.991920591404571,
+          "total_shortage_t": 12.39381278538798,
+          "unavailable_requested_supply_t": 0.0,
+          "undiscounted_cost_mln": 12830.503947580159,
+          "valid": true,
+          "violation_count": 0
+        },
+        "target_satisfaction": {
+          "all_hard_satisfied": true,
+          "all_satisfied": true,
+          "maximum_total_cost_mln": {
+            "actual": 12830.503947580159,
+            "operator": "<=",
+            "policy": "HARD",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_critical_service": {
+            "actual": 1.0,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_total_service": {
+            "actual": 0.9723660807460693,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          }
+        }
+      },
+      {
+        "base_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "BASE",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 9.030706007389723,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 11330.746236399536,
+          "discounted_cost_per_served_ton_mln": 8.151615997409738,
+          "emergency_usage_t": 34.904013961605585,
+          "environment_id": "BASE",
+          "final_inventory_t": 87.5,
+          "hard_violation_count": 22,
+          "initial_stock_total_cost_mln": 385.03514308255035,
+          "minimum_inventory_t": 38.62785388127854,
+          "months_with_shortage": 0,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 55.2945205479452,
+          "plan_id": "strategy-builder-17-702c9ec01378",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-5facb768ecc29f58",
+          "scenario_id": "BASE",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+          "total_losses_t": 22.36679593339975,
+          "total_overflow_t": 131.369270547945,
+          "total_service_level": 1.0,
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 3.375077994860476e-14,
+          "undiscounted_cost_mln": 12552.681350271716,
+          "valid": false,
+          "violation_count": 22
+        },
+        "benchmark_status": {
+          "stress_critical_service": {
+            "actual": 1.0,
+            "benchmark": 0.99,
+            "gap": 0.0,
+            "met": true,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          },
+          "stress_total_service": {
+            "actual": 0.9818891205082392,
+            "benchmark": 0.97,
+            "gap": 0.0,
+            "met": true,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          }
+        },
+        "metrics": {
+          "base_critical_shortage_t": 0.0,
+          "base_hard_violation_count": 22,
+          "base_source_mix_t": {
+            "A": 864.17004048583,
+            "B": 83.75539634426372,
+            "C": 233.11209514170037,
+            "D": 360.0,
+            "E": 34.904013961605585
+          },
+          "base_total_cost_mln": 12552.681350271716,
+          "base_total_shortage_t": 0.0,
+          "enabled_investments": [
+            "EARTH_NEW",
+            "LUNAR_ISRU",
+            "ZBO"
+          ],
+          "minimum_annual_base_critical_service": 1.0,
+          "minimum_annual_base_reserve_days": 80.7300000000001,
+          "minimum_annual_base_total_service": 1.0,
+          "minimum_annual_stress_critical_service": 1.0,
+          "minimum_annual_stress_reserve_days": 45.00000000000007,
+          "minimum_annual_stress_total_service": 0.9818891205082392,
+          "minimum_base_inventory_t": 38.62785388127854,
+          "minimum_stress_inventory_t": 0.0,
+          "source_mix_t": {
+            "A": 864.17004048583,
+            "B": 83.75539634426372,
+            "C": 233.11209514170037,
+            "D": 276.0,
+            "E": 34.904013961605585
+          },
+          "stress_critical_shortage_t": 0.0,
+          "stress_hard_violation_count": 0,
+          "stress_source_mix_t": {
+            "A": 864.17004048583,
+            "B": 83.75539634426372,
+            "C": 233.11209514170037,
+            "D": 276.0,
+            "E": 34.904013961605585
+          },
+          "stress_total_cost_mln": 12985.530447418423,
+          "stress_total_shortage_t": 8.122729452054745,
+          "total_cost_mln": 12985.530447418423
+        },
+        "mutation_history": [
+          "decrease:C:2040:0.1000",
+          "decrease:C:2040:0.2500",
+          "investment_timing:LUNAR_ISRU:2035-01->2036-01",
+          "emergency_role:2039:reserve_only->planned_supply",
+          "decrease:C:2040:0.2500"
+        ],
+        "plan": {
+          "decisions": {
+            "capacity_reservations": [
+              {
+                "reserved_capacity_t": 141.70040485839957,
+                "source_id": "A",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2036
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 152.46963562763037,
+                "source_id": "A",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 69.80802792331117,
+                "source_id": "B",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 13.94736842115255,
+                "source_id": "B",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 2.517482517582505,
+                "source_id": "C",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 34.99190283410808,
+                "source_id": "C",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 130.0,
+                "source_id": "C",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 65.8125000001,
+                "source_id": "C",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 120.0,
+                "source_id": "D",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 34.90401396170559,
+                "source_id": "E",
+                "year": 2035
+              }
+            ],
+            "emergency_role_by_year": {
+              "2035": "reserve_only",
+              "2036": "reserve_only",
+              "2037": "reserve_only",
+              "2038": "reserve_only",
+              "2039": "planned_supply",
+              "2040": "reserve_only"
+            },
+            "initial_stock_acquisition": {
+              "contract_period_end": "2034-12",
+              "contract_period_start": "2034-01",
+              "notes": "Constructive opening stock generated from official storage and lead-time data.",
+              "order_date": "2034-01",
+              "ordered_volume_t": 57.900021516172984,
+              "planned_delivery_date": "2035-01",
+              "reserved_capacity_t_per_year": 57.900021516172984,
+              "source_id": "A",
+              "status": "TEAM_DECISION"
+            },
+            "inventory_policy": {
+              "reserve_strategy_by_year": {
+                "2035": "physical",
+                "2036": "physical",
+                "2037": "physical",
+                "2038": "physical",
+                "2039": "physical",
+                "2040": "physical"
+              }
+            },
+            "investments": [
+              {
+                "buy_option": true,
+                "enabled": true,
+                "exercise_option": true,
+                "investment_id": "EARTH_NEW",
+                "option_exercise_month": "2035-02",
+                "option_purchase_month": "2035-01"
+              },
+              {
+                "enabled": true,
+                "funding_month": "2036-01",
+                "investment_id": "LUNAR_ISRU"
+              },
+              {
+                "commissioning_month": "2036-01",
+                "enabled": true,
+                "investment_id": "ZBO"
+              }
+            ],
+            "supply_orders": [
+              {
+                "mode": "monthly",
+                "source_id": "A",
+                "values": {
+                  "2035-01": 11.808367071524966,
+                  "2035-02": 11.808367071524966,
+                  "2035-03": 11.808367071524966,
+                  "2035-04": 11.808367071524966,
+                  "2035-05": 11.808367071524966,
+                  "2035-06": 11.808367071524966,
+                  "2035-07": 11.808367071524966,
+                  "2035-08": 11.808367071524966,
+                  "2035-09": 11.808367071524966,
+                  "2035-10": 11.808367071524966,
+                  "2035-11": 11.808367071524966,
+                  "2035-12": 11.808367071524966,
+                  "2036-01": 16.025641025641026,
+                  "2036-02": 16.025641025641026,
+                  "2036-03": 16.025641025641026,
+                  "2036-04": 16.025641025641026,
+                  "2036-05": 16.025641025641026,
+                  "2036-06": 16.025641025641026,
+                  "2036-07": 16.025641025641026,
+                  "2036-08": 16.025641025641026,
+                  "2036-09": 16.025641025641026,
+                  "2036-10": 16.025641025641026,
+                  "2036-11": 16.025641025641026,
+                  "2036-12": 13.71794871794873,
+                  "2037-01": 24.24932523616734,
+                  "2037-02": 24.24932523616734,
+                  "2037-05": 6.747975708502019,
+                  "2037-06": 24.24932523616734,
+                  "2037-07": 24.24932523616734,
+                  "2037-08": 24.24932523616734,
+                  "2037-09": 24.24932523616734,
+                  "2037-10": 24.24932523616734,
+                  "2037-11": 13.506747638326601,
+                  "2038-08": 28.313090418353582,
+                  "2038-09": 31.0391363022942,
+                  "2038-10": 31.0391363022942,
+                  "2038-11": 31.0391363022942,
+                  "2038-12": 31.0391363022942,
+                  "2039-07": 14.802631578947333,
+                  "2039-08": 37.82894736842105,
+                  "2039-09": 37.82894736842105,
+                  "2039-10": 37.82894736842105,
+                  "2039-11": 37.82894736842105,
+                  "2039-12": 23.881578947368496
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "B",
+                "values": {
+                  "2035-01": 8.726003490401396,
+                  "2035-02": 8.726003490401396,
+                  "2035-03": 8.726003490401396,
+                  "2035-04": 8.726003490401396,
+                  "2035-05": 8.726003490401396,
+                  "2035-06": 8.726003490401396,
+                  "2035-07": 8.726003490401396,
+                  "2035-08": 8.726003490401396,
+                  "2040-08": 13.94736842105255
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "C",
+                "values": {
+                  "2037-12": 2.3076923076922964,
+                  "2038-11": 10.74257759784074,
+                  "2038-12": 24.24932523616734,
+                  "2039-01": 31.0391363022942,
+                  "2039-02": 31.0391363022942,
+                  "2039-05": 3.1174089068825968,
+                  "2039-06": 31.0391363022942,
+                  "2039-07": 31.0391363022942,
+                  "2039-08": 2.726045883940614,
+                  "2040-01": 19.150904605263158,
+                  "2040-02": 19.150904605263158,
+                  "2040-06": 15.853618421052623,
+                  "2040-07": 11.657072368421069
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "D",
+                "values": {
+                  "2038-01": 44.08968224757698,
+                  "2038-02": 44.08968224757698,
+                  "2038-03": 31.820635504846038,
+                  "2039-01": 41.3855150697256,
+                  "2039-02": 41.3855150697256,
+                  "2039-03": 37.2289698605488,
+                  "2040-01": 37.82894736842105,
+                  "2040-02": 37.82894736842105,
+                  "2040-03": 37.82894736842105,
+                  "2040-04": 6.51315789473685
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "E",
+                "values": {
+                  "2035-01": 26.17801047120419,
+                  "2035-02": 8.726003490401396
+                }
+              }
+            ]
+          },
+          "metadata": {
+            "builder_planning_mode": "STRESS_ADAPTATION",
+            "generated_by": "STRATEGY_BUILDER",
+            "planning_scenario": "MANDATORY_STRESS",
+            "provenance": {
+              "case": "CASE_INPUT",
+              "decisions": "TEAM_DECISION"
+            },
+            "seed_profile": "MIN_COST",
+            "status": "TEAM_DECISION"
+          },
+          "plan_id": "strategy-builder-17-702c9ec01378",
+          "scenario_id": "MANDATORY_STRESS"
+        },
+        "provenance": {
+          "global_optimum_claimed": false,
+          "objective": "MIN_COST",
+          "official_inputs": "CASE_INPUT",
+          "plan_decisions": "TEAM_DECISION",
+          "planning_mode": "STRESS_ADAPTATION",
+          "planning_scenario_id": "MANDATORY_STRESS",
+          "search_targets": "OPERATOR_PREFERENCE",
+          "simulation_outputs": "DIGITAL_TWIN_RESULT",
+          "stress_service_levels": "CASE_INPUT_RESILIENCE_BENCHMARKS"
+        },
+        "search_depth": 5,
+        "stress_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "MANDATORY_STRESS",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 8.510206356737523,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 11697.350514075239,
+          "discounted_cost_per_served_ton_mln": 7.665983850637411,
+          "emergency_usage_t": 34.904013961605585,
+          "environment_id": "MANDATORY_STRESS",
+          "final_inventory_t": 0.0,
+          "hard_violation_count": 0,
+          "initial_stock_total_cost_mln": 385.03514308255035,
+          "minimum_inventory_t": 0.0,
+          "months_with_shortage": 1,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 55.2945205479452,
+          "plan_id": "strategy-builder-17-702c9ec01378",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-69ba3268835093b5",
+          "scenario_id": "MANDATORY_STRESS",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/mandatory_stress.yaml",
+          "total_losses_t": 21.358795933399747,
+          "total_overflow_t": 0.0,
+          "total_service_level": 0.9947048699791037,
+          "total_shortage_t": 8.122729452054745,
+          "unavailable_requested_supply_t": 84.00000000000003,
+          "undiscounted_cost_mln": 12985.530447418423,
+          "valid": true,
+          "violation_count": 0
+        },
+        "target_satisfaction": {
+          "all_hard_satisfied": true,
+          "all_satisfied": true,
+          "maximum_total_cost_mln": {
+            "actual": 12985.530447418423,
+            "operator": "<=",
+            "policy": "HARD",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_critical_service": {
+            "actual": 1.0,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_total_service": {
+            "actual": 0.9818891205082392,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          }
+        }
+      },
+      {
+        "base_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "BASE",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 9.033884198812618,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 11158.555693535567,
+          "discounted_cost_per_served_ton_mln": 8.027737909018393,
+          "emergency_usage_t": 58.85138238265816,
+          "environment_id": "BASE",
+          "final_inventory_t": 87.5,
+          "hard_violation_count": 15,
+          "initial_stock_total_cost_mln": 385.03514308255035,
+          "minimum_inventory_t": 38.62785388127854,
+          "months_with_shortage": 0,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 55.2945205479452,
+          "plan_id": "strategy-builder-17-fbef59ab5d77",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-5261340d6740f778",
+          "scenario_id": "BASE",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+          "total_losses_t": 21.54554593339975,
+          "total_overflow_t": 63.75302054794501,
+          "total_service_level": 1.0,
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 0.0,
+          "undiscounted_cost_mln": 12557.09903634954,
+          "valid": false,
+          "violation_count": 15
+        },
+        "benchmark_status": {
+          "stress_critical_service": {
+            "actual": 1.0,
+            "benchmark": 0.99,
+            "gap": 0.0,
+            "met": true,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          },
+          "stress_total_service": {
+            "actual": 1.0,
+            "benchmark": 0.97,
+            "gap": 0.0,
+            "met": true,
+            "provenance": "CASE_INPUT",
+            "severity": "benchmark"
+          }
+        },
+        "metrics": {
+          "base_critical_shortage_t": 0.0,
+          "base_hard_violation_count": 15,
+          "base_source_mix_t": {
+            "A": 901.7004048582995,
+            "B": 240.52766355074155,
+            "C": 306.4245951417004,
+            "D": 0,
+            "E": 58.85138238265816
+          },
+          "base_total_cost_mln": 12557.09903634954,
+          "base_total_shortage_t": 0.0,
+          "enabled_investments": [
+            "EARTH_NEW",
+            "ZBO"
+          ],
+          "minimum_annual_base_critical_service": 1.0,
+          "minimum_annual_base_reserve_days": 87.35042735042734,
+          "minimum_annual_base_total_service": 1.0,
+          "minimum_annual_stress_critical_service": 1.0,
+          "minimum_annual_stress_reserve_days": 51.6334782608696,
+          "minimum_annual_stress_total_service": 1.0,
+          "minimum_base_inventory_t": 38.62785388127854,
+          "minimum_stress_inventory_t": 7.253020547945248,
+          "source_mix_t": {
+            "A": 901.7004048582995,
+            "B": 240.52766355074155,
+            "C": 306.4245951417004,
+            "D": 0,
+            "E": 58.85138238265816
+          },
+          "stress_critical_shortage_t": 0.0,
+          "stress_hard_violation_count": 0,
+          "stress_source_mix_t": {
+            "A": 901.7004048582995,
+            "B": 240.52766355074155,
+            "C": 306.4245951417004,
+            "D": 0,
+            "E": 58.85138238265816
+          },
+          "stress_total_cost_mln": 13185.564065826276,
+          "stress_total_shortage_t": 0.0,
+          "total_cost_mln": 13185.564065826276
+        },
+        "mutation_history": [
+          "decrease:C:2040:0.2500",
+          "increase:B:2037:0.1000",
+          "decrease:B:2037:0.2500",
+          "decrease:C:2040:0.2500"
+        ],
+        "plan": {
+          "decisions": {
+            "capacity_reservations": [
+              {
+                "reserved_capacity_t": 141.70040485839957,
+                "source_id": "A",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2036
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 190.0,
+                "source_id": "A",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 69.80802792331117,
+                "source_id": "B",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 8.2500000001,
+                "source_id": "B",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 52.46963562763039,
+                "source_id": "B",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 110.0,
+                "source_id": "B",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 2.517482517582505,
+                "source_id": "C",
+                "year": 2037
+              },
+              {
+                "reserved_capacity_t": 100.9919028341081,
+                "source_id": "C",
+                "year": 2038
+              },
+              {
+                "reserved_capacity_t": 130.0,
+                "source_id": "C",
+                "year": 2039
+              },
+              {
+                "reserved_capacity_t": 73.1250000001,
+                "source_id": "C",
+                "year": 2040
+              },
+              {
+                "reserved_capacity_t": 34.90401396170559,
+                "source_id": "E",
+                "year": 2035
+              },
+              {
+                "reserved_capacity_t": 23.947368421152575,
+                "source_id": "E",
+                "year": 2040
+              }
+            ],
+            "emergency_role_by_year": {
+              "2035": "reserve_only",
+              "2036": "reserve_only",
+              "2037": "reserve_only",
+              "2038": "reserve_only",
+              "2039": "reserve_only",
+              "2040": "reserve_only"
+            },
+            "initial_stock_acquisition": {
+              "contract_period_end": "2034-12",
+              "contract_period_start": "2034-01",
+              "notes": "Constructive opening stock generated from official storage and lead-time data.",
+              "order_date": "2034-01",
+              "ordered_volume_t": 57.900021516172984,
+              "planned_delivery_date": "2035-01",
+              "reserved_capacity_t_per_year": 57.900021516172984,
+              "source_id": "A",
+              "status": "TEAM_DECISION"
+            },
+            "inventory_policy": {
+              "reserve_strategy_by_year": {
+                "2035": "physical",
+                "2036": "physical",
+                "2037": "physical",
+                "2038": "physical",
+                "2039": "physical",
+                "2040": "physical"
+              }
+            },
+            "investments": [
+              {
+                "buy_option": true,
+                "enabled": true,
+                "exercise_option": true,
+                "investment_id": "EARTH_NEW",
+                "option_exercise_month": "2035-02",
+                "option_purchase_month": "2035-01"
+              },
+              {
+                "enabled": false,
+                "investment_id": "LUNAR_ISRU"
+              },
+              {
+                "commissioning_month": "2036-01",
+                "enabled": true,
+                "investment_id": "ZBO"
+              }
+            ],
+            "supply_orders": [
+              {
+                "mode": "monthly",
+                "source_id": "A",
+                "values": {
+                  "2035-01": 11.808367071524966,
+                  "2035-02": 11.808367071524966,
+                  "2035-03": 11.808367071524966,
+                  "2035-04": 11.808367071524966,
+                  "2035-05": 11.808367071524966,
+                  "2035-06": 11.808367071524966,
+                  "2035-07": 11.808367071524966,
+                  "2035-08": 11.808367071524966,
+                  "2035-09": 11.808367071524966,
+                  "2035-10": 11.808367071524966,
+                  "2035-11": 11.808367071524966,
+                  "2035-12": 11.808367071524966,
+                  "2036-01": 16.025641025641026,
+                  "2036-02": 16.025641025641026,
+                  "2036-03": 16.025641025641026,
+                  "2036-04": 16.025641025641026,
+                  "2036-05": 16.025641025641026,
+                  "2036-06": 16.025641025641026,
+                  "2036-07": 16.025641025641026,
+                  "2036-08": 16.025641025641026,
+                  "2036-09": 16.025641025641026,
+                  "2036-10": 16.025641025641026,
+                  "2036-11": 16.025641025641026,
+                  "2036-12": 13.71794871794873,
+                  "2037-01": 24.24932523616734,
+                  "2037-02": 24.24932523616734,
+                  "2037-03": 24.24932523616734,
+                  "2037-04": 24.24932523616734,
+                  "2037-05": 24.24932523616734,
+                  "2037-06": 24.24932523616734,
+                  "2037-07": 24.24932523616734,
+                  "2037-08": 20.254723346828598,
+                  "2038-05": 25.195681511470998,
+                  "2038-06": 31.0391363022942,
+                  "2038-07": 31.0391363022942,
+                  "2038-08": 31.0391363022942,
+                  "2038-09": 31.0391363022942,
+                  "2038-10": 31.0391363022942,
+                  "2038-11": 9.608636977058012,
+                  "2039-04": 21.315789473684195,
+                  "2039-05": 37.82894736842105,
+                  "2039-06": 37.82894736842105,
+                  "2039-07": 37.82894736842105,
+                  "2039-08": 37.82894736842105,
+                  "2039-09": 17.368421052631618
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "B",
+                "values": {
+                  "2035-01": 8.726003490401396,
+                  "2035-02": 8.726003490401396,
+                  "2035-03": 8.726003490401396,
+                  "2035-04": 8.726003490401396,
+                  "2035-05": 8.726003490401396,
+                  "2035-06": 8.726003490401396,
+                  "2035-07": 8.726003490401396,
+                  "2035-08": 8.726003490401396,
+                  "2037-01": 0.6875,
+                  "2037-02": 0.6875,
+                  "2037-03": 0.6875,
+                  "2037-04": 0.6875,
+                  "2037-05": 0.6875,
+                  "2037-06": 0.6875,
+                  "2037-07": 0.6875,
+                  "2037-08": 0.6875,
+                  "2037-09": 0.6875,
+                  "2037-10": 0.6875,
+                  "2037-11": 0.6875,
+                  "2037-12": 0.6875,
+                  "2039-07": 21.430499325236188,
+                  "2039-08": 31.0391363022942,
+                  "2040-05": 20.460526315789426,
+                  "2040-06": 37.82894736842105,
+                  "2040-07": 37.82894736842105,
+                  "2040-08": 13.881578947368467
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "C",
+                "values": {
+                  "2037-12": 2.3076923076922964,
+                  "2038-08": 3.994601889338741,
+                  "2038-09": 24.24932523616734,
+                  "2038-10": 24.24932523616734,
+                  "2038-11": 24.24932523616734,
+                  "2038-12": 24.24932523616734,
+                  "2039-01": 31.0391363022942,
+                  "2039-02": 31.0391363022942,
+                  "2039-03": 31.0391363022942,
+                  "2039-04": 31.0391363022942,
+                  "2039-05": 5.843454790823202,
+                  "2040-01": 21.278782894736842,
+                  "2040-02": 21.278782894736842,
+                  "2040-03": 21.278782894736842,
+                  "2040-04": 9.288651315789478
+                }
+              },
+              {
+                "mode": "monthly",
+                "source_id": "D",
+                "values": {}
+              },
+              {
+                "mode": "monthly",
+                "source_id": "E",
+                "values": {
+                  "2035-01": 26.17801047120419,
+                  "2035-02": 8.726003490401396,
+                  "2040-10": 23.947368421052577
+                }
+              }
+            ]
+          },
+          "metadata": {
+            "builder_planning_mode": "STRESS_ADAPTATION",
+            "generated_by": "STRATEGY_BUILDER",
+            "planning_scenario": "MANDATORY_STRESS",
+            "provenance": {
+              "case": "CASE_INPUT",
+              "decisions": "TEAM_DECISION"
+            },
+            "seed_profile": "MIN_COST",
+            "status": "TEAM_DECISION"
+          },
+          "plan_id": "strategy-builder-17-fbef59ab5d77",
+          "scenario_id": "MANDATORY_STRESS"
+        },
+        "provenance": {
+          "global_optimum_claimed": false,
+          "objective": "MIN_COST",
+          "official_inputs": "CASE_INPUT",
+          "plan_decisions": "TEAM_DECISION",
+          "planning_mode": "STRESS_ADAPTATION",
+          "planning_scenario_id": "MANDATORY_STRESS",
+          "search_targets": "OPERATOR_PREFERENCE",
+          "simulation_outputs": "DIGITAL_TWIN_RESULT",
+          "stress_service_levels": "CASE_INPUT_RESILIENCE_BENCHMARKS"
+        },
+        "search_depth": 4,
+        "stress_summary": {
+          "applied_overrides": [],
+          "base_scenario_id": "MANDATORY_STRESS",
+          "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+          "cost_per_served_ton_mln": 8.595543719573843,
+          "critical_service_level": 1.0,
+          "critical_shortage_t": 0.0,
+          "delayed_delivery_count": 0,
+          "delayed_delivery_t": 0,
+          "discounted_cost_mln": 11688.8074460016,
+          "discounted_cost_per_served_ton_mln": 7.619822324642503,
+          "emergency_usage_t": 58.85138238265816,
+          "environment_id": "MANDATORY_STRESS",
+          "final_inventory_t": 7.253020547945248,
+          "hard_violation_count": 0,
+          "initial_stock_total_cost_mln": 385.03514308255035,
+          "minimum_inventory_t": 7.253020547945248,
+          "months_with_shortage": 0,
+          "official_horizon_years": [
+            2035,
+            2036,
+            2037,
+            2038,
+            2039,
+            2040
+          ],
+          "opening_inventory_t": 55.2945205479452,
+          "plan_id": "strategy-builder-17-fbef59ab5d77",
+          "research_extension_years": [],
+          "research_source_ids": [],
+          "risk_ids": [],
+          "run_id": "run-5494a1a375e9cc67",
+          "scenario_id": "MANDATORY_STRESS",
+          "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/mandatory_stress.yaml",
+          "total_losses_t": 21.54554593339975,
+          "total_overflow_t": 0.0,
+          "total_service_level": 1.0,
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 0.0,
+          "undiscounted_cost_mln": 13185.564065826276,
+          "valid": true,
+          "violation_count": 0
+        },
+        "target_satisfaction": {
+          "all_hard_satisfied": true,
+          "all_satisfied": true,
+          "maximum_total_cost_mln": {
+            "actual": 13185.564065826276,
+            "operator": "<=",
+            "policy": "HARD",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_critical_service": {
+            "actual": 1.0,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          },
+          "stress_total_service": {
+            "actual": 1.0,
+            "operator": ">=",
+            "policy": "SOFT",
+            "provenance": "OPERATOR_PREFERENCE",
+            "satisfied": true,
+            "target": null
+          }
+        }
+      }
+    ],
+    "status": "success"
+  }
+}
