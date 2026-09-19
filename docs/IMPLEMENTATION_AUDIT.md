@@ -75,3 +75,23 @@ No conflict with official starter semantics was found. The preparatory-acquisiti
 is a stricter participant decision contract inside the official schema's intentionally
 extensible `decisions` object; no official CSV, YAML, schema or validation vector was
 changed.
+
+## Extensibility/advisor audit (2026-09-19)
+
+The next audit found two participant-layer defects before implementation:
+
+1. `_run_id` read official CSV text and therefore could not distinguish in-memory
+   source/horizon overlays. It now fingerprints deterministic effective CaseData.
+2. Annual arithmetic price averaging mispriced non-uniform monthly orders under a
+   partial-year price shock. Orders are now charged at order-month prices, while
+   TOP-only exposure uses an explicitly documented active-period rate.
+
+Structural A–E branching was removed from shipment and pre-horizon mechanics. Official
+C/D investment mappings are attached as source availability data while loading the
+case; E reserve/streak semantics remain explicit case policy. Extension acceptance
+proves source F and 2041/2042 without changes to simulation logic.
+
+The advisor is deliberately outside the core and has no duplicate balance/economics.
+It performs bounded deterministic candidate generation, typed diff/locks/distance,
+and full BASE/stress reruns. It reports search-space failure rather than claiming a
+global infeasibility proof.

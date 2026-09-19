@@ -5,12 +5,12 @@ from dataclasses import asdict, dataclass, field
 from kosmohak.constraints.checker import make_violation
 from kosmohak.domain.assumptions import ModelAssumptions
 from kosmohak.domain.case import CaseData
-from kosmohak.domain.investment import commissioning_dates
 from kosmohak.domain.plan import OperatorPlan
 from kosmohak.domain.result import Violation
 from kosmohak.domain.time import add_months, parse_month
 from kosmohak.economics.contracts import contract_cost
 from kosmohak.simulation.environment import SimulationEnvironment
+from kosmohak.simulation.availability import source_commissioning_month
 from kosmohak.simulation.physics import accept_throughput
 
 
@@ -112,7 +112,7 @@ def evaluate_preparatory_acquisition(
     physical_capacity = environment.source_capacity(
         source.source_id,
         planned_delivery,
-        source.capacity_t_per_year,
+        case_data.source_capacity(source.source_id, planned_delivery),
     ) * period_fraction
     contract_limit = min(reserved_period, physical_capacity)
     feasible = min(requested, max(0.0, contract_limit))
@@ -124,7 +124,7 @@ def evaluate_preparatory_acquisition(
                 code="INITIAL_STOCK_RESERVATION_CAPACITY_EXCEEDED",
                 constraint_id="STRUCTURAL_SOURCE_CAPACITY",
                 severity="hard",
-                scenario=environment.scenario_id,
+                scenario=environment.base_scenario_id,
                 period=planned_delivery,
                 source_id=source.source_id,
                 actual=acquisition.reserved_capacity_t_per_year,
@@ -141,7 +141,7 @@ def evaluate_preparatory_acquisition(
                 code="INITIAL_STOCK_CAPACITY_EXCEEDED",
                 constraint_id="STRUCTURAL_INITIAL_STOCK_CAPACITY",
                 severity="hard",
-                scenario=environment.scenario_id,
+                scenario=environment.base_scenario_id,
                 period=planned_delivery,
                 source_id=source.source_id,
                 actual=requested,
@@ -156,14 +156,9 @@ def evaluate_preparatory_acquisition(
     base_lead = assumptions.source_delivery_lead_months(source)
     lead = environment.lead_time_months(source.source_id, order_month, base_lead)
     feasible_delivery = add_months(order_month, lead)
-    dates = commissioning_dates(plan, case_data, assumptions, environment)
-    source_commission = {
-        "A": f"{source.available_from_year}-01",
-        "B": f"{source.available_from_year}-01",
-        "C": dates["EARTH_NEW"],
-        "D": dates["LUNAR_ISRU"],
-        "E": f"{source.available_from_year}-01",
-    }[source.source_id]
+    source_commission = source_commissioning_month(
+        source, plan, case_data, assumptions, environment
+    )
     temporal_feasible = True
     if feasible_delivery > planned_delivery:
         temporal_feasible = False
@@ -172,7 +167,7 @@ def evaluate_preparatory_acquisition(
                 code="INITIAL_STOCK_LEAD_TIME_VIOLATION",
                 constraint_id="STRUCTURAL_INITIAL_STOCK_LEAD_TIME",
                 severity="hard",
-                scenario=environment.scenario_id,
+                scenario=environment.base_scenario_id,
                 period=planned_delivery,
                 source_id=source.source_id,
                 actual=feasible_delivery,
@@ -190,7 +185,7 @@ def evaluate_preparatory_acquisition(
                 code="INITIAL_STOCK_SOURCE_UNAVAILABLE",
                 constraint_id="STRUCTURAL_SOURCE_AVAILABILITY",
                 severity="hard",
-                scenario=environment.scenario_id,
+                scenario=environment.base_scenario_id,
                 period=planned_delivery,
                 source_id=source.source_id,
                 actual=planned_delivery,
@@ -208,7 +203,7 @@ def evaluate_preparatory_acquisition(
                 code="INITIAL_STOCK_LATE_DELIVERY",
                 constraint_id="STRUCTURAL_INITIAL_STOCK_TIMING",
                 severity="hard",
-                scenario=environment.scenario_id,
+                scenario=environment.base_scenario_id,
                 period=case_data.start_month,
                 source_id=source.source_id,
                 actual=planned_delivery,
@@ -226,7 +221,10 @@ def evaluate_preparatory_acquisition(
         planned_delivery,
         source_id=source.source_id,
     )
-    availability_share = environment.availability_share(source.source_id, planned_delivery)
+    availability_share = (
+        environment.availability_share(source.source_id, planned_delivery)
+        * case_data.source_availability_share(source.source_id, planned_delivery)
+    )
     gross_delivery = feasible_physical * scenario_share * availability_share
     scenario_underdelivery = feasible_physical - gross_delivery
 
@@ -240,7 +238,7 @@ def evaluate_preparatory_acquisition(
                 code="INITIAL_STORAGE_CAPACITY_EXCEEDED",
                 constraint_id="STRUCTURAL_STORAGE_CAPACITY",
                 severity="hard",
-                scenario=environment.scenario_id,
+                scenario=environment.base_scenario_id,
                 period=case_data.start_month,
                 source_id=source.source_id,
                 actual=flow.net_delivery_t,
@@ -257,7 +255,7 @@ def evaluate_preparatory_acquisition(
         source.source_id,
         source.name,
         financing_year,
-        source.variable_cost_mln_per_t,
+        case_data.source_price(source.source_id, financing_year),
     )
     reservation_rate = environment.reservation_price(
         source.source_id,

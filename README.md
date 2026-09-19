@@ -856,10 +856,10 @@ GitHub Actions запускает ту же проверку на push и pull r
 
 ---
 
-## 35. Реализованный evaluator команды
+## 35. Реализованный evaluator команды (исторический этап v0.3)
 
 Поверх starter repository добавлен deterministic monthly evaluator стратегии без
-optimizer и автоматического изменения плана. Реализация включает preparatory
+На этом этапе — без optimizer и автоматического изменения плана. Реализация включает preparatory
 initial-stock acquisition, BASE/MANDATORY_STRESS, TEAM risks, consequence comparison,
 risk register/matrix, explicit mitigation rerun, sensitivity и reverse stress.
 
@@ -894,3 +894,37 @@ python3 scripts/run_reverse_stress.py \
 
 Подробная архитектура, provenance и ограничения описаны в
 [`docs/TEAM_IMPLEMENTATION.md`](docs/TEAM_IMPLEMENTATION.md).
+
+---
+
+## 36. Research extension и Strategy Advisor (v0.4)
+
+Текущая версия добавляет неразрушающий `CaseWorkspace`, произвольные research sources,
+явное продолжение горизонта после 2040 и отдельный Strategy Advisor. Цифровой двойник
+остаётся единственным расчётчиком физики, экономики и constraints; advisor только
+создаёт и проверяет новые `OperatorPlan`.
+
+```bash
+# Три содержательно разные BASE-valid стратегии, BASE + mandatory stress + 8 risks
+python3 scripts/compare_plans.py \
+  plans/cost_focused.json plans/diversified.json plans/resilient.json \
+  --risks configs/risks/team_risks.json
+
+# Локальный детерминированный advisor
+python3 scripts/advise_plan.py \
+  --plan examples/invalid_plan_examples/repair_overcapacity.json \
+  --mode repair --seed 17
+```
+
+Публичный backend API:
+
+```text
+add_research_source / extend_horizon
+evaluate_plan / evaluate_both_scenarios / compare_plans
+repair_plan / improve_plan / improve_resilience / explore_alternatives
+```
+
+Документы: [`RESEARCH_EXTENSION.md`](docs/RESEARCH_EXTENSION.md),
+[`STRATEGY_ADVISOR.md`](docs/STRATEGY_ADVISOR.md),
+[`UI_INTEGRATION.md`](docs/UI_INTEGRATION.md),
+[`TEST_PROTOCOL.md`](docs/TEST_PROTOCOL.md).

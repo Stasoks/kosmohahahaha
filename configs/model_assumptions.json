@@ -67,8 +67,8 @@
     "basis": "The implementation requirement assigns all preparatory acquisition costs to the first model financial year."
   },
   "partial_year_price_override": {
-    "value": "arithmetic_mean_of_monthly_active_rates",
+    "value": "order_volume_weighted_plus_active_period_top_rate",
     "unit": "method",
-    "basis": "Annual contract economics needs one active rate; explicit research price overrides are averaged across the twelve calendar months in which they apply."
+    "basis": "Each physical order is charged at its order-month price. TOP-only volume has no order month and is charged at the equal-capacity time-weighted rate over active contract months."
   }
 }

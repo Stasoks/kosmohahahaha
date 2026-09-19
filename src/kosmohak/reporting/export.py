@@ -28,7 +28,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
             if key not in fields:
                 fields.append(key)
     with path.open("w", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields)
+        writer = csv.DictWriter(stream, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for row in rows:
             writer.writerow({field: _cell(row.get(field)) for field in fields})
@@ -54,6 +54,8 @@ def build_comparison(base: SimulationResult, stress: SimulationResult) -> dict[s
     summary_metrics = [
         "undiscounted_cost_mln",
         "discounted_cost_mln",
+        "cost_per_served_ton_mln",
+        "discounted_cost_per_served_ton_mln",
         "total_service_level",
         "critical_service_level",
         "total_shortage_t",

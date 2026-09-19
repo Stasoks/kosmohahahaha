@@ -1,0 +1,176 @@
+{
+  "plan_id": "accept-04-earth-core-heavy",
+  "scenario_id": "BASE",
+  "decisions": {
+    "supply_orders": [
+      {
+        "source_id": "A",
+        "mode": "annual_even",
+        "values": {
+          "2035": 100.0,
+          "2036": 145.0,
+          "2037": 180.0,
+          "2038": 190.0,
+          "2039": 190.0,
+          "2040": 190.0
+        }
+      },
+      {
+        "source_id": "B",
+        "mode": "annual_even",
+        "values": {
+          "2035": 15.0,
+          "2036": 20.0,
+          "2037": 30.0,
+          "2038": 75.0,
+          "2039": 105.0,
+          "2040": 110.0
+        }
+      },
+      {
+        "source_id": "E",
+        "mode": "annual_even",
+        "values": {
+          "2035": 0.0,
+          "2036": 0.0,
+          "2037": 0.0,
+          "2038": 35.0,
+          "2039": 55.0,
+          "2040": 0.0
+        }
+      }
+    ],
+    "capacity_reservations": [
+      {
+        "source_id": "A",
+        "year": 2035,
+        "reserved_capacity_t": 150.0
+      },
+      {
+        "source_id": "A",
+        "year": 2036,
+        "reserved_capacity_t": 180.0
+      },
+      {
+        "source_id": "A",
+        "year": 2037,
+        "reserved_capacity_t": 190.0
+      },
+      {
+        "source_id": "A",
+        "year": 2038,
+        "reserved_capacity_t": 190.0
+      },
+      {
+        "source_id": "A",
+        "year": 2039,
+        "reserved_capacity_t": 190.0
+      },
+      {
+        "source_id": "A",
+        "year": 2040,
+        "reserved_capacity_t": 190.0
+      },
+      {
+        "source_id": "B",
+        "year": 2035,
+        "reserved_capacity_t": 40.0
+      },
+      {
+        "source_id": "B",
+        "year": 2036,
+        "reserved_capacity_t": 45.0
+      },
+      {
+        "source_id": "B",
+        "year": 2037,
+        "reserved_capacity_t": 55.0
+      },
+      {
+        "source_id": "B",
+        "year": 2038,
+        "reserved_capacity_t": 90.0
+      },
+      {
+        "source_id": "B",
+        "year": 2039,
+        "reserved_capacity_t": 110.0
+      },
+      {
+        "source_id": "B",
+        "year": 2040,
+        "reserved_capacity_t": 110.0
+      },
+      {
+        "source_id": "E",
+        "year": 2035,
+        "reserved_capacity_t": 25.0
+      },
+      {
+        "source_id": "E",
+        "year": 2036,
+        "reserved_capacity_t": 25.0
+      },
+      {
+        "source_id": "E",
+        "year": 2037,
+        "reserved_capacity_t": 30.0
+      },
+      {
+        "source_id": "E",
+        "year": 2038,
+        "reserved_capacity_t": 35.0
+      },
+      {
+        "source_id": "E",
+        "year": 2039,
+        "reserved_capacity_t": 55.0
+      },
+      {
+        "source_id": "E",
+        "year": 2040,
+        "reserved_capacity_t": 80.0
+      }
+    ],
+    "investments": [
+      {
+        "investment_id": "ZBO",
+        "enabled": true,
+        "commissioning_month": "2036-01"
+      }
+    ],
+    "initial_stock_acquisition": {
+      "source_id": "A",
+      "reserved_capacity_t_per_year": 45.0,
+      "ordered_volume_t": 45.0,
+      "order_date": "2034-01",
+      "planned_delivery_date": "2035-01",
+      "contract_period_start": "2034-01",
+      "contract_period_end": "2034-12",
+      "notes": "Closed acceptance-test pre-horizon acquisition.",
+      "status": "TEAM_DECISION"
+    },
+    "inventory_policy": {
+      "reserve_strategy_by_year": {
+        "2035": "physical",
+        "2036": "physical",
+        "2037": "physical",
+        "2038": "physical",
+        "2039": "physical",
+        "2040": "physical"
+      }
+    },
+    "emergency_role_by_year": {
+      "2035": "reserve_only",
+      "2036": "reserve_only",
+      "2037": "reserve_only",
+      "2038": "planned_supply",
+      "2039": "planned_supply",
+      "2040": "reserve_only"
+    }
+  },
+  "metadata": {
+    "status": "TEAM_DECISION",
+    "notes": "Earth-Core-heavy strategy."
+  }
+}

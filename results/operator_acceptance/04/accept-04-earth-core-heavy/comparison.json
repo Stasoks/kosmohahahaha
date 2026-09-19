@@ -1,0 +1,717 @@
+{
+  "annual": [
+    {
+      "base_closing_inventory_t": 0.0,
+      "base_critical_service": 0.5523958333333334,
+      "base_losses_t": 0.45000000000000007,
+      "base_shortage_t": 47.47500000000001,
+      "base_total_service": 0.5252500000000002,
+      "stress_closing_inventory_t": 0.0,
+      "stress_critical_service": 0.5523958333333334,
+      "stress_losses_t": 0.45000000000000007,
+      "stress_shortage_t": 47.47500000000001,
+      "stress_total_service": 0.5252500000000002,
+      "year": 2035
+    },
+    {
+      "base_closing_inventory_t": 0.0,
+      "base_critical_service": 1.0,
+      "base_losses_t": 1.4200000000000004,
+      "base_shortage_t": 23.086666666666652,
+      "base_total_service": 0.8350952380952381,
+      "stress_closing_inventory_t": 0.0,
+      "stress_critical_service": 1.0,
+      "stress_losses_t": 1.4200000000000004,
+      "stress_shortage_t": 23.086666666666652,
+      "stress_total_service": 0.8350952380952381,
+      "year": 2036
+    },
+    {
+      "base_closing_inventory_t": 0.0,
+      "base_critical_service": 1.0,
+      "base_losses_t": 2.06,
+      "base_shortage_t": 20.393333333333338,
+      "base_total_service": 0.8926666666666665,
+      "stress_closing_inventory_t": 0.0,
+      "stress_critical_service": 1.0,
+      "stress_losses_t": 2.06,
+      "stress_shortage_t": 20.393333333333338,
+      "stress_total_service": 0.8926666666666665,
+      "year": 2037
+    },
+    {
+      "base_closing_inventory_t": 24.346666666666692,
+      "base_critical_service": 1.0,
+      "base_losses_t": 3.2300000000000004,
+      "base_shortage_t": 8.409999999999997,
+      "base_total_service": 0.9663599999999998,
+      "stress_closing_inventory_t": 0.0,
+      "stress_critical_service": 1.0,
+      "stress_losses_t": 3.2300000000000004,
+      "stress_shortage_t": 21.563333333333304,
+      "stress_total_service": 0.9249971014492752,
+      "year": 2038
+    },
+    {
+      "base_closing_inventory_t": 36.97333333333327,
+      "base_critical_service": 1.0,
+      "base_losses_t": 4.04,
+      "base_shortage_t": 0.0,
+      "base_total_service": 1.0000000000000002,
+      "stress_closing_inventory_t": 0.0,
+      "stress_critical_service": 1.0,
+      "stress_losses_t": 4.04,
+      "stress_shortage_t": 35.37333333333339,
+      "stress_total_service": 0.9038768115942026,
+      "year": 2039
+    },
+    {
+      "base_closing_inventory_t": 0.0,
+      "base_critical_service": 1.0,
+      "base_losses_t": 3.689999999999999,
+      "base_shortage_t": 49.216666666666775,
+      "base_total_service": 0.8738034188034186,
+      "stress_closing_inventory_t": 0.0,
+      "stress_critical_service": 1.0,
+      "stress_losses_t": 3.689999999999999,
+      "stress_shortage_t": 144.69,
+      "stress_total_service": 0.677391304347826,
+      "year": 2040
+    }
+  ],
+  "plan_id": "accept-04-earth-core-heavy",
+  "scenarios": [
+    "BASE",
+    "MANDATORY_STRESS"
+  ],
+  "source_deliveries": [
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "A",
+      "stress_gross_delivery_t": 0,
+      "year": 2035
+    },
+    {
+      "base_gross_delivery_t": 99.99999999999999,
+      "difference_t": 0.0,
+      "source_id": "A",
+      "stress_gross_delivery_t": 99.99999999999999,
+      "year": 2036
+    },
+    {
+      "base_gross_delivery_t": 145.0,
+      "difference_t": 0.0,
+      "source_id": "A",
+      "stress_gross_delivery_t": 145.0,
+      "year": 2037
+    },
+    {
+      "base_gross_delivery_t": 180.0,
+      "difference_t": 0.0,
+      "source_id": "A",
+      "stress_gross_delivery_t": 180.0,
+      "year": 2038
+    },
+    {
+      "base_gross_delivery_t": 190.0,
+      "difference_t": 0.0,
+      "source_id": "A",
+      "stress_gross_delivery_t": 190.0,
+      "year": 2039
+    },
+    {
+      "base_gross_delivery_t": 190.0,
+      "difference_t": 0.0,
+      "source_id": "A",
+      "stress_gross_delivery_t": 190.0,
+      "year": 2040
+    },
+    {
+      "base_gross_delivery_t": 10.0,
+      "difference_t": 0.0,
+      "source_id": "B",
+      "stress_gross_delivery_t": 10.0,
+      "year": 2035
+    },
+    {
+      "base_gross_delivery_t": 18.333333333333332,
+      "difference_t": 0.0,
+      "source_id": "B",
+      "stress_gross_delivery_t": 18.333333333333332,
+      "year": 2036
+    },
+    {
+      "base_gross_delivery_t": 26.666666666666668,
+      "difference_t": 0.0,
+      "source_id": "B",
+      "stress_gross_delivery_t": 26.666666666666668,
+      "year": 2037
+    },
+    {
+      "base_gross_delivery_t": 60.0,
+      "difference_t": 0.0,
+      "source_id": "B",
+      "stress_gross_delivery_t": 60.0,
+      "year": 2038
+    },
+    {
+      "base_gross_delivery_t": 95.0,
+      "difference_t": 0.0,
+      "source_id": "B",
+      "stress_gross_delivery_t": 95.0,
+      "year": 2039
+    },
+    {
+      "base_gross_delivery_t": 108.33333333333329,
+      "difference_t": 0.0,
+      "source_id": "B",
+      "stress_gross_delivery_t": 108.33333333333329,
+      "year": 2040
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "C",
+      "stress_gross_delivery_t": 0,
+      "year": 2035
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "C",
+      "stress_gross_delivery_t": 0,
+      "year": 2036
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "C",
+      "stress_gross_delivery_t": 0,
+      "year": 2037
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "C",
+      "stress_gross_delivery_t": 0,
+      "year": 2038
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "C",
+      "stress_gross_delivery_t": 0,
+      "year": 2039
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "C",
+      "stress_gross_delivery_t": 0,
+      "year": 2040
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "D",
+      "stress_gross_delivery_t": 0,
+      "year": 2035
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "D",
+      "stress_gross_delivery_t": 0,
+      "year": 2036
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "D",
+      "stress_gross_delivery_t": 0,
+      "year": 2037
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "D",
+      "stress_gross_delivery_t": 0,
+      "year": 2038
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "D",
+      "stress_gross_delivery_t": 0,
+      "year": 2039
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "D",
+      "stress_gross_delivery_t": 0,
+      "year": 2040
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "E",
+      "stress_gross_delivery_t": 0,
+      "year": 2035
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "E",
+      "stress_gross_delivery_t": 0,
+      "year": 2036
+    },
+    {
+      "base_gross_delivery_t": 0,
+      "difference_t": 0,
+      "source_id": "E",
+      "stress_gross_delivery_t": 0,
+      "year": 2037
+    },
+    {
+      "base_gross_delivery_t": 29.16666666666667,
+      "difference_t": 0.0,
+      "source_id": "E",
+      "stress_gross_delivery_t": 29.16666666666667,
+      "year": 2038
+    },
+    {
+      "base_gross_delivery_t": 51.66666666666664,
+      "difference_t": 0.0,
+      "source_id": "E",
+      "stress_gross_delivery_t": 51.66666666666664,
+      "year": 2039
+    },
+    {
+      "base_gross_delivery_t": 9.166666666666664,
+      "difference_t": 0.0,
+      "source_id": "E",
+      "stress_gross_delivery_t": 9.166666666666664,
+      "year": 2040
+    }
+  ],
+  "summary": {
+    "cost_per_served_ton_mln": {
+      "BASE": 9.525268765162428,
+      "MANDATORY_STRESS": 10.296692929189867,
+      "difference": 0.7714241640274384
+    },
+    "critical_service_level": {
+      "BASE": 0.9623070175438596,
+      "MANDATORY_STRESS": 0.9657172490824956,
+      "difference": 0.003410231538635955
+    },
+    "critical_shortage_t": {
+      "BASE": 35.80833333333334,
+      "MANDATORY_STRESS": 35.80833333333334,
+      "difference": 0.0
+    },
+    "discounted_cost_mln": {
+      "BASE": 10250.499155430012,
+      "MANDATORY_STRESS": 11057.392077617784,
+      "difference": 806.8929221877715
+    },
+    "discounted_cost_per_served_ton_mln": {
+      "BASE": 8.257086978815908,
+      "MANDATORY_STRESS": 8.907063622886552,
+      "difference": 0.6499766440706445
+    },
+    "emergency_usage_t": {
+      "BASE": 89.99999999999997,
+      "MANDATORY_STRESS": 89.99999999999997,
+      "difference": 0.0
+    },
+    "final_inventory_t": {
+      "BASE": 0.0,
+      "MANDATORY_STRESS": 0.0,
+      "difference": 0.0
+    },
+    "hard_violation_count": {
+      "BASE": 11,
+      "MANDATORY_STRESS": 5,
+      "difference": -6
+    },
+    "total_losses_t": {
+      "BASE": 14.89,
+      "MANDATORY_STRESS": 14.89,
+      "difference": 0.0
+    },
+    "total_service_level": {
+      "BASE": 0.8931067146282974,
+      "MANDATORY_STRESS": 0.8092687961755757,
+      "difference": -0.0838379184527217
+    },
+    "total_shortage_t": {
+      "BASE": 148.5816666666668,
+      "MANDATORY_STRESS": 292.5816666666667,
+      "difference": 143.99999999999991
+    },
+    "undiscounted_cost_mln": {
+      "BASE": 11824.843275,
+      "MANDATORY_STRESS": 12782.503375,
+      "difference": 957.660100000001
+    },
+    "violation_count": {
+      "BASE": 11,
+      "MANDATORY_STRESS": 12,
+      "difference": 1
+    }
+  },
+  "violations": {
+    "BASE": [
+      {
+        "actual": 0.5523958333333334,
+        "code": "BASE_CRITICAL_SERVICE",
+        "constraint_id": "BASE_CRITICAL_SERVICE",
+        "excess_or_gap": 0.43760416666666657,
+        "human_message": "Critical service is 55.24%; shortage is 35.808 t.",
+        "limit": 0.99,
+        "operator": ">=",
+        "period": "2035",
+        "reason": "critical demand service minimum",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.5252500000000002,
+        "code": "BASE_TOTAL_SERVICE",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.44474999999999976,
+        "human_message": "Total service is 52.53%; shortage is 47.475 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2035",
+        "reason": "total demand service minimum",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.8350952380952381,
+        "code": "BASE_TOTAL_SERVICE",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.13490476190476186,
+        "human_message": "Total service is 83.51%; shortage is 23.087 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2036",
+        "reason": "total demand service minimum",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.0,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 45.0,
+        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2036-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      {
+        "actual": 0.8926666666666665,
+        "code": "BASE_TOTAL_SERVICE",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.07733333333333348,
+        "human_message": "Total service is 89.27%; shortage is 20.393 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2037",
+        "reason": "total demand service minimum",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.0,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 45.0,
+        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2037-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      {
+        "actual": 0.9663599999999998,
+        "code": "BASE_TOTAL_SERVICE",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.0036400000000001986,
+        "human_message": "Total service is 96.64%; shortage is 8.410 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2038",
+        "reason": "total demand service minimum",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.0,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 45.0,
+        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2038-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      {
+        "actual": 27.770416666666698,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 17.229583333333302,
+        "human_message": "Reserve equivalence is 27.770 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2039-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      {
+        "actual": 0.8738034188034186,
+        "code": "BASE_TOTAL_SERVICE",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.09619658119658137,
+        "human_message": "Total service is 87.38%; shortage is 49.217 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2040",
+        "reason": "total demand service minimum",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 34.60324786324781,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 10.396752136752191,
+        "human_message": "Reserve equivalence is 34.603 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2040-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      }
+    ],
+    "MANDATORY_STRESS": [
+      {
+        "actual": 0.5523958333333334,
+        "code": "STRESS_CRITICAL_SERVICE_BENCHMARK",
+        "constraint_id": "BASE_CRITICAL_SERVICE",
+        "excess_or_gap": 0.43760416666666657,
+        "human_message": "Critical service is 55.24%; shortage is 35.808 t.",
+        "limit": 0.99,
+        "operator": ">=",
+        "period": "2035",
+        "reason": "critical demand service minimum",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "benchmark",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.5252500000000002,
+        "code": "STRESS_TOTAL_SERVICE_BENCHMARK",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.44474999999999976,
+        "human_message": "Total service is 52.53%; shortage is 47.475 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2035",
+        "reason": "total demand service minimum",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "benchmark",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.8350952380952381,
+        "code": "STRESS_TOTAL_SERVICE_BENCHMARK",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.13490476190476186,
+        "human_message": "Total service is 83.51%; shortage is 23.087 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2036",
+        "reason": "total demand service minimum",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "benchmark",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.0,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 45.0,
+        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2036-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      {
+        "actual": 0.8926666666666665,
+        "code": "STRESS_TOTAL_SERVICE_BENCHMARK",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.07733333333333348,
+        "human_message": "Total service is 89.27%; shortage is 20.393 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2037",
+        "reason": "total demand service minimum",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "benchmark",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.0,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 45.0,
+        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2037-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      {
+        "actual": 0.9249971014492752,
+        "code": "STRESS_TOTAL_SERVICE_BENCHMARK",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.04500289855072481,
+        "human_message": "Total service is 92.50%; shortage is 21.563 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2038",
+        "reason": "total demand service minimum",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "benchmark",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.0,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 45.0,
+        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2038-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      {
+        "actual": 0.9038768115942026,
+        "code": "STRESS_TOTAL_SERVICE_BENCHMARK",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.06612318840579734,
+        "human_message": "Total service is 90.39%; shortage is 35.373 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2039",
+        "reason": "total demand service minimum",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "benchmark",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.0,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 45.0,
+        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2039-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      {
+        "actual": 0.677391304347826,
+        "code": "STRESS_TOTAL_SERVICE_BENCHMARK",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.29260869565217396,
+        "human_message": "Total service is 67.74%; shortage is 144.690 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2040",
+        "reason": "total demand service minimum",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "benchmark",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 0.0,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 45.0,
+        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2040-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "MANDATORY_STRESS",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      }
+    ]
+  }
+}

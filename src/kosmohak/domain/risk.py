@@ -25,6 +25,9 @@ class RiskDefinition:
     source_references: tuple[str, ...]
     combination_policy: str
     mitigation: dict[str, Any] | None
+    anticipated_consequence: str
+    residual_consequence_statement: str
+    stakeholder_ids: tuple[str, ...]
     metadata: dict[str, Any]
     status: str
     raw: dict[str, Any]
@@ -114,6 +117,9 @@ class RiskEvaluation:
             "first_violation": self.consequence["risk"].get("first_violation"),
             "all_violations": self.consequence["risk"].get("violations", []),
             "mitigation": self.mitigation.to_dict() if self.mitigation else self.risk.mitigation,
+            "anticipated_consequence": self.risk.anticipated_consequence,
+            "residual_consequence_statement": self.risk.residual_consequence_statement,
+            "stakeholder_ids": list(self.risk.stakeholder_ids),
             "provenance": {
                 "risk_definition": self.risk.status,
                 "likelihood": self.risk.likelihood_status,

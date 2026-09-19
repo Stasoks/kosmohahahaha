@@ -1,0 +1,37 @@
+{
+  "status": "TEAM_ASSUMPTION",
+  "risks": [
+    {
+      "risk_id": "ACCEPT-09-CORE-OUTAGE",
+      "name": "Earth-Core outage Apr-Sep 2038",
+      "description": "Closed acceptance test.",
+      "event": "Earth-Core availability falls to zero",
+      "cause": "Test shock",
+      "period_start": "2038-04",
+      "period_end": "2038-09",
+      "affected_parameters": [
+        "availability_share"
+      ],
+      "factor_changes": [
+        {
+          "factor": "availability_share",
+          "source_id": "A",
+          "value": 0.0,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Closed deterministic acceptance test."
+        }
+      ],
+      "dependencies": [],
+      "owner": "acceptance-test",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
+      "likelihood_status": "UNKNOWN",
+      "source_references": [],
+      "combination_policy": "apply_after_base",
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
+    }
+  ]
+}

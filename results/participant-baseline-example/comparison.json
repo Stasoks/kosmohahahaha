@@ -297,6 +297,11 @@
     }
   ],
   "summary": {
+    "cost_per_served_ton_mln": {
+      "BASE": 8.32208905597673,
+      "MANDATORY_STRESS": 8.610755365295445,
+      "difference": 0.28866630931871384
+    },
     "critical_service_level": {
       "BASE": 1.0,
       "MANDATORY_STRESS": 1.0,
@@ -311,6 +316,11 @@
       "BASE": 10480.757934894153,
       "MANDATORY_STRESS": 10867.7293241281,
       "difference": 386.9713892339478
+    },
+    "discounted_cost_per_served_ton_mln": {
+      "BASE": 7.540113622226009,
+      "MANDATORY_STRESS": 7.78262020150421,
+      "difference": 0.24250657927820107
     },
     "emergency_usage_t": {
       "BASE": 0,

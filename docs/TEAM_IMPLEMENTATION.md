@@ -308,14 +308,17 @@ results/<plan_id>/risks/
 10. Внутри месяца arrival/storage происходят до service.
 11. Annual capacity excess пропорционально распределяется по заказам года.
 12. Risk scoring thresholds — `configs/risk_scoring.json`.
+13. Non-uniform orders are charged at order-month prices; TOP-only volume uses the
+    active-contract-period time-weighted price.
 
 ## Ограничения
 
 Это one-node, one-commodity, deterministic monthly evaluator. Он не моделирует
 propellant chemistry, standing boil-off, tank thermodynamics, trajectories, launch
 vehicles, transfer interfaces, correlated outages, probability distributions,
-telemetry или real-world calibration. Здесь нет optimizer, MILP, Optuna, RL, Monte
-Carlo, automatic repair, automatic mitigation, database или UI.
+telemetry или real-world calibration. Strategy Advisor использует ограниченный
+детерминированный local search и не доказывает глобальный optimum. Здесь нет MILP,
+Optuna, RL, Monte Carlo, automatic contract negotiation, database или UI.
 
 Следовательно, реализация проверяет внутреннюю согласованность и последствия стратегии
 в рамках синтетического кейса, но не является инженерно сертифицированным цифровым
@@ -327,3 +330,26 @@ Carlo, automatic repair, automatic mitigation, database или UI.
 preparatory acquisition является более строгим participant-level правилом поверх
 расширяемого official plan envelope; official files не переписаны. Материальная,
 contract, reserve и mandatory-stress семантика сохранена.
+
+## v0.4: effective case и advisor
+
+`CaseWorkspace` строит effective `CaseData` копированием official case и применением
+typed overlays. `ResearchSourceSpec` задаёт параметры и availability rule;
+`FutureYearSpec` обязан явно перечислить спрос, prices, capacity, availability,
+reliability metadata, constraints и provenance. Official rows остаются `CASE_INPUT`,
+новые entities — `TEAM_ASSUMPTION / RESEARCH_EXTENSION`.
+
+Общий shipment pipeline больше не содержит закрытого словаря A–E. Он вызывает
+`source_commissioning_month()` и одинаково обрабатывает requested, feasible, lead,
+arrival, loss, acceptance, storage и service для official и research sources.
+Специальные policy rules Earth-New, Lunar-ISRU и Emergency остаются привязаны к
+official entities и не распространяются на F.
+
+Контрактная экономика рассчитывает помесячную цену заказанных объёмов. Run ID включает
+serialized effective case. Exports содержат horizon/source provenance и новые KPI
+cost per actually served tonne.
+
+Advisor packages `patch`, `locks`, `distance`, `search_space`, `evaluator`, `repair`,
+`improve`, `resilience`, `explore`, `result`, and `serialization` отделены от
+simulation. Каждый accepted candidate проходит обычный `simulate()` в BASE и stress.
+Original plan не мутируется; применение typed patch остаётся отдельным действием.

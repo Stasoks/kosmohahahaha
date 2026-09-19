@@ -1,0 +1,89 @@
+{
+  "status": "TEAM_ASSUMPTION",
+  "base": "OFFICIAL_CASE",
+  "sources": [
+    {
+      "source_id": "F",
+      "name": "Research-Orbital-Tug",
+      "capacity_t_per_year": 24,
+      "variable_cost_mln_per_t": 4.25,
+      "reservation_rate_mln_per_t_year_capacity": 0.2,
+      "take_or_pay_share": 0.5,
+      "lead_time_min_value": 4,
+      "lead_time_max_value": 4,
+      "lead_time_unit": "month",
+      "availability_rule": {
+        "type": "calendar",
+        "available_from": "2040-07"
+      },
+      "reliability_metadata": {
+        "semantics": "metadata_only",
+        "basis": "No probability asserted."
+      },
+      "notes": "Illustrative research source; not organizer data.",
+      "provenance": {
+        "basis": "Demonstration extension API",
+        "source": "TEAM:research-source-F"
+      },
+      "status": "TEAM_ASSUMPTION",
+      "selected_lead_time_months": null
+    }
+  ],
+  "future_years": [
+    {
+      "year": 2041,
+      "base_total_demand_t": 410,
+      "base_critical_demand_t": 260,
+      "low_total_t": 328,
+      "high_total_t": 512.5,
+      "source_price_assumptions": {
+        "A": 6.4,
+        "B": 9.2,
+        "C": 7.3,
+        "D": 3.2,
+        "E": 14.2,
+        "F": 4.4
+      },
+      "source_capacity_assumptions": {
+        "A": 190,
+        "B": 110,
+        "C": 130,
+        "D": 120,
+        "E": 80,
+        "F": 24
+      },
+      "source_availability_assumptions": {
+        "A": 1,
+        "B": 1,
+        "C": 1,
+        "D": 1,
+        "E": 1,
+        "F": 1
+      },
+      "reliability_assumptions": {
+        "A": "metadata_only",
+        "B": "metadata_only",
+        "C": "metadata_only",
+        "D": "metadata_only",
+        "E": "metadata_only",
+        "F": "metadata_only"
+      },
+      "applicable_constraints": [
+        "BASE_CRITICAL_SERVICE",
+        "BASE_TOTAL_SERVICE",
+        "RESERVE_45D"
+      ],
+      "notes": "Explicit illustrative extension; no organizer forecast or automatic carry-forward.",
+      "provenance": {
+        "basis": "Demonstration of explicit 2041 inputs",
+        "source": "TEAM:research-horizon-2041"
+      },
+      "status": "TEAM_ASSUMPTION",
+      "scope": "RESEARCH_EXTENSION",
+      "scenario_assumptions": {
+        "BASE": "multipliers 1.0; explicit team convention",
+        "MANDATORY_STRESS": "not extended beyond official 2040"
+      }
+    }
+  ]
+}

@@ -2,14 +2,16 @@
   "base_scenario_id": "BASE",
   "evaluated_points": [
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10480.757934894153,
       "final_inventory_t": 45.45666666588559,
       "hard_violation_count": 0,
       "minimum_inventory_t": 17.300000000009504,
-      "run_id": "run-939204716097ffcd",
+      "run_id": "run-737ce6dff04f5652",
       "total_cost_mln": 11567.703787807655,
+      "total_demand_t": 1390.0,
       "total_service_level": 1.0,
       "total_shortage_t": 0.0,
       "valid": true,
@@ -17,14 +19,16 @@
       "violations": []
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10461.87540675883,
+      "discounted_cost_mln": 10461.875406758829,
       "final_inventory_t": 31.556666665885768,
       "hard_violation_count": 3,
       "minimum_inventory_t": 16.30000000000948,
-      "run_id": "run-f2e0f24106633e9d",
-      "total_cost_mln": 11545.059787807657,
+      "run_id": "run-9c2a93da04420464",
+      "total_cost_mln": 11545.059787807655,
+      "total_demand_t": 1403.8999999999999,
       "total_service_level": 1.0000000000000002,
       "total_shortage_t": 0.0,
       "valid": false,
@@ -40,7 +44,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0002",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -55,7 +59,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0002",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -70,7 +74,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0002",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -78,14 +82,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10442.992878623507,
       "final_inventory_t": 17.65666666588568,
       "hard_violation_count": 4,
       "minimum_inventory_t": 15.300000000009511,
-      "run_id": "run-f90313308dfad376",
-      "total_cost_mln": 11522.415787807657,
+      "run_id": "run-c08b44b3418ea9b0",
+      "total_cost_mln": 11522.415787807655,
+      "total_demand_t": 1417.8,
       "total_service_level": 1.0,
       "total_shortage_t": 0.0,
       "valid": false,
@@ -101,7 +107,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0003",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -116,7 +122,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0003",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -131,7 +137,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0003",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -146,7 +152,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0003",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -154,14 +160,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10424.110350488185,
+      "discounted_cost_mln": 10424.110350488183,
       "final_inventory_t": 3.7566666658856604,
       "hard_violation_count": 5,
       "minimum_inventory_t": 3.7566666658856604,
-      "run_id": "run-0065cc7a11d69f93",
-      "total_cost_mln": 11499.771787807656,
+      "run_id": "run-fed0931cdc32b596",
+      "total_cost_mln": 11499.771787807655,
+      "total_demand_t": 1431.7,
       "total_service_level": 1.0,
       "total_shortage_t": 0.0,
       "valid": false,
@@ -177,7 +185,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0004",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -192,7 +200,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0004",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -207,7 +215,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0004",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -222,7 +230,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0004",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -237,7 +245,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0004",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -245,14 +253,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10406.658932896124,
+      "discounted_cost_mln": 10406.658932896122,
       "final_inventory_t": 0.0,
       "hard_violation_count": 5,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-02e4838e4666d4e8",
-      "total_cost_mln": 11478.954287807921,
+      "run_id": "run-20796cf3d42b0701",
+      "total_cost_mln": 11478.954287807917,
+      "total_demand_t": 1445.6000000000001,
       "total_service_level": 0.9929833056626214,
       "total_shortage_t": 10.143333334114395,
       "valid": false,
@@ -268,7 +278,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0005",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -283,7 +293,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0005",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -298,7 +308,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0005",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -313,7 +323,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0005",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -328,7 +338,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0005",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -336,14 +346,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10393.011724455504,
       "final_inventory_t": 0.0,
       "hard_violation_count": 6,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-0ed3ec8d0a9f1d8e",
-      "total_cost_mln": 11462.992029808065,
+      "run_id": "run-92a4ddaa56b400e8",
+      "total_cost_mln": 11462.992029808063,
+      "total_demand_t": 1459.5,
       "total_service_level": 0.983526321799168,
       "total_shortage_t": 24.043333334114312,
       "valid": false,
@@ -359,7 +371,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0006",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -374,7 +386,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0006",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -389,7 +401,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0006",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -404,7 +416,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0006",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -419,7 +431,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0006",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -434,7 +446,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0006",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -442,14 +454,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10383.234278569827,
+      "discounted_cost_mln": 10383.234278569824,
       "final_inventory_t": 0.0,
       "hard_violation_count": 6,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-283d90505ddc98e9",
-      "total_cost_mln": 11451.81996380832,
+      "run_id": "run-135ba1f61faca0b9",
+      "total_cost_mln": 11451.819963808319,
+      "total_demand_t": 1473.4,
       "total_service_level": 0.9742477715935154,
       "total_shortage_t": 37.94333333411442,
       "valid": false,
@@ -465,7 +479,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0007",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -480,7 +494,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0007",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -495,7 +509,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0007",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -510,7 +524,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0007",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -525,7 +539,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0007",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -540,7 +554,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0007",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -548,14 +562,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10377.370561908796,
       "final_inventory_t": 0.0,
       "hard_violation_count": 7,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-4d71c66a729cba80",
-      "total_cost_mln": 11445.327975808597,
+      "run_id": "run-3495d67b81d963c9",
+      "total_cost_mln": 11445.327975808596,
+      "total_demand_t": 1487.3,
       "total_service_level": 0.9651426522328285,
       "total_shortage_t": 51.8433333341144,
       "valid": false,
@@ -571,7 +587,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0008",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -586,7 +602,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0008",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -601,7 +617,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0008",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -616,7 +632,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0008",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -631,7 +647,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0008",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -646,7 +662,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0008",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -661,7 +677,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0008",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -669,14 +685,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10373.453105910547,
+      "discounted_cost_mln": 10373.453105910543,
       "final_inventory_t": 0.0,
       "hard_violation_count": 8,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-65b4d19345e8d445",
-      "total_cost_mln": 11441.09583580862,
+      "run_id": "run-79c4754c06942951",
+      "total_cost_mln": 11441.095835808619,
+      "total_demand_t": 1501.2,
       "total_service_level": 0.9562061461936355,
       "total_shortage_t": 65.7433333341144,
       "valid": false,
@@ -692,7 +710,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0009",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -707,7 +725,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0009",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -722,7 +740,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0009",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -737,7 +755,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0009",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -752,7 +770,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0009",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -767,7 +785,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0009",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -782,7 +800,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0009",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -797,7 +815,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0009",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -805,14 +823,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10370.017133828289,
       "final_inventory_t": 0.0,
       "hard_violation_count": 8,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-869ff4f1485005fa",
+      "run_id": "run-d487bc60626e4bb6",
       "total_cost_mln": 11437.403399445078,
+      "total_demand_t": 1515.1000000000001,
       "total_service_level": 0.9474336127423177,
       "total_shortage_t": 79.64333333411443,
       "valid": false,
@@ -828,7 +848,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0010",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -843,7 +863,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0010",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -858,7 +878,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0010",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -873,7 +893,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0010",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -888,7 +908,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0010",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -903,7 +923,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0010",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -918,7 +938,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0010",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -933,7 +953,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0010",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -941,14 +961,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10367.752640734121,
       "final_inventory_t": 0.0,
       "hard_violation_count": 9,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-bb686b7f3c354989",
-      "total_cost_mln": 11435.004895808757,
+      "run_id": "run-ac72dbeffe1a406b",
+      "total_cost_mln": 11435.004895808755,
+      "total_demand_t": 1529.0,
       "total_service_level": 0.9388205798992058,
       "total_shortage_t": 93.54333333411446,
       "valid": false,
@@ -964,7 +986,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -979,7 +1001,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -994,7 +1016,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1009,7 +1031,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1024,7 +1046,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1039,7 +1061,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1054,7 +1076,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1069,7 +1091,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1084,7 +1106,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0011",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1092,14 +1114,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10366.154091981287,
+      "discounted_cost_mln": 10366.154091981283,
       "final_inventory_t": 0.0,
       "hard_violation_count": 9,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-61feedd3d13609fc",
-      "total_cost_mln": 11433.340595808757,
+      "run_id": "run-ee4dff229a6e9a1b",
+      "total_cost_mln": 11433.340595808755,
+      "total_demand_t": 1542.8999999999999,
       "total_service_level": 0.9303627368370508,
       "total_shortage_t": 107.4433333341145,
       "valid": false,
@@ -1115,7 +1139,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1130,7 +1154,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1145,7 +1169,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1160,7 +1184,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1175,7 +1199,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1190,7 +1214,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1205,7 +1229,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1220,7 +1244,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1235,7 +1259,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0012",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1243,14 +1267,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10364.563443455208,
       "final_inventory_t": 0.0,
       "hard_violation_count": 9,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-12674ceb62cf5357",
-      "total_cost_mln": 11431.684995808757,
+      "run_id": "run-19d5a0cfebea72db",
+      "total_cost_mln": 11431.684995808753,
+      "total_demand_t": 1556.8,
       "total_service_level": 0.92205592668672,
       "total_shortage_t": 121.34333333411448,
       "valid": false,
@@ -1266,7 +1292,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1281,7 +1307,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1296,7 +1322,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1311,7 +1337,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1326,7 +1352,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1341,7 +1367,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1356,7 +1382,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1371,7 +1397,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1386,7 +1412,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0013",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1394,14 +1420,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10363.106300598065,
       "final_inventory_t": 0.0,
       "hard_violation_count": 9,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-e159a5dd0ee7220f",
-      "total_cost_mln": 11430.172995808756,
+      "run_id": "run-ecf697723526c399",
+      "total_cost_mln": 11430.172995808754,
+      "total_demand_t": 1570.7,
       "total_service_level": 0.9138961397248906,
       "total_shortage_t": 135.2433333341142,
       "valid": false,
@@ -1417,7 +1445,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1432,7 +1460,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1447,7 +1475,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1462,7 +1490,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1477,7 +1505,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1492,7 +1520,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1507,7 +1535,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1522,7 +1550,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1537,7 +1565,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0014",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1545,14 +1573,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10361.751919645685,
+      "discounted_cost_mln": 10361.751919645681,
       "final_inventory_t": 0.0,
       "hard_violation_count": 10,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-c910e89fcd2b9ebf",
+      "run_id": "run-afbd01e4e6de2d97",
       "total_cost_mln": 11428.768895808755,
+      "total_demand_t": 1584.6000000000001,
       "total_service_level": 0.9058795069202862,
       "total_shortage_t": 149.1433333341142,
       "valid": false,
@@ -1568,7 +1598,7 @@
           "operator": ">=",
           "period": "2036",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1583,7 +1613,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1598,7 +1628,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1613,7 +1643,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1628,7 +1658,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1643,7 +1673,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1658,7 +1688,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1673,7 +1703,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1688,7 +1718,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1703,7 +1733,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0015",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1711,14 +1741,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10360.479919645684,
       "final_inventory_t": 0.0,
       "hard_violation_count": 10,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-381127aaa1bd2855",
-      "total_cost_mln": 11427.451295808754,
+      "run_id": "run-9e919154a4f0dd19",
+      "total_cost_mln": 11427.451295808753,
+      "total_demand_t": 1598.5,
       "total_service_level": 0.8980022938166317,
       "total_shortage_t": 163.0433333341142,
       "valid": false,
@@ -1734,7 +1766,7 @@
           "operator": ">=",
           "period": "2036",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1749,7 +1781,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1764,7 +1796,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1779,7 +1811,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1794,7 +1826,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1809,7 +1841,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1824,7 +1856,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1839,7 +1871,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1854,7 +1886,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1869,7 +1901,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0016",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1877,14 +1909,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10359.277062502828,
+      "discounted_cost_mln": 10359.277062502824,
       "final_inventory_t": 0.0,
       "hard_violation_count": 10,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-cbfeaac986ce6138",
-      "total_cost_mln": 11426.206295808755,
+      "run_id": "run-31c4c145d1215716",
+      "total_cost_mln": 11426.206295808754,
+      "total_demand_t": 1612.3999999999999,
       "total_service_level": 0.8902608947320055,
       "total_shortage_t": 176.94333333411424,
       "valid": false,
@@ -1900,7 +1934,7 @@
           "operator": ">=",
           "period": "2036",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1915,7 +1949,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1930,7 +1964,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1945,7 +1979,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1960,7 +1994,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -1975,7 +2009,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -1990,7 +2024,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2005,7 +2039,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2020,7 +2054,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2035,7 +2069,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0017",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2043,14 +2077,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10358.184586312349,
       "final_inventory_t": 0.0,
       "hard_violation_count": 10,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-00b1bb9efc54e01f",
-      "total_cost_mln": 11425.077195808755,
+      "run_id": "run-6b5baaac0034ec64",
+      "total_cost_mln": 11425.077195808752,
+      "total_demand_t": 1626.3,
       "total_service_level": 0.8826518272556636,
       "total_shortage_t": 190.84333333411428,
       "valid": false,
@@ -2066,7 +2102,7 @@
           "operator": ">=",
           "period": "2036",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2081,7 +2117,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2096,7 +2132,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2111,7 +2147,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2126,7 +2162,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2141,7 +2177,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2156,7 +2192,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2171,7 +2207,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2186,7 +2222,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2201,7 +2237,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0018",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2209,14 +2245,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
       "discounted_cost_mln": 10357.45987202663,
       "final_inventory_t": 0.0,
       "hard_violation_count": 10,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-bb2f0b0e40fe3739",
-      "total_cost_mln": 11424.33319580875,
+      "run_id": "run-d585f285bd119f74",
+      "total_cost_mln": 11424.333195808747,
+      "total_demand_t": 1640.2,
       "total_service_level": 0.8751717270246834,
       "total_shortage_t": 204.74333333411437,
       "valid": false,
@@ -2232,7 +2270,7 @@
           "operator": ">=",
           "period": "2036",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2247,7 +2285,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2262,7 +2300,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2277,7 +2315,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2292,7 +2330,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2307,7 +2345,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2322,7 +2360,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2337,7 +2375,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2352,7 +2390,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2367,7 +2405,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0019",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2375,14 +2413,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10356.932157740917,
+      "discounted_cost_mln": 10356.932157740914,
       "final_inventory_t": 0.0,
       "hard_violation_count": 10,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-919cb40746db56ad",
-      "total_cost_mln": 11423.79559580875,
+      "run_id": "run-928885c4f75264fe",
+      "total_cost_mln": 11423.795595808746,
+      "total_demand_t": 1654.1000000000001,
       "total_service_level": 0.8678173427639717,
       "total_shortage_t": 218.6433333341143,
       "valid": false,
@@ -2398,7 +2438,7 @@
           "operator": ">=",
           "period": "2036",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2413,7 +2453,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2428,7 +2468,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2443,7 +2483,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2458,7 +2498,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2473,7 +2513,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2488,7 +2528,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2503,7 +2543,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2518,7 +2558,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2533,7 +2573,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0020",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2541,14 +2581,16 @@
       ]
     },
     {
+      "critical_demand_t": 950.0,
       "critical_service_level": 1.0,
       "critical_shortage_t": 0.0,
-      "discounted_cost_mln": 10356.41549107425,
+      "discounted_cost_mln": 10356.415491074247,
       "final_inventory_t": 0.0,
       "hard_violation_count": 10,
       "minimum_inventory_t": 0.0,
-      "run_id": "run-fb51b3f0e9d04268",
-      "total_cost_mln": 11423.26959580875,
+      "run_id": "run-0b7d4ca518b5bbda",
+      "total_cost_mln": 11423.269595808748,
+      "total_demand_t": 1668.0,
       "total_service_level": 0.860585531574272,
       "total_shortage_t": 232.54333333411438,
       "valid": false,
@@ -2564,7 +2606,7 @@
           "operator": ">=",
           "period": "2036",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2579,7 +2621,7 @@
           "operator": ">=",
           "period": "2036-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2594,7 +2636,7 @@
           "operator": ">=",
           "period": "2037",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2609,7 +2651,7 @@
           "operator": ">=",
           "period": "2037-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2624,7 +2666,7 @@
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2639,7 +2681,7 @@
           "operator": ">=",
           "period": "2038-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2654,7 +2696,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2669,7 +2711,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2684,7 +2726,7 @@
           "operator": ">=",
           "period": "2040",
           "reason": "total demand service minimum",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -2699,7 +2741,7 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+SENS_demand_multiplier_0021",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -2718,7 +2760,7 @@
     "operator": ">=",
     "period": "2040",
     "reason": "total demand service minimum",
-    "scenario": "BASE+SENS_demand_multiplier_0006",
+    "scenario": "BASE",
     "severity": "hard",
     "source_id": null,
     "unit": "share"
@@ -2735,14 +2777,16 @@
     "strategy_changed": false
   },
   "result_metrics": {
+    "critical_demand_t": 950.0,
     "critical_service_level": 1.0,
     "critical_shortage_t": 0.0,
     "discounted_cost_mln": 10393.011724455504,
     "final_inventory_t": 0.0,
     "hard_violation_count": 6,
     "minimum_inventory_t": 0.0,
-    "run_id": "run-0ed3ec8d0a9f1d8e",
-    "total_cost_mln": 11462.992029808065,
+    "run_id": "run-92a4ddaa56b400e8",
+    "total_cost_mln": 11462.992029808063,
+    "total_demand_t": 1459.5,
     "total_service_level": 0.983526321799168,
     "total_shortage_t": 24.043333334114312,
     "valid": false,

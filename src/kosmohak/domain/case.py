@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,10 @@ class SupplySource:
     available_from_year: int | None
     status: str
     notes: str
+    availability_rule: dict[str, Any] = field(default_factory=dict)
+    reliability_metadata: dict[str, Any] = field(default_factory=dict)
+    provenance: dict[str, Any] = field(default_factory=dict)
+    selected_lead_time_months: int | None = None
 
 
 @dataclass(frozen=True)
@@ -94,6 +99,9 @@ class CaseData:
     investments: dict[str, InvestmentOption]
     constraints: dict[str, ConstraintDefinition]
     status: str = "CASE_INPUT"
+    horizon_provenance: dict[int, dict[str, Any]] = field(default_factory=dict)
+    future_year_assumptions: dict[int, dict[str, Any]] = field(default_factory=dict)
+    workspace_provenance: dict[str, Any] = field(default_factory=dict)
 
     @property
     def years(self) -> tuple[int, ...]:
@@ -110,3 +118,63 @@ class CaseData:
     def source_by_name(self, name: str) -> SupplySource:
         return self.sources[self.source_id_by_name[name]]
 
+    def source_capacity(self, source_id: str, month_or_year: str | int) -> float:
+        year = int(str(month_or_year)[:4])
+        default = self.sources[source_id].capacity_t_per_year
+        value = self.future_year_assumptions.get(year, {}).get(
+            "source_capacity_assumptions", {}
+        ).get(source_id, default)
+        return _assumption_value(value)
+
+    def source_price(self, source_id: str, month_or_year: str | int) -> float:
+        year = int(str(month_or_year)[:4])
+        default = self.sources[source_id].variable_cost_mln_per_t
+        value = self.future_year_assumptions.get(year, {}).get(
+            "source_price_assumptions", {}
+        ).get(source_id, default)
+        return _assumption_value(value)
+
+    def source_availability_share(self, source_id: str, month_or_year: str | int) -> float:
+        year = int(str(month_or_year)[:4])
+        value = self.future_year_assumptions.get(year, {}).get(
+            "source_availability_assumptions", {}
+        ).get(source_id, 1.0)
+        return max(0.0, min(1.0, _assumption_value(value)))
+
+    def constraint_applies(self, constraint_id: str, year: int) -> bool:
+        if year not in self.future_year_assumptions:
+            return True
+        return constraint_id in set(
+            self.future_year_assumptions[year].get("applicable_constraints", [])
+        )
+
+    @property
+    def official_years(self) -> tuple[int, ...]:
+        return tuple(
+            year
+            for year in self.years
+            if self.horizon_provenance.get(year, {}).get("scope")
+            != "RESEARCH_EXTENSION"
+        )
+
+    @property
+    def research_years(self) -> tuple[int, ...]:
+        return tuple(year for year in self.years if year not in self.official_years)
+
+    @property
+    def research_source_ids(self) -> tuple[str, ...]:
+        return tuple(
+            sorted(
+                source_id
+                for source_id, source in self.sources.items()
+                if source.status != "CASE_INPUT"
+            )
+        )
+
+
+def _assumption_value(value: Any) -> float:
+    if isinstance(value, dict):
+        if "value" not in value:
+            raise ValueError("Numeric research assumption mapping must contain value")
+        value = value["value"]
+    return float(value)

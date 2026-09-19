@@ -1,0 +1,20 @@
+scope,id,BASE,MANDATORY_STRESS,difference
+summary,undiscounted_cost_mln,12038.068875,12807.848875,769.7799999999988
+summary,discounted_cost_mln,10593.084362001911,11241.90924189592,648.8248798940094
+summary,cost_per_served_ton_mln,9.203522116079313,10.139142164462182,0.9356200483828694
+summary,discounted_cost_per_served_ton_mln,8.098781226085858,8.89948945494284,0.8007082288569816
+summary,total_service_level,0.9409964028776979,0.8234734897870493,-0.11752291309064866
+summary,critical_service_level,0.9754868421052632,0.9777046433700334,0.002217801264770225
+summary,total_shortage_t,82.01499999999999,270.7916666666666,188.77666666666659
+summary,critical_shortage_t,23.287500000000005,23.287500000000005,0.0
+summary,total_losses_t,16.15,15.600000000000001,-0.5499999999999972
+summary,emergency_usage_t,0,0,0
+summary,final_inventory_t,0.5066666666666322,0.0,-0.5066666666666322
+summary,violation_count,9,12,3
+summary,hard_violation_count,9,5,-4
+annual,2035,"{""base_total_service"": 0.6525833333333332, ""base_critical_service"": 0.7089062499999997, ""base_shortage_t"": 34.74166666666667, ""base_closing_inventory_t"": 0.0, ""base_losses_t"": 1.0499999999999998}","{""stress_total_service"": 0.6525833333333332, ""stress_critical_service"": 0.7089062499999997, ""stress_shortage_t"": 34.74166666666667, ""stress_closing_inventory_t"": 0.0, ""stress_losses_t"": 1.0499999999999998}",
+annual,2036,"{""base_total_service"": 0.8821428571428571, ""base_critical_service"": 1.0, ""base_shortage_t"": 16.5, ""base_closing_inventory_t"": 0.0, ""base_losses_t"": 1.5}","{""stress_total_service"": 0.8821428571428571, ""stress_critical_service"": 1.0, ""stress_shortage_t"": 16.5, ""stress_closing_inventory_t"": 0.0, ""stress_losses_t"": 1.5}",
+annual,2037,"{""base_total_service"": 0.8753333333333333, ""base_critical_service"": 1.0, ""base_shortage_t"": 23.68666666666666, ""base_closing_inventory_t"": 0.0, ""base_losses_t"": 2.0199999999999996}","{""stress_total_service"": 0.8753333333333333, ""stress_critical_service"": 1.0, ""stress_shortage_t"": 23.68666666666666, ""stress_closing_inventory_t"": 0.0, ""stress_losses_t"": 2.0199999999999996}",
+annual,2038,"{""base_total_service"": 0.9716533333333331, ""base_critical_service"": 1.0, ""base_shortage_t"": 7.086666666666666, ""base_closing_inventory_t"": 17.26000000000002, ""base_losses_t"": 3.1599999999999993}","{""stress_total_service"": 0.8276289855072461, ""stress_critical_service"": 1.0, ""stress_shortage_t"": 49.55666666666668, ""stress_closing_inventory_t"": 0.0, ""stress_losses_t"": 2.8899999999999992}",
+annual,2039,"{""base_total_service"": 1.0000000000000002, ""base_critical_service"": 1.0, ""base_shortage_t"": 0.0, ""base_closing_inventory_t"": 18.35999999999996, ""base_losses_t"": 3.8999999999999995}","{""stress_total_service"": 0.809909420289855, ""stress_critical_service"": 1.0, ""stress_shortage_t"": 69.95333333333332, ""stress_closing_inventory_t"": 0.0, ""stress_losses_t"": 3.6200000000000006}",
+annual,2040,"{""base_total_service"": 1.0000000000000002, ""base_critical_service"": 1.0, ""base_shortage_t"": 0.0, ""base_closing_inventory_t"": 0.5066666666666322, ""base_losses_t"": 4.5200000000000005}","{""stress_total_service"": 0.8297584541062804, ""stress_critical_service"": 1.0, ""stress_shortage_t"": 76.35333333333324, ""stress_closing_inventory_t"": 0.0, ""stress_losses_t"": 4.5200000000000005}",

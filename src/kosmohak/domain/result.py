@@ -48,6 +48,7 @@ class SimulationResult:
         }
 
     def to_export_envelope(self) -> dict[str, Any]:
+        effective_case = self.assumptions.get("effective_case_provenance", {})
         return {
             "scenario_id": self.summary["scenario_id"],
             "plan_id": self.summary["plan_id"],
@@ -65,5 +66,6 @@ class SimulationResult:
             "constraint_checks": [item.to_dict() for item in self.violations],
             "risk_register": [],
             "pre_horizon": self.pre_horizon,
+            "effective_case_provenance": effective_case,
             "summary": self.summary,
         }

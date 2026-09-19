@@ -1,0 +1,17 @@
+[
+  {
+    "actual": 2102.5,
+    "code": "CAPEX_2037",
+    "constraint_id": "CAPEX_2037",
+    "excess_or_gap": 302.5,
+    "human_message": "Cumulative CAPEX through 2037 is 2102.500 mln units.",
+    "limit": 1800.0,
+    "operator": "<=",
+    "period": "2037",
+    "reason": "CAPEX through end-2037",
+    "scenario": "BASE",
+    "severity": "hard",
+    "source_id": null,
+    "unit": "mln_units"
+  }
+]

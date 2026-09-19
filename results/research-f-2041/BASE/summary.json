@@ -1,0 +1,47 @@
+{
+  "applied_overrides": [],
+  "base_scenario_id": "BASE",
+  "case_input_root": "/home/stas/python_projects/kosmohack",
+  "cost_per_served_ton_mln": 7.969510859892829,
+  "critical_service_level": 1.0,
+  "critical_shortage_t": 0.0,
+  "delayed_delivery_count": 0,
+  "delayed_delivery_t": 0,
+  "discounted_cost_mln": 12603.65437135493,
+  "discounted_cost_per_served_ton_mln": 7.002030206308295,
+  "emergency_usage_t": 0,
+  "environment_id": "BASE",
+  "final_inventory_t": 80.38599999921881,
+  "hard_violation_count": 0,
+  "initial_stock_total_cost_mln": 417.8787958115801,
+  "minimum_inventory_t": 17.300000000009504,
+  "months_with_shortage": 0,
+  "official_horizon_years": [
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040
+  ],
+  "opening_inventory_t": 60.0000000000095,
+  "plan_id": "research-f-2041",
+  "research_extension_years": [
+    2041
+  ],
+  "research_source_ids": [
+    "F"
+  ],
+  "risk_ids": [],
+  "run_id": "run-6c55f5cf830d19a1",
+  "scenario_id": "BASE",
+  "scenario_source": "/home/stas/python_projects/kosmohack/scenarios/base.yaml",
+  "total_losses_t": 24.1139999999904,
+  "total_overflow_t": 0.0,
+  "total_service_level": 1.0,
+  "total_shortage_t": 0.0,
+  "unavailable_requested_supply_t": 4.000533238013304e-10,
+  "undiscounted_cost_mln": 14345.119547807091,
+  "valid": true,
+  "violation_count": 0
+}

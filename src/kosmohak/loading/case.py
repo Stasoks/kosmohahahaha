@@ -86,7 +86,36 @@ class CaseDataLoader:
                 }
             )
         _validate_rows(source_typed, _schema(root, "supply_sources.schema.json"), "data/supply_sources.csv")
-        sources = {row["source_id"]: SupplySource(**row) for row in source_typed}
+        official_availability_rules = {
+            "C": {"type": "investment", "investment_id": "EARTH_NEW"},
+            "D": {"type": "investment", "investment_id": "LUNAR_ISRU"},
+        }
+        sources = {
+            row["source_id"]: SupplySource(
+                **row,
+                availability_rule=official_availability_rules.get(
+                    row["source_id"],
+                    {
+                        "type": "calendar",
+                        "available_from": (
+                            f"{row['available_from_year']}-01"
+                            if row["available_from_year"] is not None
+                            else None
+                        ),
+                    },
+                ),
+                reliability_metadata={
+                    "profile": row["reliability_profile"],
+                    "semantics": "METADATA_ONLY",
+                },
+                provenance={
+                    "status": "CASE_INPUT",
+                    "scope": "OFFICIAL_CASE",
+                    "source": "data/supply_sources.csv",
+                },
+            )
+            for row in source_typed
+        }
         if len(sources) != len(source_typed):
             raise CaseDataError("data/supply_sources.csv contains duplicate source IDs")
         names = {source.name: source.source_id for source in sources.values()}
@@ -180,4 +209,16 @@ class CaseDataLoader:
             storage=storage,
             investments=investments,
             constraints=constraints,
+            horizon_provenance={
+                year: {
+                    "status": "CASE_INPUT",
+                    "scope": "OFFICIAL_CASE_HORIZON",
+                    "source": "data/demand.csv",
+                }
+                for year in demand
+            },
+            workspace_provenance={
+                "status": "CASE_INPUT",
+                "scope": "OFFICIAL_CASE",
+            },
         )

@@ -1,0 +1,596 @@
+===== TEST 01: 01_balanced_isru.json =====
+PLAN: accept-01-balanced-isru
+SCENARIO: BASE
+VALID: NO
+Undiscounted cost: 12038.069 mln units
+Discounted cost: 10593.084 mln units
+Total shortage: 82.015 t
+Final inventory: 0.507 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=65.26% critical=70.89% shortage=34.742 t inventory=0.000 t cost=1346.349
+2036 total=88.21% critical=100.00% shortage=16.500 t inventory=0.000 t cost=2639.500
+2037 total=87.53% critical=100.00% shortage=23.687 t inventory=0.000 t cost=1522.500
+2038 total=97.17% critical=100.00% shortage=7.087 t inventory=17.260 t cost=1891.730
+2039 total=100.00% critical=100.00% shortage=0.000 t inventory=18.360 t cost=2140.057
+2040 total=100.00% critical=100.00% shortage=0.000 t inventory=0.507 t cost=2497.933
+
+ACTIVE INVESTMENTS: LUNAR_ISRU, ZBO
+
+VIOLATIONS:
+[2035] BASE_CRITICAL_SERVICE (hard): actual=0.7089062499999997 >= limit=0.99 share; gap/excess=0.28109375000000025; critical demand service minimum
+[2035] BASE_TOTAL_SERVICE (hard): actual=0.6525833333333332 >= limit=0.97 share; gap/excess=0.3174166666666668; total demand service minimum
+[2036] BASE_TOTAL_SERVICE (hard): actual=0.8821428571428571 >= limit=0.97 share; gap/excess=0.08785714285714286; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] BASE_TOTAL_SERVICE (hard): actual=0.8753333333333333 >= limit=0.97 share; gap/excess=0.09466666666666668; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039-01] RESERVE_45D (hard): actual=19.68718750000002 >= limit=45.0 days; gap/excess=25.31281249999998; physical stock or demonstrably equivalent contracted emergency reserve
+[2040-01] RESERVE_45D (hard): actual=17.183076923076886 >= limit=45.0 days; gap/excess=27.816923076923114; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/01/accept-01-balanced-isru/BASE
+
+PLAN: accept-01-balanced-isru
+SCENARIO: MANDATORY_STRESS
+VALID: NO
+Undiscounted cost: 12807.849 mln units
+Discounted cost: 11241.909 mln units
+Total shortage: 270.792 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=65.26% critical=70.89% shortage=34.742 t inventory=0.000 t cost=1346.349
+2036 total=88.21% critical=100.00% shortage=16.500 t inventory=0.000 t cost=2639.500
+2037 total=87.53% critical=100.00% shortage=23.687 t inventory=0.000 t cost=1522.500
+2038 total=82.76% critical=100.00% shortage=49.557 t inventory=0.000 t cost=2265.875
+2039 total=80.99% critical=100.00% shortage=69.953 t inventory=0.000 t cost=2539.125
+2040 total=82.98% critical=100.00% shortage=76.353 t inventory=0.000 t cost=2494.500
+
+ACTIVE INVESTMENTS: LUNAR_ISRU, ZBO
+
+VIOLATIONS:
+[2035] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.7089062499999997 >= limit=0.99 share; gap/excess=0.28109375000000025; critical demand service minimum
+[2035] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.6525833333333332 >= limit=0.97 share; gap/excess=0.3174166666666668; total demand service minimum
+[2036] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8821428571428571 >= limit=0.97 share; gap/excess=0.08785714285714286; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8753333333333333 >= limit=0.97 share; gap/excess=0.09466666666666668; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8276289855072461 >= limit=0.97 share; gap/excess=0.1423710144927539; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.809909420289855 >= limit=0.97 share; gap/excess=0.16009057971014495; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8297584541062804 >= limit=0.97 share; gap/excess=0.14024154589371962; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/01/accept-01-balanced-isru/MANDATORY_STRESS
+
+Comparison saved: results/operator_acceptance/01/accept-01-balanced-isru
+
+===== TEST 02: 02_earth_new_strategy.json =====
+PLAN: accept-02-earth-new
+SCENARIO: BASE
+VALID: NO
+Undiscounted cost: 12240.352 mln units
+Discounted cost: 10660.354 mln units
+Total shortage: 63.252 t
+Final inventory: 7.733 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=63.67% critical=67.08% shortage=36.333 t inventory=0.000 t cost=1727.481
+2036 total=88.21% critical=100.00% shortage=16.500 t inventory=0.000 t cost=1367.000
+2037 total=94.52% critical=100.00% shortage=10.418 t inventory=4.433 t cost=1596.931
+2038 total=100.00% critical=100.00% shortage=0.000 t inventory=22.840 t cost=2101.528
+2039 total=100.00% critical=100.00% shortage=0.000 t inventory=25.587 t cost=2525.393
+2040 total=100.00% critical=100.00% shortage=0.000 t inventory=7.733 t cost=2922.019
+
+ACTIVE INVESTMENTS: EARTH_NEW, ZBO
+
+VIOLATIONS:
+[2035] BASE_CRITICAL_SERVICE (hard): actual=0.6708333333333335 >= limit=0.99 share; gap/excess=0.3191666666666665; critical demand service minimum
+[2035] BASE_TOTAL_SERVICE (hard): actual=0.6366666666666669 >= limit=0.97 share; gap/excess=0.33333333333333304; total demand service minimum
+[2036] BASE_TOTAL_SERVICE (hard): actual=0.8821428571428572 >= limit=0.97 share; gap/excess=0.08785714285714274; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] BASE_TOTAL_SERVICE (hard): actual=0.9451666666666666 >= limit=0.97 share; gap/excess=0.024833333333333374; total demand service minimum
+[2037] ORDER_CAPACITY_EXCEEDED source=C (hard): actual=24.999999999999996 <= limit=23.333333333333336 t/year; gap/excess=1.6666666666666607; Ordered volume exceeds active reserved/physical volume.
+[2037] SOURCE_UNAVAILABLE source=C (hard): actual=10.41666666666666 <= limit=0.0 t; gap/excess=10.41666666666666; Orders were placed before source commissioning/availability.
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038-01] RESERVE_45D (hard): actual=6.472666666666653 >= limit=45.0 days; gap/excess=38.527333333333345; physical stock or demonstrably equivalent contracted emergency reserve
+[2039-01] RESERVE_45D (hard): actual=26.051875000000038 >= limit=45.0 days; gap/excess=18.948124999999962; physical stock or demonstrably equivalent contracted emergency reserve
+[2040-01] RESERVE_45D (hard): actual=23.94649572649571 >= limit=45.0 days; gap/excess=21.05350427350429; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/02/accept-02-earth-new/BASE
+
+PLAN: accept-02-earth-new
+SCENARIO: MANDATORY_STRESS
+VALID: NO
+Undiscounted cost: 12969.941 mln units
+Discounted cost: 11275.579 mln units
+Total shortage: 199.518 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=63.67% critical=67.08% shortage=36.333 t inventory=0.000 t cost=1727.481
+2036 total=88.21% critical=100.00% shortage=16.500 t inventory=0.000 t cost=1367.000
+2037 total=94.52% critical=100.00% shortage=10.418 t inventory=4.433 t cost=1596.931
+2038 total=94.90% critical=100.00% shortage=14.660 t inventory=0.000 t cost=2456.405
+2039 total=87.70% critical=100.00% shortage=45.253 t inventory=0.000 t cost=2910.125
+2040 total=82.98% critical=100.00% shortage=76.353 t inventory=0.000 t cost=2912.000
+
+ACTIVE INVESTMENTS: EARTH_NEW, ZBO
+
+VIOLATIONS:
+[2035] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.6708333333333335 >= limit=0.99 share; gap/excess=0.3191666666666665; critical demand service minimum
+[2035] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.6366666666666669 >= limit=0.97 share; gap/excess=0.33333333333333304; total demand service minimum
+[2036] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8821428571428572 >= limit=0.97 share; gap/excess=0.08785714285714274; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] ORDER_CAPACITY_EXCEEDED source=C (hard): actual=24.999999999999996 <= limit=23.333333333333336 t/year; gap/excess=1.6666666666666607; Ordered volume exceeds active reserved/physical volume.
+[2037] SOURCE_UNAVAILABLE source=C (hard): actual=10.41666666666666 <= limit=0.0 t; gap/excess=10.41666666666666; Orders were placed before source commissioning/availability.
+[2037] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.9451666666666666 >= limit=0.97 share; gap/excess=0.024833333333333374; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.9490086956521738 >= limit=0.97 share; gap/excess=0.020991304347826145; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=5.628405797101438 >= limit=45.0 days; gap/excess=39.371594202898564; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8770289855072463 >= limit=0.97 share; gap/excess=0.09297101449275369; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8297584541062804 >= limit=0.97 share; gap/excess=0.14024154589371962; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/02/accept-02-earth-new/MANDATORY_STRESS
+
+Comparison saved: results/operator_acceptance/02/accept-02-earth-new
+
+===== TEST 03: 03_full_diversification.json =====
+PLAN: accept-03-full-diversification
+SCENARIO: BASE
+VALID: NO
+Undiscounted cost: 12494.991 mln units
+Discounted cost: 11089.312 mln units
+Total shortage: 65.768 t
+Final inventory: 17.797 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=71.63% critical=74.95% shortage=28.375 t inventory=0.000 t cost=3007.746
+2036 total=84.69% critical=100.00% shortage=21.440 t inventory=0.000 t cost=1281.000
+2037 total=94.03% critical=100.00% shortage=11.337 t inventory=0.000 t cost=1507.000
+2038 total=98.15% critical=100.00% shortage=4.617 t inventory=21.377 t cost=1962.715
+2039 total=100.00% critical=100.00% shortage=0.000 t inventory=29.063 t cost=2246.537
+2040 total=100.00% critical=100.00% shortage=0.000 t inventory=17.797 t cost=2489.992
+
+ACTIVE INVESTMENTS: EARTH_NEW, LUNAR_ISRU, ZBO
+
+VIOLATIONS:
+[2035] BASE_CRITICAL_SERVICE (hard): actual=0.7494791666666668 >= limit=0.99 share; gap/excess=0.24052083333333318; critical demand service minimum
+[2035] BASE_TOTAL_SERVICE (hard): actual=0.7162500000000003 >= limit=0.97 share; gap/excess=0.2537499999999997; total demand service minimum
+[2036] BASE_TOTAL_SERVICE (hard): actual=0.8468571428571429 >= limit=0.97 share; gap/excess=0.12314285714285711; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] BASE_TOTAL_SERVICE (hard): actual=0.9403333333333331 >= limit=0.97 share; gap/excess=0.02966666666666684; total demand service minimum
+[2037] SOURCE_UNAVAILABLE source=C (hard): actual=2.5 <= limit=0.0 t; gap/excess=2.5; Orders were placed before source commissioning/availability.
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039-01] RESERVE_45D (hard): actual=24.38276041666672 >= limit=45.0 days; gap/excess=20.61723958333328; physical stock or demonstrably equivalent contracted emergency reserve
+[2040-01] RESERVE_45D (hard): actual=27.2002991452992 >= limit=45.0 days; gap/excess=17.7997008547008; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/03/accept-03-full-diversification/BASE
+
+PLAN: accept-03-full-diversification
+SCENARIO: MANDATORY_STRESS
+VALID: NO
+Undiscounted cost: 13104.371 mln units
+Discounted cost: 11603.889 mln units
+Total shortage: 231.080 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=71.63% critical=74.95% shortage=28.375 t inventory=0.000 t cost=3007.746
+2036 total=84.69% critical=100.00% shortage=21.440 t inventory=0.000 t cost=1281.000
+2037 total=94.03% critical=100.00% shortage=11.337 t inventory=0.000 t cost=1507.000
+2038 total=86.34% critical=100.00% shortage=39.265 t inventory=0.000 t cost=2270.250
+2039 total=83.45% critical=100.00% shortage=60.897 t inventory=0.000 t cost=2563.375
+2040 total=84.44% critical=100.00% shortage=69.767 t inventory=0.000 t cost=2475.000
+
+ACTIVE INVESTMENTS: EARTH_NEW, LUNAR_ISRU, ZBO
+
+VIOLATIONS:
+[2035] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.7494791666666668 >= limit=0.99 share; gap/excess=0.24052083333333318; critical demand service minimum
+[2035] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.7162500000000003 >= limit=0.97 share; gap/excess=0.2537499999999997; total demand service minimum
+[2036] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8468571428571429 >= limit=0.97 share; gap/excess=0.12314285714285711; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] SOURCE_UNAVAILABLE source=C (hard): actual=2.5 <= limit=0.0 t; gap/excess=2.5; Orders were placed before source commissioning/availability.
+[2037] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.9403333333333331 >= limit=0.97 share; gap/excess=0.02966666666666684; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8634260869565216 >= limit=0.97 share; gap/excess=0.10657391304347841; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8345199275362318 >= limit=0.97 share; gap/excess=0.13548007246376814; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8444444444444446 >= limit=0.97 share; gap/excess=0.12555555555555542; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/03/accept-03-full-diversification/MANDATORY_STRESS
+
+Comparison saved: results/operator_acceptance/03/accept-03-full-diversification
+
+===== TEST 04: 04_earth_core_heavy.json =====
+PLAN: accept-04-earth-core-heavy
+SCENARIO: BASE
+VALID: NO
+Undiscounted cost: 11824.843 mln units
+Discounted cost: 10250.499 mln units
+Total shortage: 148.582 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=52.53% critical=55.24% shortage=47.475 t inventory=0.000 t cost=1172.753
+2036 total=83.51% critical=100.00% shortage=23.087 t inventory=0.000 t cost=1365.500
+2037 total=89.27% critical=100.00% shortage=20.393 t inventory=0.000 t cost=1499.250
+2038 total=96.64% critical=100.00% shortage=8.410 t inventory=24.347 t cost=2457.593
+2039 total=100.00% critical=100.00% shortage=0.000 t inventory=36.973 t cost=3023.466
+2040 total=87.38% critical=100.00% shortage=49.217 t inventory=0.000 t cost=2306.281
+
+ACTIVE INVESTMENTS: ZBO
+
+VIOLATIONS:
+[2035] BASE_CRITICAL_SERVICE (hard): actual=0.5523958333333334 >= limit=0.99 share; gap/excess=0.43760416666666657; critical demand service minimum
+[2035] BASE_TOTAL_SERVICE (hard): actual=0.5252500000000002 >= limit=0.97 share; gap/excess=0.44474999999999976; total demand service minimum
+[2036] BASE_TOTAL_SERVICE (hard): actual=0.8350952380952381 >= limit=0.97 share; gap/excess=0.13490476190476186; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] BASE_TOTAL_SERVICE (hard): actual=0.8926666666666665 >= limit=0.97 share; gap/excess=0.07733333333333348; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] BASE_TOTAL_SERVICE (hard): actual=0.9663599999999998 >= limit=0.97 share; gap/excess=0.0036400000000001986; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039-01] RESERVE_45D (hard): actual=27.770416666666698 >= limit=45.0 days; gap/excess=17.229583333333302; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] BASE_TOTAL_SERVICE (hard): actual=0.8738034188034186 >= limit=0.97 share; gap/excess=0.09619658119658137; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=34.60324786324781 >= limit=45.0 days; gap/excess=10.396752136752191; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/04/accept-04-earth-core-heavy/BASE
+
+PLAN: accept-04-earth-core-heavy
+SCENARIO: MANDATORY_STRESS
+VALID: NO
+Undiscounted cost: 12782.503 mln units
+Discounted cost: 11057.392 mln units
+Total shortage: 292.582 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=52.53% critical=55.24% shortage=47.475 t inventory=0.000 t cost=1172.753
+2036 total=83.51% critical=100.00% shortage=23.087 t inventory=0.000 t cost=1365.500
+2037 total=89.27% critical=100.00% shortage=20.393 t inventory=0.000 t cost=1499.250
+2038 total=92.50% critical=100.00% shortage=21.563 t inventory=0.000 t cost=2913.125
+2039 total=90.39% critical=100.00% shortage=35.373 t inventory=0.000 t cost=3532.875
+2040 total=67.74% critical=100.00% shortage=144.690 t inventory=0.000 t cost=2299.000
+
+ACTIVE INVESTMENTS: ZBO
+
+VIOLATIONS:
+[2035] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.5523958333333334 >= limit=0.99 share; gap/excess=0.43760416666666657; critical demand service minimum
+[2035] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.5252500000000002 >= limit=0.97 share; gap/excess=0.44474999999999976; total demand service minimum
+[2036] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8350952380952381 >= limit=0.97 share; gap/excess=0.13490476190476186; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8926666666666665 >= limit=0.97 share; gap/excess=0.07733333333333348; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.9249971014492752 >= limit=0.97 share; gap/excess=0.04500289855072481; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.9038768115942026 >= limit=0.97 share; gap/excess=0.06612318840579734; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.677391304347826 >= limit=0.97 share; gap/excess=0.29260869565217396; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/04/accept-04-earth-core-heavy/MANDATORY_STRESS
+
+Comparison saved: results/operator_acceptance/04/accept-04-earth-core-heavy
+
+===== TEST 05: 05_no_zbo_stress.json =====
+PLAN: accept-05-no-zbo-stress
+SCENARIO: BASE
+VALID: NO
+Undiscounted cost: 12825.927 mln units
+Discounted cost: 11325.915 mln units
+Total shortage: 81.708 t
+Final inventory: 37.500 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=60.48% critical=63.10% shortage=39.517 t inventory=0.000 t cost=2924.409
+2036 total=84.13% critical=100.00% shortage=22.217 t inventory=0.000 t cost=1131.500
+2037 total=91.31% critical=100.00% shortage=16.508 t inventory=0.000 t cost=1527.250
+2038 total=98.61% critical=100.00% shortage=3.467 t inventory=28.825 t cost=2099.015
+2039 total=100.00% critical=100.00% shortage=0.000 t inventory=43.333 t cost=2428.818
+2040 total=100.00% critical=100.00% shortage=0.000 t inventory=37.500 t cost=2714.935
+
+ACTIVE INVESTMENTS: EARTH_NEW, LUNAR_ISRU
+
+VIOLATIONS:
+[2035] BASE_CRITICAL_SERVICE (hard): actual=0.6310416666666667 >= limit=0.99 share; gap/excess=0.35895833333333327; critical demand service minimum
+[2035] BASE_TOTAL_SERVICE (hard): actual=0.6048333333333336 >= limit=0.97 share; gap/excess=0.3651666666666664; total demand service minimum
+[2036] BASE_TOTAL_SERVICE (hard): actual=0.841309523809524 >= limit=0.97 share; gap/excess=0.12869047619047602; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] BASE_TOTAL_SERVICE (hard): actual=0.9131140350877192 >= limit=0.97 share; gap/excess=0.05688596491228082; total demand service minimum
+[2037] SOURCE_UNAVAILABLE source=C (hard): actual=1.6666666666666679 <= limit=0.0 t; gap/excess=1.6666666666666679; Orders were placed before source commissioning/availability.
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039-01] RESERVE_45D (hard): actual=32.87851562500004 >= limit=45.0 days; gap/excess=12.121484374999959; physical stock or demonstrably equivalent contracted emergency reserve
+[2039-09] STORAGE_CAPACITY_EXCEEDED (hard): actual=72.54583333333339 <= limit=70.0 t; gap/excess=2.545833333333391; Post-loss inflow does not fit in active storage.
+[2039-10] STORAGE_CAPACITY_EXCEEDED (hard): actual=72.77916666666667 <= limit=70.0 t; gap/excess=2.7791666666666686; Post-loss inflow does not fit in active storage.
+[2039-11] STORAGE_CAPACITY_EXCEEDED (hard): actual=72.77916666666667 <= limit=70.0 t; gap/excess=2.7791666666666686; Post-loss inflow does not fit in active storage.
+[2039-12] STORAGE_CAPACITY_EXCEEDED (hard): actual=72.77916666666667 <= limit=70.0 t; gap/excess=2.7791666666666686; Post-loss inflow does not fit in active storage.
+[2040-01] RESERVE_45D (hard): actual=40.55555555555555 >= limit=45.0 days; gap/excess=4.44444444444445; physical stock or demonstrably equivalent contracted emergency reserve
+[2040-01] STORAGE_CAPACITY_EXCEEDED (hard): actual=73.97291666666666 <= limit=70.0 t; gap/excess=3.972916666666663; Post-loss inflow does not fit in active storage.
+[2040-05] STORAGE_CAPACITY_EXCEEDED (hard): actual=70.51666666666665 <= limit=70.0 t; gap/excess=0.5166666666666515; Post-loss inflow does not fit in active storage.
+[2040-06] STORAGE_CAPACITY_EXCEEDED (hard): actual=71.32291666666666 <= limit=70.0 t; gap/excess=1.3229166666666572; Post-loss inflow does not fit in active storage.
+[2040-07] STORAGE_CAPACITY_EXCEEDED (hard): actual=71.32291666666666 <= limit=70.0 t; gap/excess=1.3229166666666572; Post-loss inflow does not fit in active storage.
+[2040-08] STORAGE_CAPACITY_EXCEEDED (hard): actual=71.32291666666666 <= limit=70.0 t; gap/excess=1.3229166666666572; Post-loss inflow does not fit in active storage.
+[2040-09] STORAGE_CAPACITY_EXCEEDED (hard): actual=71.32291666666666 <= limit=70.0 t; gap/excess=1.3229166666666572; Post-loss inflow does not fit in active storage.
+[2040-10] STORAGE_CAPACITY_EXCEEDED (hard): actual=71.32291666666666 <= limit=70.0 t; gap/excess=1.3229166666666572; Post-loss inflow does not fit in active storage.
+[2040-11] STORAGE_CAPACITY_EXCEEDED (hard): actual=71.32291666666666 <= limit=70.0 t; gap/excess=1.3229166666666572; Post-loss inflow does not fit in active storage.
+[2040-12] STORAGE_CAPACITY_EXCEEDED (hard): actual=71.32291666666666 <= limit=70.0 t; gap/excess=1.3229166666666572; Post-loss inflow does not fit in active storage.
+
+Saved: results/operator_acceptance/05/accept-05-no-zbo-stress/BASE
+
+PLAN: accept-05-no-zbo-stress
+SCENARIO: MANDATORY_STRESS
+VALID: NO
+Undiscounted cost: 13503.784 mln units
+Discounted cost: 11899.123 mln units
+Total shortage: 201.377 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=60.48% critical=63.10% shortage=39.517 t inventory=0.000 t cost=2924.409
+2036 total=84.13% critical=100.00% shortage=22.217 t inventory=0.000 t cost=1131.500
+2037 total=91.31% critical=100.00% shortage=16.508 t inventory=0.000 t cost=1527.250
+2038 total=89.55% critical=100.00% shortage=30.048 t inventory=0.000 t cost=2451.000
+2039 total=88.45% critical=100.00% shortage=42.504 t inventory=0.000 t cost=2781.625
+2040 total=88.72% critical=100.00% shortage=50.583 t inventory=0.000 t cost=2688.000
+
+ACTIVE INVESTMENTS: EARTH_NEW, LUNAR_ISRU
+
+VIOLATIONS:
+[2035] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.6310416666666667 >= limit=0.99 share; gap/excess=0.35895833333333327; critical demand service minimum
+[2035] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.6048333333333336 >= limit=0.97 share; gap/excess=0.3651666666666664; total demand service minimum
+[2036] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.841309523809524 >= limit=0.97 share; gap/excess=0.12869047619047602; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] SOURCE_UNAVAILABLE source=C (hard): actual=1.6666666666666679 <= limit=0.0 t; gap/excess=1.6666666666666679; Orders were placed before source commissioning/availability.
+[2037] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.9131140350877192 >= limit=0.97 share; gap/excess=0.05688596491228082; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] STRESS_LOSS_LIMIT (hard): actual=0.045 <= limit=0.02 share; gap/excess=0.024999999999999998; applies from 2038 in mandatory stress only
+[2038] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8954855072463767 >= limit=0.97 share; gap/excess=0.07451449275362332; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] STRESS_LOSS_LIMIT (hard): actual=0.04499999999999999 <= limit=0.02 share; gap/excess=0.02499999999999999; applies from 2038 in mandatory stress only
+[2039] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8844995471014492 >= limit=0.97 share; gap/excess=0.0855004528985508; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] STRESS_LOSS_LIMIT (hard): actual=0.04499999999999999 <= limit=0.02 share; gap/excess=0.02499999999999999; applies from 2038 in mandatory stress only
+[2040] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8872166480862134 >= limit=0.97 share; gap/excess=0.08278335191378661; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/05/accept-05-no-zbo-stress/MANDATORY_STRESS
+
+Comparison saved: results/operator_acceptance/05/accept-05-no-zbo-stress
+
+===== TEST 06: 06_emergency_abuse.json =====
+PLAN: accept-06-emergency-abuse
+SCENARIO: BASE
+VALID: NO
+Undiscounted cost: 10868.592 mln units
+Discounted cost: 9510.990 mln units
+Total shortage: 328.013 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=50.93% critical=55.33% shortage=49.067 t inventory=0.000 t cost=1161.314
+2036 total=96.27% critical=100.00% shortage=5.220 t inventory=6.010 t cost=1587.605
+2037 total=94.60% critical=100.00% shortage=10.267 t inventory=0.000 t cost=1796.923
+2038 total=86.61% critical=100.00% shortage=33.463 t inventory=0.000 t cost=2232.250
+2039 total=66.12% critical=97.45% shortage=108.403 t inventory=0.000 t cost=1901.500
+2040 total=68.82% critical=100.00% shortage=121.593 t inventory=0.000 t cost=2189.000
+
+ACTIVE INVESTMENTS: ZBO
+
+VIOLATIONS:
+[2035] BASE_CRITICAL_SERVICE (hard): actual=0.5533333333333335 >= limit=0.99 share; gap/excess=0.43666666666666654; critical demand service minimum
+[2035] BASE_TOTAL_SERVICE (hard): actual=0.5093333333333336 >= limit=0.97 share; gap/excess=0.46066666666666634; total demand service minimum
+[2036] BASE_TOTAL_SERVICE (hard): actual=0.9627142857142855 >= limit=0.97 share; gap/excess=0.007285714285714451; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] BASE_TOTAL_SERVICE (hard): actual=0.9459649122807017 >= limit=0.97 share; gap/excess=0.024035087719298298; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=11.545526315789479 >= limit=45.0 days; gap/excess=33.45447368421052; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] BASE_TOTAL_SERVICE (hard): actual=0.8661466666666666 >= limit=0.97 share; gap/excess=0.10385333333333335; total demand service minimum
+[2038] EMERGENCY_BASE_STREAK source=E (hard): actual=3.0 <= limit=2.0 years; gap/excess=1.0; Emergency cannot serve as the base channel for more than two consecutive years
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] BASE_CRITICAL_SERVICE (hard): actual=0.9744761904761904 >= limit=0.99 share; gap/excess=0.015523809523809606; critical demand service minimum
+[2039] BASE_TOTAL_SERVICE (hard): actual=0.6612395833333332 >= limit=0.97 share; gap/excess=0.30876041666666676; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] BASE_TOTAL_SERVICE (hard): actual=0.6882222222222224 >= limit=0.97 share; gap/excess=0.28177777777777757; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/06/accept-06-emergency-abuse/BASE
+
+PLAN: accept-06-emergency-abuse
+SCENARIO: MANDATORY_STRESS
+VALID: NO
+Undiscounted cost: 11620.467 mln units
+Discounted cost: 10142.147 mln units
+Total shortage: 472.013 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=50.93% critical=55.33% shortage=49.067 t inventory=0.000 t cost=1161.314
+2036 total=96.27% critical=100.00% shortage=5.220 t inventory=6.010 t cost=1587.605
+2037 total=94.60% critical=100.00% shortage=10.267 t inventory=0.000 t cost=1796.923
+2038 total=75.32% critical=100.00% shortage=70.963 t inventory=0.000 t cost=2538.250
+2039 total=57.50% critical=87.58% shortage=156.403 t inventory=0.000 t cost=2347.375
+2040 total=59.85% critical=93.36% shortage=180.093 t inventory=0.000 t cost=2189.000
+
+ACTIVE INVESTMENTS: ZBO
+
+VIOLATIONS:
+[2035] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.5533333333333335 >= limit=0.99 share; gap/excess=0.43666666666666654; critical demand service minimum
+[2035] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.5093333333333336 >= limit=0.97 share; gap/excess=0.46066666666666634; total demand service minimum
+[2036] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.9627142857142855 >= limit=0.97 share; gap/excess=0.007285714285714451; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.9459649122807017 >= limit=0.97 share; gap/excess=0.024035087719298298; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=11.545526315789479 >= limit=45.0 days; gap/excess=33.45447368421052; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] EMERGENCY_BASE_STREAK source=E (hard): actual=3.0 <= limit=2.0 years; gap/excess=1.0; Emergency cannot serve as the base channel for more than two consecutive years
+[2038] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.7531710144927534 >= limit=0.97 share; gap/excess=0.2168289855072466; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.8757902001380261 >= limit=0.99 share; gap/excess=0.11420979986197388; critical demand service minimum
+[2039] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.5749909420289853 >= limit=0.97 share; gap/excess=0.3950090579710147; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.9335884057971016 >= limit=0.99 share; gap/excess=0.05641159420289843; critical demand service minimum
+[2040] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.5984541062801934 >= limit=0.97 share; gap/excess=0.3715458937198066; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/06/accept-06-emergency-abuse/MANDATORY_STRESS
+
+Comparison saved: results/operator_acceptance/06/accept-06-emergency-abuse
+
+===== TEST 07: 07_initial_stock_core_top.json =====
+PLAN: accept-07-initial-stock-core-top
+SCENARIO: BASE
+VALID: NO
+Undiscounted cost: 10225.909 mln units
+Discounted cost: 8922.577 mln units
+Total shortage: 282.237 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=60.48% critical=63.10% shortage=39.517 t inventory=0.000 t cost=1309.909
+2036 total=83.51% critical=100.00% shortage=23.087 t inventory=0.000 t cost=1356.750
+2037 total=87.53% critical=100.00% shortage=23.687 t inventory=0.000 t cost=1422.250
+2038 total=85.63% critical=100.00% shortage=35.933 t inventory=0.000 t cost=1715.000
+2039 total=81.82% critical=100.00% shortage=58.180 t inventory=0.000 t cost=2151.000
+2040 total=73.89% critical=100.00% shortage=101.833 t inventory=0.000 t cost=2271.000
+
+ACTIVE INVESTMENTS: ZBO
+
+VIOLATIONS:
+[2035] BASE_CRITICAL_SERVICE (hard): actual=0.6310416666666667 >= limit=0.99 share; gap/excess=0.35895833333333327; critical demand service minimum
+[2035] BASE_TOTAL_SERVICE (hard): actual=0.6048333333333336 >= limit=0.97 share; gap/excess=0.3651666666666664; total demand service minimum
+[2036] BASE_TOTAL_SERVICE (hard): actual=0.8350952380952381 >= limit=0.97 share; gap/excess=0.13490476190476186; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] BASE_TOTAL_SERVICE (hard): actual=0.8753333333333332 >= limit=0.97 share; gap/excess=0.09466666666666679; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] BASE_TOTAL_SERVICE (hard): actual=0.8562666666666665 >= limit=0.97 share; gap/excess=0.11373333333333346; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] BASE_TOTAL_SERVICE (hard): actual=0.8181875 >= limit=0.97 share; gap/excess=0.15181250000000002; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] BASE_TOTAL_SERVICE (hard): actual=0.7388888888888888 >= limit=0.97 share; gap/excess=0.23111111111111116; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/07/accept-07-initial-stock-core-top/BASE
+
+PLAN: accept-07-initial-stock-core-top
+SCENARIO: MANDATORY_STRESS
+VALID: NO
+Undiscounted cost: 11136.534 mln units
+Discounted cost: 9688.261 mln units
+Total shortage: 426.237 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=60.48% critical=63.10% shortage=39.517 t inventory=0.000 t cost=1309.909
+2036 total=83.51% critical=100.00% shortage=23.087 t inventory=0.000 t cost=1356.750
+2037 total=87.53% critical=100.00% shortage=23.687 t inventory=0.000 t cost=1422.250
+2038 total=74.46% critical=100.00% shortage=73.433 t inventory=0.000 t cost=2116.375
+2039 total=71.15% critical=98.71% shortage=106.180 t inventory=0.000 t cost=2660.250
+2040 total=64.25% critical=99.31% shortage=160.333 t inventory=0.000 t cost=2271.000
+
+ACTIVE INVESTMENTS: ZBO
+
+VIOLATIONS:
+[2035] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.6310416666666667 >= limit=0.99 share; gap/excess=0.35895833333333327; critical demand service minimum
+[2035] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.6048333333333336 >= limit=0.97 share; gap/excess=0.3651666666666664; total demand service minimum
+[2036] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8350952380952381 >= limit=0.97 share; gap/excess=0.13490476190476186; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8753333333333332 >= limit=0.97 share; gap/excess=0.09466666666666679; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.7445797101449273 >= limit=0.97 share; gap/excess=0.22542028985507268; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.9871359558316081 >= limit=0.99 share; gap/excess=0.0028640441683919216; critical demand service minimum
+[2039] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.7114673913043479 >= limit=0.97 share; gap/excess=0.2585326086956521; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.642512077294686 >= limit=0.97 share; gap/excess=0.327487922705314; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/07/accept-07-initial-stock-core-top/MANDATORY_STRESS
+
+Comparison saved: results/operator_acceptance/07/accept-07-initial-stock-core-top
+
+===== TEST 08: 08_impossible_initial_isru.json =====
+PLAN: accept-08-impossible-initial-isru
+SCENARIO: BASE
+VALID: NO
+Undiscounted cost: 11743.970 mln units
+Discounted cost: 10298.985 mln units
+Total shortage: 124.990 t
+Final inventory: 0.507 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=22.28% critical=27.85% shortage=77.717 t inventory=0.000 t cost=1052.250
+2036 total=88.21% critical=100.00% shortage=16.500 t inventory=0.000 t cost=2639.500
+2037 total=87.53% critical=100.00% shortage=23.687 t inventory=0.000 t cost=1522.500
+2038 total=97.17% critical=100.00% shortage=7.087 t inventory=17.260 t cost=1891.730
+2039 total=100.00% critical=100.00% shortage=0.000 t inventory=18.360 t cost=2140.057
+2040 total=100.00% critical=100.00% shortage=0.000 t inventory=0.507 t cost=2497.933
+
+ACTIVE INVESTMENTS: LUNAR_ISRU, ZBO
+
+VIOLATIONS:
+[2035] BASE_CRITICAL_SERVICE (hard): actual=0.27854166666666663 >= limit=0.99 share; gap/excess=0.7114583333333333; critical demand service minimum
+[2035] BASE_TOTAL_SERVICE (hard): actual=0.22283333333333336 >= limit=0.97 share; gap/excess=0.7471666666666666; total demand service minimum
+[2035-01] INITIAL_STOCK_SOURCE_UNAVAILABLE source=D (hard): actual=2035-01 >= limit=2038-01 month; gap/excess=None; Selected source is unavailable for the preparatory delivery.
+[2035-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2036] BASE_TOTAL_SERVICE (hard): actual=0.8821428571428571 >= limit=0.97 share; gap/excess=0.08785714285714286; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] BASE_TOTAL_SERVICE (hard): actual=0.8753333333333333 >= limit=0.97 share; gap/excess=0.09466666666666668; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039-01] RESERVE_45D (hard): actual=19.68718750000002 >= limit=45.0 days; gap/excess=25.31281249999998; physical stock or demonstrably equivalent contracted emergency reserve
+[2040-01] RESERVE_45D (hard): actual=17.183076923076886 >= limit=45.0 days; gap/excess=27.816923076923114; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/08/accept-08-impossible-initial-isru/BASE
+
+PLAN: accept-08-impossible-initial-isru
+SCENARIO: MANDATORY_STRESS
+VALID: NO
+Undiscounted cost: 12513.750 mln units
+Discounted cost: 10947.810 mln units
+Total shortage: 313.767 t
+Final inventory: 0.000 t
+
+ANNUAL SERVICE AND COSTS:
+2035 total=22.28% critical=27.85% shortage=77.717 t inventory=0.000 t cost=1052.250
+2036 total=88.21% critical=100.00% shortage=16.500 t inventory=0.000 t cost=2639.500
+2037 total=87.53% critical=100.00% shortage=23.687 t inventory=0.000 t cost=1522.500
+2038 total=82.76% critical=100.00% shortage=49.557 t inventory=0.000 t cost=2265.875
+2039 total=80.99% critical=100.00% shortage=69.953 t inventory=0.000 t cost=2539.125
+2040 total=82.98% critical=100.00% shortage=76.353 t inventory=0.000 t cost=2494.500
+
+ACTIVE INVESTMENTS: LUNAR_ISRU, ZBO
+
+VIOLATIONS:
+[2035] STRESS_CRITICAL_SERVICE_BENCHMARK (benchmark): actual=0.27854166666666663 >= limit=0.99 share; gap/excess=0.7114583333333333; critical demand service minimum
+[2035] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.22283333333333336 >= limit=0.97 share; gap/excess=0.7471666666666666; total demand service minimum
+[2035-01] INITIAL_STOCK_SOURCE_UNAVAILABLE source=D (hard): actual=2035-01 >= limit=2038-01 month; gap/excess=None; Selected source is unavailable for the preparatory delivery.
+[2035-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2036] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8821428571428571 >= limit=0.97 share; gap/excess=0.08785714285714286; total demand service minimum
+[2036-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2037] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8753333333333333 >= limit=0.97 share; gap/excess=0.09466666666666668; total demand service minimum
+[2037-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2038] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8276289855072461 >= limit=0.97 share; gap/excess=0.1423710144927539; total demand service minimum
+[2038-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2039] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.809909420289855 >= limit=0.97 share; gap/excess=0.16009057971014495; total demand service minimum
+[2039-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+[2040] STRESS_TOTAL_SERVICE_BENCHMARK (benchmark): actual=0.8297584541062804 >= limit=0.97 share; gap/excess=0.14024154589371962; total demand service minimum
+[2040-01] RESERVE_45D (hard): actual=0.0 >= limit=45.0 days; gap/excess=45.0; physical stock or demonstrably equivalent contracted emergency reserve
+
+Saved: results/operator_acceptance/08/accept-08-impossible-initial-isru/MANDATORY_STRESS
+
+Comparison saved: results/operator_acceptance/08/accept-08-impossible-initial-isru
+
+===== TEST 09: 09_core_outage_2038.json =====
+Evaluated 1 risks for accept-01-balanced-isru on BASE
+Unknown likelihood: ACCEPT-09-CORE-OUTAGE
+Saved: results/operator_acceptance/09/accept-01-balanced-isru/risks
+
+===== TEST 10: 10_core_price_shock_2038.json =====
+Evaluated 1 risks for accept-01-balanced-isru on BASE
+Unknown likelihood: ACCEPT-10-CORE-PRICE-X1.5
+Saved: results/operator_acceptance/10/accept-01-balanced-isru/risks
+

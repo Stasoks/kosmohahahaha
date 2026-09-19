@@ -1,0 +1,37 @@
+{
+  "status": "TEAM_ASSUMPTION",
+  "risks": [
+    {
+      "risk_id": "ACCEPT-10-CORE-PRICE-X1.5",
+      "name": "Earth-Core price x1.5 in 2038",
+      "description": "Closed acceptance test.",
+      "event": "Earth-Core variable price rises by 50%",
+      "cause": "Test shock",
+      "period_start": "2038-01",
+      "period_end": "2038-12",
+      "affected_parameters": [
+        "variable_price_multiplier"
+      ],
+      "factor_changes": [
+        {
+          "factor": "variable_price_multiplier",
+          "source_id": "A",
+          "value": 1.5,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Closed deterministic acceptance test."
+        }
+      ],
+      "dependencies": [],
+      "owner": "acceptance-test",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
+      "likelihood_status": "UNKNOWN",
+      "source_references": [],
+      "combination_policy": "apply_after_base",
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
+    }
+  ]
+}

@@ -78,6 +78,29 @@ def test_initial_stock_uses_contract_top_and_reservation_fee(
     assert result.annual[0]["initial_stock_cost_mln"] == pytest.approx(70 * 6.2 + 45)
 
 
+def test_initial_stock_independent_50_t_contract_vector(
+    tmp_path, case_data, assumptions, base_scenario
+):
+    """Independent requirement vector; expected values are not derived from engine helpers."""
+
+    def mutate(raw):
+        acquisition = raw["decisions"]["initial_stock_acquisition"]
+        acquisition["ordered_volume_t"] = 50
+        acquisition["reserved_capacity_t_per_year"] = 100
+
+    plan = _plan(tmp_path, case_data, assumptions, mutate)
+    result = simulate(plan, base_scenario, case_data, assumptions)
+    pre = result.pre_horizon
+    assert pre["payable_volume_t"] == pytest.approx(70)
+    assert pre["procurement_cost_mln"] == pytest.approx(434)
+    assert pre["reservation_cost_mln"] == pytest.approx(45)
+    assert pre["take_or_pay_effect_mln"] == pytest.approx(124)
+    assert pre["gross_delivery_t"] == pytest.approx(50)
+    assert pre["losses_t"] == pytest.approx(2.25)
+    assert pre["opening_inventory_t"] == pytest.approx(47.75)
+    assert result.monthly[0]["gross_delivery_by_source"].get("A", 0) == 0
+
+
 def test_initial_shipment_does_not_reappear_as_january_arrival(base_result):
     january = base_result.monthly[0]
     assert january["month"] == "2035-01"

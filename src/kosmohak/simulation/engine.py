@@ -13,13 +13,14 @@ from kosmohak.domain.plan import OperatorPlan
 from kosmohak.domain.result import SimulationResult
 from kosmohak.domain.scenario import Scenario
 from kosmohak.domain.time import month_range
-from kosmohak.economics.contracts import contract_cost
+from kosmohak.economics.contracts import priced_contract_cost
 from kosmohak.economics.finance import discount_end_of_year, holding_cost
 from kosmohak.economics.investments import investment_events
 from kosmohak.simulation.environment import SimulationEnvironment, ensure_environment
 from kosmohak.simulation.physics import accept_throughput, reserve_tons, serve_demand
 from kosmohak.simulation.pipeline import build_shipments, expand_orders
 from kosmohak.simulation.pre_horizon import evaluate_preparatory_acquisition
+from kosmohak.workspace.serialization import effective_case_to_dict
 
 
 def _run_id(
@@ -28,22 +29,13 @@ def _run_id(
     case_data: CaseData,
     assumptions: ModelAssumptions,
 ) -> str:
-    case_files = [
-        "data/demand.csv",
-        "data/supply_sources.csv",
-        "data/storage_options.csv",
-        "data/investment_options.csv",
-        "data/constraints.csv",
-    ]
     payload = {
         "plan": plan.raw,
         "base_scenario": environment.base_scenario.config,
         "environment_id": environment.environment_id,
         "overrides": environment.applied_overrides(),
         "assumptions": assumptions.raw,
-        "case_input": {
-            path: (case_data.root / path).read_text(encoding="utf-8") for path in case_files
-        },
+        "effective_case": effective_case_to_dict(case_data),
     }
     digest = hashlib.sha256(
         json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -202,26 +194,39 @@ def simulate(
             ordered = info["ordered_t"]
             active_fraction = info["active_fraction"]
             reserved = plan.reservation(source_id, year)
-            price = env.variable_price(
-                source_id,
-                source.name,
-                year,
-                source.variable_cost_mln_per_t,
-            )
-            reservation_rate = env.reservation_price(
-                source_id,
-                year,
-                source.reservation_rate_mln_per_t_year_capacity,
-            )
-            contract = contract_cost(
-                ordered_volume_t=ordered,
+            year_months = [f"{year:04d}-{number:02d}" for number in range(1, 13)]
+            ordered_by_month = {
+                month: orders.get(source_id, {}).get(month, 0.0)
+                for month in year_months
+                if orders.get(source_id, {}).get(month, 0.0) != 0
+            }
+            prices = {
+                month: env.variable_price_for_month(
+                    source_id,
+                    source.name,
+                    month,
+                    case_data.source_price(source_id, month),
+                )
+                for month in year_months
+            }
+            reservation_rates = {
+                month: env.reservation_price_for_month(
+                    source_id,
+                    month,
+                    source.reservation_rate_mln_per_t_year_capacity,
+                )
+                for month in year_months
+            }
+            contract = priced_contract_cost(
+                ordered_by_month_t=ordered_by_month,
+                variable_price_by_month_mln_per_t=prices,
+                active_months=info["active_months"],
                 reserved_capacity_period_t=reserved * active_fraction,
                 take_or_pay_share=source.take_or_pay_share,
-                variable_price_mln_per_t=price,
                 annual_reserved_capacity_t=reserved,
-                reservation_rate_mln_per_t_year_capacity=reservation_rate,
-                period_fraction=active_fraction,
+                reservation_rate_by_month_mln_per_t_year_capacity=reservation_rates,
             )
+            price = contract.effective_variable_price_mln_per_t
             planned_delivery = sum(
                 shipment.feasible_t
                 for shipment in shipments
@@ -258,6 +263,8 @@ def simulate(
                 {
                     "source_id": source_id,
                     "source_name": source.name,
+                    "source_status": source.status,
+                    "source_provenance": source.provenance,
                     "year": year,
                     "reserved_capacity_t_per_year": reserved,
                     "active_fraction": active_fraction,
@@ -276,6 +283,9 @@ def simulate(
                     "payable_volume_t": contract.payable_volume_t + (preparatory.payable_volume_t if is_preparatory_row else 0.0),
                     "utilization": gross_delivery / physical_capacity if physical_capacity else 0.0,
                     "active_variable_price_mln_per_t": price,
+                    "ordered_payment_mln": contract.ordered_payment_mln,
+                    "take_or_pay_extra_volume_t": contract.take_or_pay_extra_volume_t,
+                    "take_or_pay_price_mln_per_t": contract.take_or_pay_price_mln_per_t,
                     "procurement_cost_mln": contract.variable_payment_mln + prep_procurement,
                     "reservation_cost_mln": contract.reservation_payment_mln + prep_reservation,
                     "take_or_pay_effect_mln": contract.take_or_pay_effect_mln + prep_top,
@@ -315,6 +325,11 @@ def simulate(
         annual_rows.append(
             {
                 "year": year,
+                "horizon_scope": case_data.horizon_provenance.get(year, {}).get(
+                    "scope", "OFFICIAL_CASE_HORIZON"
+                ),
+                "provenance_status": case_data.demand[year].status,
+                "year_provenance": case_data.horizon_provenance.get(year, {}),
                 "demand_total_t": demand_total,
                 "demand_critical_t": demand_critical,
                 "served_total_t": served_total,
@@ -404,6 +419,16 @@ def simulate(
         "valid": hard_count == 0,
         "undiscounted_cost_mln": sum(row["total_cost_mln"] for row in annual_rows),
         "discounted_cost_mln": sum(row["discounted_cost_mln"] for row in annual_rows),
+        "cost_per_served_ton_mln": (
+            sum(row["total_cost_mln"] for row in annual_rows) / total_served
+            if total_served
+            else None
+        ),
+        "discounted_cost_per_served_ton_mln": (
+            sum(row["discounted_cost_mln"] for row in annual_rows) / total_served
+            if total_served
+            else None
+        ),
         "total_service_level": total_served / total_demand if total_demand else 1.0,
         "critical_service_level": critical_served / critical_demand if critical_demand else 1.0,
         "total_shortage_t": sum(row["shortage_t"] for row in annual_rows),
@@ -426,6 +451,9 @@ def simulate(
         "hard_violation_count": hard_count,
         "case_input_root": str(case_data.root),
         "scenario_source": str(env.source_path),
+        "official_horizon_years": list(case_data.official_years),
+        "research_extension_years": list(case_data.research_years),
+        "research_source_ids": list(case_data.research_source_ids),
     }
     return SimulationResult(
         summary=summary,
@@ -441,6 +469,22 @@ def simulate(
                 "environment_id": env.environment_id,
                 "risk_ids": list(env.risk_ids),
                 "applied_overrides": env.applied_overrides(),
+            },
+            "effective_case_provenance": {
+                "status": case_data.status,
+                "workspace": case_data.workspace_provenance,
+                "horizon": {
+                    str(year): value
+                    for year, value in sorted(case_data.horizon_provenance.items())
+                },
+                "research_sources": {
+                    source_id: case_data.sources[source_id].provenance
+                    for source_id in case_data.research_source_ids
+                },
+                "future_year_assumptions": {
+                    str(year): value
+                    for year, value in sorted(case_data.future_year_assumptions.items())
+                },
             },
         },
         pre_horizon=preparatory.to_dict(),

@@ -255,38 +255,53 @@ class SimulationEnvironment:
             ),
         )
 
+    def variable_price_for_month(
+        self, source_id: str, source_name: str, month: str, base_price: float
+    ) -> float:
+        year = int(month[:4])
+        value = base_price * self.base_scenario.variable_price_multiplier(source_name, year)
+        for change in self._source_changes(
+            "variable_price_multiplier", month, source_id, source_name
+        ):
+            value *= self._change_value(change, month)
+        for change in self._source_changes(
+            "variable_price_override", month, source_id, source_name
+        ):
+            value = self._change_value(change, month)
+        return max(0.0, value)
+
     def variable_price(self, source_id: str, source_name: str, year: int, base_price: float) -> float:
-        base = base_price * self.base_scenario.variable_price_multiplier(source_name, year)
-        monthly_values: list[float] = []
-        for number in range(1, 13):
-            month = f"{year:04d}-{number:02d}"
-            value = base
-            for change in self._source_changes(
-                "variable_price_multiplier", month, source_id, source_name
-            ):
-                value *= self._change_value(change, month)
-            for change in self._source_changes(
-                "variable_price_override", month, source_id, source_name
-            ):
-                value = self._change_value(change, month)
-            monthly_values.append(max(0.0, value))
-        return sum(monthly_values) / 12.0
+        """Compatibility display rate; contract charging uses monthly prices."""
+        values = [
+            self.variable_price_for_month(
+                source_id, source_name, f"{year:04d}-{number:02d}", base_price
+            )
+            for number in range(1, 13)
+        ]
+        return sum(values) / 12.0
+
+    def reservation_price_for_month(
+        self, source_id: str, month: str, base_rate: float
+    ) -> float:
+        value = base_rate
+        for change in self._source_changes(
+            "reservation_price_multiplier", month, source_id
+        ):
+            value *= self._change_value(change, month)
+        for change in self._source_changes(
+            "reservation_price_override", month, source_id
+        ):
+            value = self._change_value(change, month)
+        return max(0.0, value)
 
     def reservation_price(self, source_id: str, year: int, base_rate: float) -> float:
-        monthly_values: list[float] = []
-        for number in range(1, 13):
-            month = f"{year:04d}-{number:02d}"
-            value = base_rate
-            for change in self._source_changes(
-                "reservation_price_multiplier", month, source_id
-            ):
-                value *= self._change_value(change, month)
-            for change in self._source_changes(
-                "reservation_price_override", month, source_id
-            ):
-                value = self._change_value(change, month)
-            monthly_values.append(max(0.0, value))
-        return sum(monthly_values) / 12.0
+        values = [
+            self.reservation_price_for_month(
+                source_id, f"{year:04d}-{number:02d}", base_rate
+            )
+            for number in range(1, 13)
+        ]
+        return sum(values) / 12.0
 
     def storage_loss_rate(self, storage_id: str, month: str, base_rate: float) -> float:
         value = self._multiply(

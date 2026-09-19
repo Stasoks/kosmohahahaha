@@ -1,57 +1,74 @@
 {
   "status": "TEAM_ASSUMPTION",
+  "portfolio_id": "competition-risk-portfolio-v2",
+  "basis": "Deterministic consequence portfolio. Likelihood stays UNKNOWN without basis and source.",
   "risks": [
     {
       "risk_id": "R-ISRU-UNDERDELIVERY",
       "name": "Lunar-ISRU underdelivery",
-      "description": "Deterministic research shock applied to the same operator plan on top of BASE.",
+      "description": "Deterministic TEAM research scenario evaluated through the unchanged digital twin.",
       "event": "Lunar-ISRU supplies only 40% of feasible volume",
-      "cause": "Research assumption for immature production and transfer operations",
+      "cause": "Immature production and transfer operations",
       "period_start": "2038-01",
       "period_end": "2039-12",
-      "affected_parameters": ["actual_delivery_share"],
+      "affected_parameters": [
+        "actual_delivery_share"
+      ],
       "factor_changes": [
         {
           "factor": "actual_delivery_share",
           "source_id": "D",
           "value": 0.4,
           "status": "TEAM_ASSUMPTION",
-          "basis": "Illustrative deterministic consequence scenario; not a claimed probability."
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
         }
       ],
-      "dependencies": ["Lunar-ISRU commissioned"],
-      "owner": "Supply strategy lead",
+      "dependencies": [],
+      "owner": "supply_strategy",
       "likelihood": {
         "likelihood_type": "unknown"
       },
       "likelihood_status": "UNKNOWN",
-      "source_references": ["data/supply_sources.csv reliability_profile shown as metadata only"],
+      "source_references": [],
       "combination_policy": "apply_after_base",
+      "anticipated_consequence": "Reduced delivered lunar volume, lower inventory and potentially lower service.",
+      "mitigation": {
+        "mitigation_id": "M-ISRU-DIVERSIFY",
+        "description": "Preserve Earth/Flex headroom; no automatic patch is asserted."
+      },
+      "residual_consequence": "Must be recomputed after an operator-approved diversification patch.",
+      "stakeholder_ids": [
+        "operator",
+        "critical_consumers",
+        "fuel_suppliers",
+        "financing"
+      ],
       "metadata": {
-        "status": "TEAM_ASSUMPTION",
-        "reliability_profile_semantics": "METADATA_ONLY"
+        "status": "TEAM_ASSUMPTION"
       }
     },
     {
       "risk_id": "R-EARTH-PRICE",
       "name": "Earth channel price shock",
-      "description": "Deterministic price-only research scenario.",
+      "description": "Deterministic TEAM research scenario evaluated through the unchanged digital twin.",
       "event": "Earth-Core variable price rises by 20%",
       "cause": "Team commercial sensitivity assumption",
       "period_start": "2038-01",
       "period_end": "2039-12",
-      "affected_parameters": ["variable_price_multiplier"],
+      "affected_parameters": [
+        "variable_price_multiplier"
+      ],
       "factor_changes": [
         {
           "factor": "variable_price_multiplier",
           "source_id": "A",
           "value": 1.2,
           "status": "TEAM_ASSUMPTION",
-          "basis": "Illustrative deterministic price sensitivity."
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
         }
       ],
       "dependencies": [],
-      "owner": "Commercial lead",
+      "owner": "commercial",
       "likelihood": {
         "likelihood_type": "qualitative",
         "score": 2,
@@ -60,47 +77,310 @@
         "source": "TEAM_RATIONALE:price-workshop-v1"
       },
       "likelihood_status": "TEAM_ASSUMPTION",
-      "source_references": ["TEAM_RATIONALE:price-workshop-v1"],
+      "source_references": [
+        "TEAM_RATIONALE:price-workshop-v1"
+      ],
       "combination_policy": "apply_after_base",
-      "metadata": {"status": "TEAM_ASSUMPTION"}
+      "anticipated_consequence": "Procurement cost increases; physical deliveries must remain unchanged.",
+      "mitigation": {
+        "mitigation_id": "M-PRICE-HEDGE",
+        "description": "Compare diversified contract mix; no unpriced hedge benefit is assumed."
+      },
+      "residual_consequence": "Residual cost is computed only for an explicit approved plan.",
+      "stakeholder_ids": [
+        "operator",
+        "fuel_suppliers",
+        "financing"
+      ],
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
     },
     {
       "risk_id": "R-CORE-OUTAGE",
       "name": "Earth-Core temporary unavailability",
-      "description": "A deterministic outage with an explicitly supplied operator mitigation patch.",
+      "description": "Deterministic TEAM research scenario evaluated through the unchanged digital twin.",
       "event": "Earth-Core availability falls to zero",
       "cause": "Illustrative launch-channel interruption",
-      "period_start": "2038-01",
-      "period_end": "2038-12",
-      "affected_parameters": ["availability_share"],
+      "period_start": "2038-04",
+      "period_end": "2038-09",
+      "affected_parameters": [
+        "availability_share"
+      ],
       "factor_changes": [
         {
           "factor": "availability_share",
           "source_id": "A",
-          "value": 0.0,
+          "value": 0,
           "status": "TEAM_ASSUMPTION",
-          "basis": "Deterministic outage used to evaluate consequences."
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
         }
       ],
       "dependencies": [],
-      "owner": "Operations lead",
-      "likelihood": {"likelihood_type": "unknown"},
+      "owner": "operations",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
       "likelihood_status": "UNKNOWN",
       "source_references": [],
       "combination_policy": "apply_after_base",
+      "anticipated_consequence": "No Earth-Core arrivals in the declared disruption months; inventory may bridge part of the outage.",
       "mitigation": {
         "mitigation_id": "M-FLEX-2038",
         "description": "Operator-specified additional Earth-Flex reservation and orders.",
         "plan_patch": {
           "capacity_reservations": [
-            {"source_id": "B", "year": 2038, "reserved_capacity_t": 110}
+            {
+              "source_id": "B",
+              "year": 2038,
+              "reserved_capacity_t": 110
+            }
           ],
           "supply_orders": [
-            {"source_id": "B", "mode": "annual_even", "values": {"2038": 110}}
+            {
+              "source_id": "B",
+              "mode": "annual_even",
+              "values": {
+                "2038": 110
+              }
+            }
           ]
         }
       },
-      "metadata": {"status": "TEAM_ASSUMPTION"}
+      "residual_consequence": "Residual shortage and mitigation cost are recomputed through the same digital twin.",
+      "stakeholder_ids": [
+        "operator",
+        "critical_consumers",
+        "commercial_consumers",
+        "launch_logistics"
+      ],
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
+    },
+    {
+      "risk_id": "R-EARTH-NEW-DELAY",
+      "name": "Earth-New commissioning delay",
+      "description": "Deterministic TEAM research scenario evaluated through the unchanged digital twin.",
+      "event": "Earth-New commissioning slips by six months",
+      "cause": "Integration and readiness uncertainty",
+      "period_start": "2035-02",
+      "period_end": "2035-02",
+      "affected_parameters": [
+        "investment_commissioning_delay_months"
+      ],
+      "factor_changes": [
+        {
+          "factor": "investment_commissioning_delay_months",
+          "investment_id": "EARTH_NEW",
+          "value": 6,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
+        }
+      ],
+      "dependencies": [],
+      "owner": "investment_program",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
+      "likelihood_status": "UNKNOWN",
+      "source_references": [],
+      "combination_policy": "apply_after_base",
+      "anticipated_consequence": "Early Earth-New orders become unavailable and service/inventory may deteriorate.",
+      "mitigation": {
+        "mitigation_id": "M-EARTH-NEW-BRIDGE",
+        "description": "Assess temporary flexible supply only through an explicit plan patch."
+      },
+      "residual_consequence": "Unknown until a bridge plan is approved and simulated.",
+      "stakeholder_ids": [
+        "operator",
+        "fuel_suppliers",
+        "launch_logistics",
+        "financing"
+      ],
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
+    },
+    {
+      "risk_id": "R-STORAGE-DEGRADATION",
+      "name": "Storage degradation",
+      "description": "Deterministic TEAM research scenario evaluated through the unchanged digital twin.",
+      "event": "Active ZBO throughput loss rises to 2.5%",
+      "cause": "Illustrative equipment degradation",
+      "period_start": "2038-01",
+      "period_end": "2040-12",
+      "affected_parameters": [
+        "storage_loss_rate_override"
+      ],
+      "factor_changes": [
+        {
+          "factor": "storage_loss_rate_override",
+          "storage_id": "ZBO",
+          "value": 0.025,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
+        }
+      ],
+      "dependencies": [],
+      "owner": "storage_operations",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
+      "likelihood_status": "UNKNOWN",
+      "source_references": [],
+      "combination_policy": "apply_after_base",
+      "anticipated_consequence": "Higher throughput loss reduces accepted net fuel and inventory.",
+      "mitigation": {
+        "mitigation_id": "M-STORAGE-MARGIN",
+        "description": "Evaluate additional gross supply or maintenance timing as operator decisions."
+      },
+      "residual_consequence": "Not monetized beyond calculated supply and operating effects.",
+      "stakeholder_ids": [
+        "operator",
+        "critical_consumers",
+        "financing"
+      ],
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
+    },
+    {
+      "risk_id": "R-DEMAND-UPSIDE",
+      "name": "Demand upside",
+      "description": "Deterministic TEAM research scenario evaluated through the unchanged digital twin.",
+      "event": "Total and critical demand rise by 10%",
+      "cause": "Research demand-growth assumption",
+      "period_start": "2039-01",
+      "period_end": "2040-12",
+      "affected_parameters": [
+        "total_demand_multiplier",
+        "critical_demand_multiplier"
+      ],
+      "factor_changes": [
+        {
+          "factor": "total_demand_multiplier",
+          "value": 1.1,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
+        },
+        {
+          "factor": "critical_demand_multiplier",
+          "value": 1.1,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
+        }
+      ],
+      "dependencies": [],
+      "owner": "demand_planning",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
+      "likelihood_status": "UNKNOWN",
+      "source_references": [],
+      "combination_policy": "apply_after_base",
+      "anticipated_consequence": "Service requirements rise and available inventory is consumed faster.",
+      "mitigation": {
+        "mitigation_id": "M-DEMAND-OPTIONS",
+        "description": "Retain contract headroom; exact volumes require an approved patch."
+      },
+      "residual_consequence": "Calculated only after explicit demand-response decisions.",
+      "stakeholder_ids": [
+        "operator",
+        "critical_consumers",
+        "commercial_consumers",
+        "fuel_suppliers"
+      ],
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
+    },
+    {
+      "risk_id": "R-LOGISTICS-DELAY",
+      "name": "Launch and logistics delay",
+      "description": "Deterministic TEAM research scenario evaluated through the unchanged digital twin.",
+      "event": "Earth-Flex shipments gain three months of lead time",
+      "cause": "Illustrative launch/logistics disruption",
+      "period_start": "2037-01",
+      "period_end": "2039-12",
+      "affected_parameters": [
+        "additional_lead_time_months"
+      ],
+      "factor_changes": [
+        {
+          "factor": "additional_lead_time_months",
+          "source_id": "B",
+          "value": 3,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
+        }
+      ],
+      "dependencies": [],
+      "owner": "launch_logistics",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
+      "likelihood_status": "UNKNOWN",
+      "source_references": [],
+      "combination_policy": "apply_after_base",
+      "anticipated_consequence": "Deliveries shift later; total physical volume is not fabricated or deleted.",
+      "mitigation": {
+        "mitigation_id": "M-LOGISTICS-EARLY-ORDER",
+        "description": "Test earlier ordering as an explicit plan patch."
+      },
+      "residual_consequence": "Depends on inventory at the delayed arrival boundary.",
+      "stakeholder_ids": [
+        "operator",
+        "critical_consumers",
+        "launch_logistics",
+        "fuel_suppliers"
+      ],
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
+    },
+    {
+      "risk_id": "R-CAPEX-OVERRUN",
+      "name": "Lunar-ISRU CAPEX overrun",
+      "description": "Deterministic TEAM research scenario evaluated through the unchanged digital twin.",
+      "event": "Lunar-ISRU CAPEX rises by 25%",
+      "cause": "Illustrative investment cost sensitivity",
+      "period_start": "2035-03",
+      "period_end": "2035-03",
+      "affected_parameters": [
+        "capex_multiplier"
+      ],
+      "factor_changes": [
+        {
+          "factor": "capex_multiplier",
+          "investment_id": "LUNAR_ISRU",
+          "value": 1.25,
+          "status": "TEAM_ASSUMPTION",
+          "basis": "Illustrative deterministic consequence assumption; not an asserted probability."
+        }
+      ],
+      "dependencies": [],
+      "owner": "financing",
+      "likelihood": {
+        "likelihood_type": "unknown"
+      },
+      "likelihood_status": "UNKNOWN",
+      "source_references": [],
+      "combination_policy": "apply_after_base",
+      "anticipated_consequence": "CAPEX and possibly the official cumulative CAPEX constraint change; physics remains identical.",
+      "mitigation": {
+        "mitigation_id": "M-CAPEX-GATE",
+        "description": "Reconsider investment timing only through an operator-approved plan."
+      },
+      "residual_consequence": "No financing benefit or penalty is invented beyond case economics.",
+      "stakeholder_ids": [
+        "operator",
+        "fuel_suppliers",
+        "financing"
+      ],
+      "metadata": {
+        "status": "TEAM_ASSUMPTION"
+      }
     }
   ]
 }

@@ -4,12 +4,13 @@ from collections import defaultdict
 
 from kosmohak.domain.assumptions import ModelAssumptions
 from kosmohak.domain.case import CaseData
-from kosmohak.domain.investment import active_months_in_year, commissioning_dates
+from kosmohak.domain.investment import active_months_in_year
 from kosmohak.domain.plan import OperatorPlan
 from kosmohak.domain.shipment import Shipment
 from kosmohak.domain.time import add_months, month_range
 from kosmohak.simulation.physics import apply_delivery_share
 from kosmohak.simulation.environment import SimulationEnvironment
+from kosmohak.simulation.availability import source_commissioning_dates
 
 
 def expand_orders(plan: OperatorPlan, case_data: CaseData) -> dict[str, dict[str, float]]:
@@ -27,22 +28,6 @@ def expand_orders(plan: OperatorPlan, case_data: CaseData) -> dict[str, dict[str
                     if month in valid_months:
                         output[schedule.source_id][month] = tons / 12.0
     return {source_id: dict(values) for source_id, values in output.items()}
-
-
-def source_commissioning_dates(
-    plan: OperatorPlan,
-    case_data: CaseData,
-    assumptions: ModelAssumptions,
-    environment: SimulationEnvironment | None = None,
-) -> dict[str, str | None]:
-    investments = commissioning_dates(plan, case_data, assumptions, environment)
-    return {
-        "A": f"{case_data.sources['A'].available_from_year}-01",
-        "B": f"{case_data.sources['B'].available_from_year}-01",
-        "C": investments["EARTH_NEW"],
-        "D": investments["LUNAR_ISRU"],
-        "E": f"{case_data.sources['E'].available_from_year}-01",
-    }
 
 
 def source_active_fraction(commissioning_month: str | None, year: int) -> float:
@@ -79,7 +64,11 @@ def build_shipments(
             active_fraction = len(active_months) / 12.0
             reserved_period = plan.reservation(source_id, year) * active_fraction
             physical_period = sum(
-                environment.source_capacity(source_id, month, source.capacity_t_per_year) / 12.0
+                environment.source_capacity(
+                    source_id,
+                    month,
+                    case_data.source_capacity(source_id, month),
+                ) / 12.0
                 for month in active_months
             )
             contract_limit = min(reserved_period, physical_period)
@@ -91,6 +80,7 @@ def build_shipments(
                 "contract_limit_t": contract_limit,
                 "physical_limit_t": physical_period,
                 "active_fraction": active_fraction,
+                "active_months": active_months,
                 "factor": factor,
             }
 
@@ -116,7 +106,10 @@ def build_shipments(
                 actual_arrival,
                 source_id=source_id,
             )
-            availability_share = environment.availability_share(source_id, actual_arrival)
+            availability_share = (
+                environment.availability_share(source_id, actual_arrival)
+                * case_data.source_availability_share(source_id, actual_arrival)
+            )
             actual = apply_delivery_share(
                 feasible_t,
                 share * availability_share,

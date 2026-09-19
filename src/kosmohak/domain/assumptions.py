@@ -36,6 +36,8 @@ class ModelAssumptions:
         return int(self.raw["lunar_isru_delivery_lead_months"]["value"])
 
     def source_delivery_lead_months(self, source: SupplySource) -> int:
+        if source.selected_lead_time_months is not None:
+            return int(source.selected_lead_time_months)
         if source.source_id == "C":
             return self.earth_new_operational_delivery_lag_months
         if source.source_id == "D":
@@ -45,9 +47,13 @@ class ModelAssumptions:
                 raise ValueError(f"No selected delivery lead-time assumption for {source.source_id}")
             return int(source.lead_time_min_value)
         conversion = self.raw["week_to_model_month_conversion"]
-        if source.lead_time_unit == "week" and conversion["rounding"] == "ceil":
-            days = source.lead_time_max_value * float(conversion["days_per_week"])
+        if source.lead_time_unit in {"day", "week", "year"} and conversion["rounding"] == "ceil":
+            unit_days = {
+                "day": 1.0,
+                "week": float(conversion["days_per_week"]),
+                "year": float(conversion["days_per_model_year"]),
+            }[source.lead_time_unit]
+            days = source.lead_time_max_value * unit_days
             model_month_days = float(conversion["days_per_model_year"]) / 12.0
             return ceil(days / model_month_days)
         raise ValueError(f"Unsupported lead-time conversion for {source.source_id}")
-

@@ -1,0 +1,59 @@
+{
+  "applied_overrides": [
+    {
+      "application_order": 1,
+      "basis": "Closed deterministic acceptance test.",
+      "factor": "availability_share",
+      "factor_order": 1,
+      "period_end": "2038-09",
+      "period_start": "2038-04",
+      "risk_id": "ACCEPT-09-CORE-OUTAGE",
+      "risk_order": 1,
+      "source_id": "A",
+      "status": "TEAM_ASSUMPTION",
+      "value": 0.0
+    }
+  ],
+  "base_scenario_id": "BASE",
+  "case_input_root": "/home/stas/python_projects/kosmohack",
+  "cost_per_served_ton_mln": 9.81838564897299,
+  "critical_service_level": 0.94165,
+  "critical_shortage_t": 55.432500000000005,
+  "delayed_delivery_count": 0,
+  "delayed_delivery_t": 0,
+  "discounted_cost_mln": 10580.400484987116,
+  "discounted_cost_per_served_ton_mln": 8.640506067033892,
+  "emergency_usage_t": 0,
+  "environment_id": "BASE+ACCEPT-09-CORE-OUTAGE",
+  "final_inventory_t": 0.0,
+  "hard_violation_count": 11,
+  "initial_stock_total_cost_mln": 407.2500000000001,
+  "minimum_inventory_t": 0.0,
+  "months_with_shortage": 51,
+  "official_horizon_years": [
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040
+  ],
+  "opening_inventory_t": 42.975,
+  "plan_id": "accept-01-balanced-isru",
+  "research_extension_years": [],
+  "research_source_ids": [],
+  "risk_ids": [
+    "ACCEPT-09-CORE-OUTAGE"
+  ],
+  "run_id": "run-15db2de3425b245e",
+  "scenario_id": "BASE+ACCEPT-09-CORE-OUTAGE",
+  "scenario_source": "/home/stas/python_projects/kosmohack/scenarios/base.yaml",
+  "total_losses_t": 15.129999999999999,
+  "total_overflow_t": 0.0,
+  "total_service_level": 0.880943645083933,
+  "total_shortage_t": 165.48833333333334,
+  "unavailable_requested_supply_t": 85.00000000000003,
+  "undiscounted_cost_mln": 12022.727775,
+  "valid": false,
+  "violation_count": 11
+}

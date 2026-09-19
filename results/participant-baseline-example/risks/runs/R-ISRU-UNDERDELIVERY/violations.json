@@ -9,7 +9,7 @@
     "operator": ">=",
     "period": "2039",
     "reason": "total demand service minimum",
-    "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+    "scenario": "BASE",
     "severity": "hard",
     "source_id": null,
     "unit": "share"
@@ -24,7 +24,7 @@
     "operator": ">=",
     "period": "2039-01",
     "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-    "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+    "scenario": "BASE",
     "severity": "hard",
     "source_id": null,
     "unit": "days"
@@ -39,7 +39,7 @@
     "operator": ">=",
     "period": "2040-01",
     "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-    "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+    "scenario": "BASE",
     "severity": "hard",
     "source_id": null,
     "unit": "days"

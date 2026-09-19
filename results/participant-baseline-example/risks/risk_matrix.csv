@@ -26,3 +26,8 @@ likelihood_score,impact_score,risks
 5,5,[]
 UNKNOWN,5,"[{""impact_score"": 5, ""name"": ""Lunar-ISRU underdelivery"", ""risk_id"": ""R-ISRU-UNDERDELIVERY""}]"
 UNKNOWN,5,"[{""impact_score"": 5, ""name"": ""Earth-Core temporary unavailability"", ""risk_id"": ""R-CORE-OUTAGE""}]"
+UNKNOWN,1,"[{""impact_score"": 1, ""name"": ""Earth-New commissioning delay"", ""risk_id"": ""R-EARTH-NEW-DELAY""}]"
+UNKNOWN,2,"[{""impact_score"": 2, ""name"": ""Storage degradation"", ""risk_id"": ""R-STORAGE-DEGRADATION""}]"
+UNKNOWN,5,"[{""impact_score"": 5, ""name"": ""Demand upside"", ""risk_id"": ""R-DEMAND-UPSIDE""}]"
+UNKNOWN,1,"[{""impact_score"": 1, ""name"": ""Launch and logistics delay"", ""risk_id"": ""R-LOGISTICS-DELAY""}]"
+UNKNOWN,2,"[{""impact_score"": 2, ""name"": ""Lunar-ISRU CAPEX overrun"", ""risk_id"": ""R-CAPEX-OVERRUN""}]"

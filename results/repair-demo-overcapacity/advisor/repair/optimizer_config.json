@@ -1,0 +1,16 @@
+{
+  "allowed_change_budget": null,
+  "increase_fractions": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "max_candidates": 200,
+  "max_suggestions": 3,
+  "reduction_fractions": [
+    0.02,
+    0.05,
+    0.1
+  ],
+  "seed": 17
+}

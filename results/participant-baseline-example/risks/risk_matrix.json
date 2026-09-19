@@ -57,6 +57,31 @@
       "impact_score": 5,
       "name": "Earth-Core temporary unavailability",
       "risk_id": "R-CORE-OUTAGE"
+    },
+    {
+      "impact_score": 1,
+      "name": "Earth-New commissioning delay",
+      "risk_id": "R-EARTH-NEW-DELAY"
+    },
+    {
+      "impact_score": 2,
+      "name": "Storage degradation",
+      "risk_id": "R-STORAGE-DEGRADATION"
+    },
+    {
+      "impact_score": 5,
+      "name": "Demand upside",
+      "risk_id": "R-DEMAND-UPSIDE"
+    },
+    {
+      "impact_score": 1,
+      "name": "Launch and logistics delay",
+      "risk_id": "R-LOGISTICS-DELAY"
+    },
+    {
+      "impact_score": 2,
+      "name": "Lunar-ISRU CAPEX overrun",
+      "risk_id": "R-CAPEX-OVERRUN"
     }
   ]
 }

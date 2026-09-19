@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: kosmohak-fuel-digital-twin
+Version: 0.3.0
+Summary: Deterministic strategy and risk evaluator over the official KosmoHackathon starter kit
+Home-page: UNKNOWN
+License: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.10
+Provides-Extra: dev
+
+UNKNOWN
+

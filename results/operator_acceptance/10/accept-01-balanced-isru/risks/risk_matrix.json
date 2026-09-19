@@ -1,0 +1,51 @@
+{
+  "axes": {
+    "impact": "ordinal 1..5",
+    "likelihood": "ordinal 1..5"
+  },
+  "cells": {
+    "1": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    },
+    "2": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    },
+    "3": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    },
+    "4": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    },
+    "5": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    }
+  },
+  "note": "likelihood × impact is an ordinal prioritization score, not expected loss.",
+  "unknown_likelihood": [
+    {
+      "impact_score": 2,
+      "name": "Earth-Core price x1.5 in 2038",
+      "risk_id": "ACCEPT-10-CORE-PRICE-X1.5"
+    }
+  ]
+}

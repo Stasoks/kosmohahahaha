@@ -1,0 +1,236 @@
+{
+  "plan_id": "resilient",
+  "scenario_id": "BASE",
+  "decisions": {
+    "supply_orders": [
+      {
+        "source_id": "A",
+        "mode": "annual_even",
+        "values": {
+          "2035": 120,
+          "2036": 150,
+          "2037": 190,
+          "2038": 170,
+          "2039": 180,
+          "2040": 0
+        }
+      },
+      {
+        "source_id": "B",
+        "mode": "annual_even",
+        "values": {
+          "2035": 90,
+          "2036": 5,
+          "2037": 0,
+          "2038": 0,
+          "2039": 0,
+          "2040": 0
+        }
+      },
+      {
+        "source_id": "C",
+        "mode": "monthly",
+        "values": {
+          "2037-02": 4.3636363636,
+          "2037-03": 4.3636363636,
+          "2037-04": 4.3636363636,
+          "2037-05": 4.3636363636,
+          "2037-06": 4.3636363636,
+          "2037-07": 4.3636363636,
+          "2037-08": 4.3636363636,
+          "2037-09": 4.3636363636,
+          "2037-10": 4.3636363636,
+          "2037-11": 4.3636363636,
+          "2037-12": 4.3636363636,
+          "2038-01": 5,
+          "2038-02": 5,
+          "2038-03": 5,
+          "2038-04": 5,
+          "2038-05": 5,
+          "2038-06": 5,
+          "2038-07": 5,
+          "2038-08": 5,
+          "2038-09": 5,
+          "2038-10": 5,
+          "2038-11": 5,
+          "2038-12": 5,
+          "2039-01": 6.6666666667,
+          "2039-02": 6.6666666667,
+          "2039-03": 6.6666666667,
+          "2039-04": 6.6666666667,
+          "2039-05": 6.6666666667,
+          "2039-06": 6.6666666667,
+          "2039-07": 6.6666666667,
+          "2039-08": 6.6666666667,
+          "2039-09": 6.6666666667,
+          "2039-10": 6.6666666667,
+          "2039-11": 6.6666666667,
+          "2039-12": 6.6666666667,
+          "2040-01": 8.3333333333,
+          "2040-02": 8.3333333333,
+          "2040-03": 8.3333333333,
+          "2040-04": 8.3333333333,
+          "2040-05": 8.3333333333,
+          "2040-06": 8.3333333333,
+          "2040-07": 8.3333333333,
+          "2040-08": 8.3333333333,
+          "2040-09": 8.3333333333,
+          "2040-10": 8.3333333333,
+          "2040-11": 8.3333333333,
+          "2040-12": 8.3333333333
+        }
+      },
+      {
+        "source_id": "D",
+        "mode": "annual_even",
+        "values": {
+          "2035": 0,
+          "2036": 0,
+          "2037": 0,
+          "2038": 50.2,
+          "2039": 89.3,
+          "2040": 110
+        }
+      },
+      {
+        "source_id": "E",
+        "mode": "annual_even",
+        "values": {
+          "2035": 0,
+          "2036": 0,
+          "2037": 0,
+          "2038": 0,
+          "2039": 0,
+          "2040": 0
+        }
+      }
+    ],
+    "capacity_reservations": [
+      {
+        "source_id": "A",
+        "year": 2035,
+        "reserved_capacity_t": 120
+      },
+      {
+        "source_id": "A",
+        "year": 2036,
+        "reserved_capacity_t": 150
+      },
+      {
+        "source_id": "A",
+        "year": 2037,
+        "reserved_capacity_t": 190
+      },
+      {
+        "source_id": "A",
+        "year": 2038,
+        "reserved_capacity_t": 170
+      },
+      {
+        "source_id": "A",
+        "year": 2039,
+        "reserved_capacity_t": 180
+      },
+      {
+        "source_id": "B",
+        "year": 2035,
+        "reserved_capacity_t": 90
+      },
+      {
+        "source_id": "B",
+        "year": 2036,
+        "reserved_capacity_t": 5
+      },
+      {
+        "source_id": "C",
+        "year": 2037,
+        "reserved_capacity_t": 60
+      },
+      {
+        "source_id": "C",
+        "year": 2038,
+        "reserved_capacity_t": 60
+      },
+      {
+        "source_id": "C",
+        "year": 2039,
+        "reserved_capacity_t": 80
+      },
+      {
+        "source_id": "C",
+        "year": 2040,
+        "reserved_capacity_t": 100
+      },
+      {
+        "source_id": "D",
+        "year": 2038,
+        "reserved_capacity_t": 50.2
+      },
+      {
+        "source_id": "D",
+        "year": 2039,
+        "reserved_capacity_t": 89.3
+      },
+      {
+        "source_id": "D",
+        "year": 2040,
+        "reserved_capacity_t": 110
+      }
+    ],
+    "investments": [
+      {
+        "investment_id": "ZBO",
+        "enabled": true,
+        "commissioning_month": "2036-01"
+      },
+      {
+        "investment_id": "EARTH_NEW",
+        "enabled": true,
+        "buy_option": true,
+        "option_purchase_month": "2035-01",
+        "exercise_option": true,
+        "option_exercise_month": "2035-02"
+      },
+      {
+        "investment_id": "LUNAR_ISRU",
+        "enabled": true,
+        "funding_month": "2035-03"
+      }
+    ],
+    "initial_stock_acquisition": {
+      "source_id": "A",
+      "reserved_capacity_t_per_year": 63,
+      "ordered_volume_t": 62.8272251309,
+      "order_date": "2034-01",
+      "planned_delivery_date": "2035-01",
+      "contract_period_start": "2034-01",
+      "contract_period_end": "2034-12",
+      "notes": "Pre-horizon Earth-Core acquisition sized to yield 60 t after the official 4.5% throughput loss.",
+      "status": "TEAM_DECISION"
+    },
+    "inventory_policy": {
+      "reserve_strategy_by_year": {
+        "2035": "physical",
+        "2036": "physical",
+        "2037": "physical",
+        "2038": "physical",
+        "2039": "physical",
+        "2040": "physical"
+      }
+    },
+    "emergency_role_by_year": {
+      "2035": "reserve_only",
+      "2036": "reserve_only",
+      "2037": "reserve_only",
+      "2038": "reserve_only",
+      "2039": "reserve_only",
+      "2040": "reserve_only"
+    }
+  },
+  "metadata": {
+    "status": "TEAM_DECISION",
+    "rationale": "Use remaining Earth-Core capacity in 2037 to carry more inventory into the mandatory stress years.",
+    "derived_from": "participant-baseline-example",
+    "selection_policy": "Demonstration strategy only; no automatic winner claim."
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "plan_id": "accept-03-full-diversification",
+  "scenario_id": "BASE",
+  "decisions": {
+    "supply_orders": [
+      {
+        "source_id": "A",
+        "mode": "annual_even",
+        "values": {
+          "2035": 90.0,
+          "2036": 120.0,
+          "2037": 140.0,
+          "2038": 145.0,
+          "2039": 150.0,
+          "2040": 155.0
+        }
+      },
+      {
+        "source_id": "B",
+        "mode": "annual_even",
+        "values": {
+          "2035": 30.0,
+          "2036": 30.0,
+          "2037": 35.0,
+          "2038": 40.0,
+          "2039": 45.0,
+          "2040": 50.0
+        }
+      },
+      {
+        "source_id": "C",
+        "mode": "annual_even",
+        "values": {
+          "2035": 0.0,
+          "2036": 0.0,
+          "2037": 30.0,
+          "2038": 50.0,
+          "2039": 60.0,
+          "2040": 70.0
+        }
+      },
+      {
+        "source_id": "D",
+        "mode": "annual_even",
+        "values": {
+          "2035": 0.0,
+          "2036": 0.0,
+          "2037": 0.0,
+          "2038": 50.0,
+          "2039": 90.0,
+          "2040": 120.0
+        }
+      }
+    ],
+    "capacity_reservations": [
+      {
+        "source_id": "A",
+        "year": 2035,
+        "reserved_capacity_t": 100.0
+      },
+      {
+        "source_id": "A",
+        "year": 2036,
+        "reserved_capacity_t": 130.0
+      },
+      {
+        "source_id": "A",
+        "year": 2037,
+        "reserved_capacity_t": 150.0
+      },
+      {
+        "source_id": "A",
+        "year": 2038,
+        "reserved_capacity_t": 155.0
+      },
+      {
+        "source_id": "A",
+        "year": 2039,
+        "reserved_capacity_t": 160.0
+      },
+      {
+        "source_id": "A",
+        "year": 2040,
+        "reserved_capacity_t": 165.0
+      },
+      {
+        "source_id": "B",
+        "year": 2035,
+        "reserved_capacity_t": 60.0
+      },
+      {
+        "source_id": "B",
+        "year": 2036,
+        "reserved_capacity_t": 60.0
+      },
+      {
+        "source_id": "B",
+        "year": 2037,
+        "reserved_capacity_t": 60.0
+      },
+      {
+        "source_id": "B",
+        "year": 2038,
+        "reserved_capacity_t": 65.0
+      },
+      {
+        "source_id": "B",
+        "year": 2039,
+        "reserved_capacity_t": 70.0
+      },
+      {
+        "source_id": "B",
+        "year": 2040,
+        "reserved_capacity_t": 75.0
+      },
+      {
+        "source_id": "C",
+        "year": 2037,
+        "reserved_capacity_t": 50.0
+      },
+      {
+        "source_id": "C",
+        "year": 2038,
+        "reserved_capacity_t": 70.0
+      },
+      {
+        "source_id": "C",
+        "year": 2039,
+        "reserved_capacity_t": 80.0
+      },
+      {
+        "source_id": "C",
+        "year": 2040,
+        "reserved_capacity_t": 90.0
+      },
+      {
+        "source_id": "D",
+        "year": 2038,
+        "reserved_capacity_t": 50.0
+      },
+      {
+        "source_id": "D",
+        "year": 2039,
+        "reserved_capacity_t": 90.0
+      },
+      {
+        "source_id": "D",
+        "year": 2040,
+        "reserved_capacity_t": 120.0
+      },
+      {
+        "source_id": "E",
+        "year": 2035,
+        "reserved_capacity_t": 30.0
+      },
+      {
+        "source_id": "E",
+        "year": 2036,
+        "reserved_capacity_t": 30.0
+      },
+      {
+        "source_id": "E",
+        "year": 2037,
+        "reserved_capacity_t": 35.0
+      },
+      {
+        "source_id": "E",
+        "year": 2038,
+        "reserved_capacity_t": 40.0
+      },
+      {
+        "source_id": "E",
+        "year": 2039,
+        "reserved_capacity_t": 45.0
+      },
+      {
+        "source_id": "E",
+        "year": 2040,
+        "reserved_capacity_t": 50.0
+      }
+    ],
+    "investments": [
+      {
+        "investment_id": "ZBO",
+        "enabled": true,
+        "commissioning_month": "2036-01"
+      },
+      {
+        "investment_id": "EARTH_NEW",
+        "enabled": true,
+        "buy_option": true,
+        "option_purchase_month": "2035-01",
+        "exercise_option": true,
+        "option_exercise_month": "2035-02"
+      },
+      {
+        "investment_id": "LUNAR_ISRU",
+        "enabled": true,
+        "funding_month": "2035-06"
+      }
+    ],
+    "initial_stock_acquisition": {
+      "source_id": "B",
+      "reserved_capacity_t_per_year": 55.0,
+      "ordered_volume_t": 55.0,
+      "order_date": "2034-08",
+      "planned_delivery_date": "2035-01",
+      "contract_period_start": "2034-01",
+      "contract_period_end": "2034-12",
+      "notes": "Closed acceptance-test pre-horizon acquisition.",
+      "status": "TEAM_DECISION"
+    },
+    "inventory_policy": {
+      "reserve_strategy_by_year": {
+        "2035": "physical",
+        "2036": "physical",
+        "2037": "physical",
+        "2038": "physical",
+        "2039": "physical",
+        "2040": "physical"
+      }
+    },
+    "emergency_role_by_year": {
+      "2035": "reserve_only",
+      "2036": "reserve_only",
+      "2037": "reserve_only",
+      "2038": "reserve_only",
+      "2039": "reserve_only",
+      "2040": "reserve_only"
+    }
+  },
+  "metadata": {
+    "status": "TEAM_DECISION",
+    "notes": "Diversified strategy using Earth-New and Lunar-ISRU."
+  }
+}

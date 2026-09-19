@@ -14,7 +14,7 @@
         "operator": ">=",
         "period": "2039",
         "reason": "total demand service minimum",
-        "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "share"
@@ -29,7 +29,7 @@
         "operator": ">=",
         "period": "2039-01",
         "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-        "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "days"
@@ -44,16 +44,17 @@
         "operator": ">=",
         "period": "2040-01",
         "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-        "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "days"
       }
     ],
+    "anticipated_consequence": "Reduced delivered lunar volume, lower inventory and potentially lower service.",
     "applied_overrides": [
       {
         "application_order": 1,
-        "basis": "Illustrative deterministic consequence scenario; not a claimed probability.",
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
         "factor": "actual_delivery_share",
         "factor_order": 1,
         "period_end": "2039-12",
@@ -72,7 +73,7 @@
         "discounted_cost_mln": 10480.757934894153,
         "fixed_opex_mln": 270.0,
         "holding_mln": 161.27499199891457,
-        "procurement_mln": 8864.328795808742,
+        "procurement_mln": 8864.32879580874,
         "reservation_mln": 482.1,
         "total_cost_mln": 11567.703787807655
       },
@@ -94,7 +95,7 @@
       "minimum_inventory_t": 17.300000000009504,
       "months_with_shortage": 0,
       "reserve_breaches": [],
-      "run_id": "run-0a6bf011a9548c27",
+      "run_id": "run-12c6690efb5ebdd0",
       "storage_overflow_t": 0.0,
       "total_demand_t": 1390.0,
       "total_service_by_year": {
@@ -110,11 +111,9 @@
       "violation_duration_periods": 0,
       "violations": []
     },
-    "baseline_run_id": "run-0a6bf011a9548c27",
-    "cause": "Research assumption for immature production and transfer operations",
-    "dependencies": [
-      "Lunar-ISRU commissioned"
-    ],
+    "baseline_run_id": "run-12c6690efb5ebdd0",
+    "cause": "Immature production and transfer operations",
+    "dependencies": [],
     "environment_id": "BASE+R-ISRU-UNDERDELIVERY",
     "event": "Lunar-ISRU supplies only 40% of feasible volume",
     "first_violation": {
@@ -127,7 +126,7 @@
       "operator": ">=",
       "period": "2039",
       "reason": "total demand service minimum",
-      "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+      "scenario": "BASE",
       "severity": "hard",
       "source_id": null,
       "unit": "share"
@@ -162,15 +161,18 @@
     "likelihood_basis": null,
     "likelihood_score": null,
     "likelihood_status": "UNKNOWN",
-    "mitigation": null,
+    "mitigation": {
+      "description": "Preserve Earth/Flex headroom; no automatic patch is asserted.",
+      "mitigation_id": "M-ISRU-DIVERSIFY"
+    },
     "name": "Lunar-ISRU underdelivery",
     "ordinal_risk_score": null,
-    "owner": "Supply strategy lead",
+    "owner": "supply_strategy",
     "period_end": "2039-12",
     "period_start": "2038-01",
     "provenance": {
       "impact": "DIGITAL_TWIN_RESULT",
-      "impact_run_id": "run-1c656c49443cfa27",
+      "impact_run_id": "run-291588eaf9eb676d",
       "impact_score": "TEAM_ASSUMPTION_SCORING_RULE",
       "likelihood": "UNKNOWN",
       "risk_definition": "TEAM_ASSUMPTION"
@@ -183,7 +185,7 @@
         "holding_mln": -72.45227839942943,
         "procurement_mln": 0.0,
         "reservation_mln": 0.0,
-        "total_cost_mln": -72.45227839942709
+        "total_cost_mln": -72.45227839943072
       },
       "critical_service_by_year": {
         "2035": 0.0,
@@ -215,6 +217,7 @@
       "unavailable_requested_supply_t": 74.77000000000001,
       "violation_duration_periods": 3
     },
+    "residual_consequence_statement": "Must be recomputed after an operator-approved diversification patch.",
     "risk_id": "R-ISRU-UNDERDELIVERY",
     "risk_metrics": {
       "costs": {
@@ -222,9 +225,9 @@
         "discounted_cost_mln": 10422.201445624629,
         "fixed_opex_mln": 270.0,
         "holding_mln": 88.82271359948514,
-        "procurement_mln": 8864.328795808742,
+        "procurement_mln": 8864.32879580874,
         "reservation_mln": 482.1,
-        "total_cost_mln": 11495.251509408228
+        "total_cost_mln": 11495.251509408225
       },
       "critical_service_by_year": {
         "2035": 1.0,
@@ -248,7 +251,7 @@
         "operator": ">=",
         "period": "2039",
         "reason": "total demand service minimum",
-        "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "share"
@@ -272,7 +275,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -287,13 +290,13 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
         }
       ],
-      "run_id": "run-1c656c49443cfa27",
+      "run_id": "run-291588eaf9eb676d",
       "storage_overflow_t": 0.0,
       "total_demand_t": 1390.0,
       "total_service_by_year": {
@@ -318,7 +321,7 @@
           "operator": ">=",
           "period": "2039",
           "reason": "total demand service minimum",
-          "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -333,7 +336,7 @@
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
@@ -348,16 +351,20 @@
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+R-ISRU-UNDERDELIVERY",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
         }
       ]
     },
-    "risk_run_id": "run-1c656c49443cfa27",
-    "source_references": [
-      "data/supply_sources.csv reliability_profile shown as metadata only"
+    "risk_run_id": "run-291588eaf9eb676d",
+    "source_references": [],
+    "stakeholder_ids": [
+      "operator",
+      "critical_consumers",
+      "fuel_suppliers",
+      "financing"
     ]
   },
   {
@@ -365,10 +372,11 @@
       "variable_price_multiplier"
     ],
     "all_violations": [],
+    "anticipated_consequence": "Procurement cost increases; physical deliveries must remain unchanged.",
     "applied_overrides": [
       {
         "application_order": 1,
-        "basis": "Illustrative deterministic price sensitivity.",
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
         "factor": "variable_price_multiplier",
         "factor_order": 1,
         "period_end": "2039-12",
@@ -387,7 +395,7 @@
         "discounted_cost_mln": 10480.757934894153,
         "fixed_opex_mln": 270.0,
         "holding_mln": 161.27499199891457,
-        "procurement_mln": 8864.328795808742,
+        "procurement_mln": 8864.32879580874,
         "reservation_mln": 482.1,
         "total_cost_mln": 11567.703787807655
       },
@@ -409,7 +417,7 @@
       "minimum_inventory_t": 17.300000000009504,
       "months_with_shortage": 0,
       "reserve_breaches": [],
-      "run_id": "run-0a6bf011a9548c27",
+      "run_id": "run-12c6690efb5ebdd0",
       "storage_overflow_t": 0.0,
       "total_demand_t": 1390.0,
       "total_service_by_year": {
@@ -425,7 +433,7 @@
       "violation_duration_periods": 0,
       "violations": []
     },
-    "baseline_run_id": "run-0a6bf011a9548c27",
+    "baseline_run_id": "run-12c6690efb5ebdd0",
     "cause": "Team commercial sensitivity assumption",
     "dependencies": [],
     "environment_id": "BASE+R-EARTH-PRICE",
@@ -446,7 +454,7 @@
       },
       "incremental_cost_pct": {
         "score": 2,
-        "value": 3.751824977204527
+        "value": 3.751824977204496
       },
       "shortage_share": {
         "score": 1,
@@ -464,15 +472,18 @@
     "likelihood_basis": "Team workshop judgement; not organizer data.",
     "likelihood_score": 2,
     "likelihood_status": "TEAM_ASSUMPTION",
-    "mitigation": null,
+    "mitigation": {
+      "description": "Compare diversified contract mix; no unpriced hedge benefit is assumed.",
+      "mitigation_id": "M-PRICE-HEDGE"
+    },
     "name": "Earth channel price shock",
     "ordinal_risk_score": 4,
-    "owner": "Commercial lead",
+    "owner": "commercial",
     "period_end": "2039-12",
     "period_start": "2038-01",
     "provenance": {
       "impact": "DIGITAL_TWIN_RESULT",
-      "impact_run_id": "run-5b64e65179c991f2",
+      "impact_run_id": "run-6fbe786168a9ad26",
       "impact_score": "TEAM_ASSUMPTION_SCORING_RULE",
       "likelihood": "TEAM_ASSUMPTION",
       "risk_definition": "TEAM_ASSUMPTION"
@@ -483,9 +494,9 @@
         "discounted_cost_mln": 365.724158143983,
         "fixed_opex_mln": 0.0,
         "holding_mln": 0.0,
-        "procurement_mln": 433.9999999999982,
+        "procurement_mln": 434.0,
         "reservation_mln": 0.0,
-        "total_cost_mln": 434.0000000000018
+        "total_cost_mln": 433.9999999999982
       },
       "critical_service_by_year": {
         "2035": 0.0,
@@ -517,6 +528,7 @@
       "unavailable_requested_supply_t": 0.0,
       "violation_duration_periods": 0
     },
+    "residual_consequence_statement": "Residual cost is computed only for an explicit approved plan.",
     "risk_id": "R-EARTH-PRICE",
     "risk_metrics": {
       "costs": {
@@ -526,7 +538,7 @@
         "holding_mln": 161.27499199891457,
         "procurement_mln": 9298.32879580874,
         "reservation_mln": 482.1,
-        "total_cost_mln": 12001.703787807657
+        "total_cost_mln": 12001.703787807653
       },
       "critical_service_by_year": {
         "2035": 1.0,
@@ -546,7 +558,7 @@
       "minimum_inventory_t": 17.300000000009504,
       "months_with_shortage": 0,
       "reserve_breaches": [],
-      "run_id": "run-5b64e65179c991f2",
+      "run_id": "run-6fbe786168a9ad26",
       "storage_overflow_t": 0.0,
       "total_demand_t": 1390.0,
       "total_service_by_year": {
@@ -562,9 +574,14 @@
       "violation_duration_periods": 0,
       "violations": []
     },
-    "risk_run_id": "run-5b64e65179c991f2",
+    "risk_run_id": "run-6fbe786168a9ad26",
     "source_references": [
       "TEAM_RATIONALE:price-workshop-v1"
+    ],
+    "stakeholder_ids": [
+      "operator",
+      "fuel_suppliers",
+      "financing"
     ]
   },
   {
@@ -573,79 +590,80 @@
     ],
     "all_violations": [
       {
-        "actual": 0.7255411764683191,
+        "actual": 0.9101141176470587,
         "code": "BASE_CRITICAL_SERVICE",
         "constraint_id": "BASE_CRITICAL_SERVICE",
-        "excess_or_gap": 0.26445882353168093,
-        "human_message": "Critical service is 72.55%; shortage is 46.658 t.",
+        "excess_or_gap": 0.07988588235294125,
+        "human_message": "Critical service is 91.01%; shortage is 15.281 t.",
         "limit": 0.99,
         "operator": ">=",
         "period": "2038",
         "reason": "critical demand service minimum",
-        "scenario": "BASE+R-CORE-OUTAGE",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "share"
       },
       {
-        "actual": 0.5467013333317903,
+        "actual": 0.8459037333317903,
         "code": "BASE_TOTAL_SERVICE",
         "constraint_id": "BASE_TOTAL_SERVICE",
-        "excess_or_gap": 0.4232986666682097,
-        "human_message": "Total service is 54.67%; shortage is 113.325 t.",
+        "excess_or_gap": 0.12409626666820972,
+        "human_message": "Total service is 84.59%; shortage is 38.524 t.",
         "limit": 0.97,
         "operator": ">=",
         "period": "2038",
         "reason": "total demand service minimum",
-        "scenario": "BASE+R-CORE-OUTAGE",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "share"
       },
       {
-        "actual": 0.0,
+        "actual": 4.835565625000004,
         "code": "RESERVE_45D",
         "constraint_id": "RESERVE_45D",
-        "excess_or_gap": 45.0,
-        "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+        "excess_or_gap": 40.164434375,
+        "human_message": "Reserve equivalence is 4.836 days; required 45.000 days.",
         "limit": 45.0,
         "operator": ">=",
         "period": "2039-01",
         "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-        "scenario": "BASE+R-CORE-OUTAGE",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "days"
       },
       {
-        "actual": 11.876850427350371,
+        "actual": 12.194119658119602,
         "code": "RESERVE_45D",
         "constraint_id": "RESERVE_45D",
-        "excess_or_gap": 33.12314957264963,
-        "human_message": "Reserve equivalence is 11.877 days; required 45.000 days.",
+        "excess_or_gap": 32.805880341880396,
+        "human_message": "Reserve equivalence is 12.194 days; required 45.000 days.",
         "limit": 45.0,
         "operator": ">=",
         "period": "2040-01",
         "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-        "scenario": "BASE+R-CORE-OUTAGE",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "days"
       }
     ],
+    "anticipated_consequence": "No Earth-Core arrivals in the declared disruption months; inventory may bridge part of the outage.",
     "applied_overrides": [
       {
         "application_order": 1,
-        "basis": "Deterministic outage used to evaluate consequences.",
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
         "factor": "availability_share",
         "factor_order": 1,
-        "period_end": "2038-12",
-        "period_start": "2038-01",
+        "period_end": "2038-09",
+        "period_start": "2038-04",
         "risk_id": "R-CORE-OUTAGE",
         "risk_order": 1,
         "source_id": "A",
         "status": "TEAM_ASSUMPTION",
-        "value": 0.0
+        "value": 0
       }
     ],
     "base_scenario_id": "BASE",
@@ -655,7 +673,7 @@
         "discounted_cost_mln": 10480.757934894153,
         "fixed_opex_mln": 270.0,
         "holding_mln": 161.27499199891457,
-        "procurement_mln": 8864.328795808742,
+        "procurement_mln": 8864.32879580874,
         "reservation_mln": 482.1,
         "total_cost_mln": 11567.703787807655
       },
@@ -677,7 +695,7 @@
       "minimum_inventory_t": 17.300000000009504,
       "months_with_shortage": 0,
       "reserve_breaches": [],
-      "run_id": "run-0a6bf011a9548c27",
+      "run_id": "run-12c6690efb5ebdd0",
       "storage_overflow_t": 0.0,
       "total_demand_t": 1390.0,
       "total_service_by_year": {
@@ -693,22 +711,22 @@
       "violation_duration_periods": 0,
       "violations": []
     },
-    "baseline_run_id": "run-0a6bf011a9548c27",
+    "baseline_run_id": "run-12c6690efb5ebdd0",
     "cause": "Illustrative launch-channel interruption",
     "dependencies": [],
     "environment_id": "BASE+R-CORE-OUTAGE",
     "event": "Earth-Core availability falls to zero",
     "first_violation": {
-      "actual": 0.7255411764683191,
+      "actual": 0.9101141176470587,
       "code": "BASE_CRITICAL_SERVICE",
       "constraint_id": "BASE_CRITICAL_SERVICE",
-      "excess_or_gap": 0.26445882353168093,
-      "human_message": "Critical service is 72.55%; shortage is 46.658 t.",
+      "excess_or_gap": 0.07988588235294125,
+      "human_message": "Critical service is 91.01%; shortage is 15.281 t.",
       "limit": 0.99,
       "operator": ">=",
       "period": "2038",
       "reason": "critical demand service minimum",
-      "scenario": "BASE+R-CORE-OUTAGE",
+      "scenario": "BASE",
       "severity": "hard",
       "source_id": null,
       "unit": "share"
@@ -716,11 +734,11 @@
     "impact_dimensions": {
       "critical_service_degradation_pp": {
         "score": 5,
-        "value": 27.445882353168095
+        "value": 8.988588235294126
       },
       "disruption_duration_months": {
-        "score": 5,
-        "value": 12.0
+        "score": 4,
+        "value": 4.0
       },
       "hard_violation_count": {
         "score": 4,
@@ -731,8 +749,8 @@
         "value": 0.0
       },
       "shortage_share": {
-        "score": 5,
-        "value": 0.08433458033600892
+        "score": 3,
+        "value": 0.02771515587557725
       }
     },
     "impact_score": 5,
@@ -744,44 +762,44 @@
     "likelihood_score": null,
     "likelihood_status": "UNKNOWN",
     "mitigation": {
-      "base_mitigated_cost_mln": 12639.58279480827,
+      "base_mitigated_cost_mln": 12639.582794808266,
       "base_original_cost_mln": 11567.703787807655,
       "mitigated_plan_id": "participant-baseline-example--mitigation-M-FLEX-2038",
-      "mitigation_cost_mln": 1071.8790070006144,
+      "mitigation_cost_mln": 1071.8790070006107,
       "mitigation_id": "M-FLEX-2038",
       "original_risk_metrics": {
         "costs": {
           "capex_mln": 1790.0,
-          "discounted_cost_mln": 10412.52794312916,
+          "discounted_cost_mln": 10418.64332496515,
           "fixed_opex_mln": 270.0,
-          "holding_mln": 78.1435839996899,
-          "procurement_mln": 8864.328795808742,
+          "holding_mln": 85.26836199962045,
+          "procurement_mln": 8864.32879580874,
           "reservation_mln": 482.1,
-          "total_cost_mln": 11484.572379808433
+          "total_cost_mln": 11491.697157808361
         },
         "critical_service_by_year": {
           "2035": 1.0,
           "2036": 1.0,
           "2037": 1.0,
-          "2038": 0.7255411764683191,
+          "2038": 0.9101141176470587,
           "2039": 1.0,
           "2040": 1.0
         },
-        "critical_shortage_t": 46.65800000038574,
+        "critical_shortage_t": 15.280600000000005,
         "delayed_delivery_count": 0,
         "delayed_delivery_t": 0.0,
-        "final_inventory_t": 4.601733332937997,
+        "final_inventory_t": 4.940733332937995,
         "first_violation": {
-          "actual": 0.7255411764683191,
+          "actual": 0.9101141176470587,
           "code": "BASE_CRITICAL_SERVICE",
           "constraint_id": "BASE_CRITICAL_SERVICE",
-          "excess_or_gap": 0.26445882353168093,
-          "human_message": "Critical service is 72.55%; shortage is 46.658 t.",
+          "excess_or_gap": 0.07988588235294125,
+          "human_message": "Critical service is 91.01%; shortage is 15.281 t.",
           "limit": 0.99,
           "operator": ">=",
           "period": "2038",
           "reason": "critical demand service minimum",
-          "scenario": "BASE+R-CORE-OUTAGE",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
@@ -793,110 +811,110 @@
           "2040-01"
         ],
         "minimum_inventory_t": 0.0,
-        "months_with_shortage": 12,
+        "months_with_shortage": 4,
         "reserve_breaches": [
           {
-            "actual": 0.0,
+            "actual": 4.835565625000004,
             "code": "RESERVE_45D",
             "constraint_id": "RESERVE_45D",
-            "excess_or_gap": 45.0,
-            "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+            "excess_or_gap": 40.164434375,
+            "human_message": "Reserve equivalence is 4.836 days; required 45.000 days.",
             "limit": 45.0,
             "operator": ">=",
             "period": "2039-01",
             "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-            "scenario": "BASE+R-CORE-OUTAGE",
+            "scenario": "BASE",
             "severity": "hard",
             "source_id": null,
             "unit": "days"
           },
           {
-            "actual": 11.876850427350371,
+            "actual": 12.194119658119602,
             "code": "RESERVE_45D",
             "constraint_id": "RESERVE_45D",
-            "excess_or_gap": 33.12314957264963,
-            "human_message": "Reserve equivalence is 11.877 days; required 45.000 days.",
+            "excess_or_gap": 32.805880341880396,
+            "human_message": "Reserve equivalence is 12.194 days; required 45.000 days.",
             "limit": 45.0,
             "operator": ">=",
             "period": "2040-01",
             "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-            "scenario": "BASE+R-CORE-OUTAGE",
+            "scenario": "BASE",
             "severity": "hard",
             "source_id": null,
             "unit": "days"
           }
         ],
-        "run_id": "run-964e9491bbcb724f",
+        "run_id": "run-47d05c145fdbd7d8",
         "storage_overflow_t": 0.0,
         "total_demand_t": 1390.0,
         "total_service_by_year": {
           "2035": 1.0000000000000002,
           "2036": 1.0,
           "2037": 1.0,
-          "2038": 0.5467013333317903,
-          "2039": 0.98781125,
+          "2038": 0.8459037333317903,
+          "2039": 1.0000000000000002,
           "2040": 1.0000000000000002
         },
-        "total_shortage_t": 117.2250666670524,
-        "unavailable_requested_supply_t": 160.00000000040006,
+        "total_shortage_t": 38.52406666705238,
+        "unavailable_requested_supply_t": 80.00000000040005,
         "violation_duration_periods": 3,
         "violations": [
           {
-            "actual": 0.7255411764683191,
+            "actual": 0.9101141176470587,
             "code": "BASE_CRITICAL_SERVICE",
             "constraint_id": "BASE_CRITICAL_SERVICE",
-            "excess_or_gap": 0.26445882353168093,
-            "human_message": "Critical service is 72.55%; shortage is 46.658 t.",
+            "excess_or_gap": 0.07988588235294125,
+            "human_message": "Critical service is 91.01%; shortage is 15.281 t.",
             "limit": 0.99,
             "operator": ">=",
             "period": "2038",
             "reason": "critical demand service minimum",
-            "scenario": "BASE+R-CORE-OUTAGE",
+            "scenario": "BASE",
             "severity": "hard",
             "source_id": null,
             "unit": "share"
           },
           {
-            "actual": 0.5467013333317903,
+            "actual": 0.8459037333317903,
             "code": "BASE_TOTAL_SERVICE",
             "constraint_id": "BASE_TOTAL_SERVICE",
-            "excess_or_gap": 0.4232986666682097,
-            "human_message": "Total service is 54.67%; shortage is 113.325 t.",
+            "excess_or_gap": 0.12409626666820972,
+            "human_message": "Total service is 84.59%; shortage is 38.524 t.",
             "limit": 0.97,
             "operator": ">=",
             "period": "2038",
             "reason": "total demand service minimum",
-            "scenario": "BASE+R-CORE-OUTAGE",
+            "scenario": "BASE",
             "severity": "hard",
             "source_id": null,
             "unit": "share"
           },
           {
-            "actual": 0.0,
+            "actual": 4.835565625000004,
             "code": "RESERVE_45D",
             "constraint_id": "RESERVE_45D",
-            "excess_or_gap": 45.0,
-            "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+            "excess_or_gap": 40.164434375,
+            "human_message": "Reserve equivalence is 4.836 days; required 45.000 days.",
             "limit": 45.0,
             "operator": ">=",
             "period": "2039-01",
             "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-            "scenario": "BASE+R-CORE-OUTAGE",
+            "scenario": "BASE",
             "severity": "hard",
             "source_id": null,
             "unit": "days"
           },
           {
-            "actual": 11.876850427350371,
+            "actual": 12.194119658119602,
             "code": "RESERVE_45D",
             "constraint_id": "RESERVE_45D",
-            "excess_or_gap": 33.12314957264963,
-            "human_message": "Reserve equivalence is 11.877 days; required 45.000 days.",
+            "excess_or_gap": 32.805880341880396,
+            "human_message": "Reserve equivalence is 12.194 days; required 45.000 days.",
             "limit": 45.0,
             "operator": ">=",
             "period": "2040-01",
             "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-            "scenario": "BASE+R-CORE-OUTAGE",
+            "scenario": "BASE",
             "severity": "hard",
             "source_id": null,
             "unit": "days"
@@ -910,9 +928,9 @@
             "discounted_cost_mln": 11403.198571515535,
             "fixed_opex_mln": 270.0,
             "holding_mln": 237.65399899952754,
-            "procurement_mln": 9843.328795808742,
+            "procurement_mln": 9843.32879580874,
             "reservation_mln": 498.6,
-            "total_cost_mln": 12639.58279480827
+            "total_cost_mln": 12639.582794808266
           },
           "critical_service_by_year": {
             "2035": 1.0,
@@ -962,7 +980,7 @@
           "minimum_inventory_t": 17.300000000009504,
           "months_with_shortage": 0,
           "reserve_breaches": [],
-          "run_id": "run-af644adef28ac894",
+          "run_id": "run-7c2de0f85f79bf22",
           "storage_overflow_t": 72.63096666624786,
           "total_demand_t": 1390.0,
           "total_service_by_year": {
@@ -1207,191 +1225,129 @@
         "delta": {
           "costs": {
             "capex_mln": 0.0,
-            "discounted_cost_mln": -96.71938884552947,
+            "discounted_cost_mln": -41.34743662461369,
             "fixed_opex_mln": 0.0,
-            "holding_mln": -117.07376699983772,
+            "holding_mln": -49.110207000613,
             "procurement_mln": 0.0,
             "reservation_mln": 0.0,
-            "total_cost_mln": -117.07376699983797
+            "total_cost_mln": -49.1102070006109
           },
           "critical_service_by_year": {
             "2035": 0.0,
             "2036": 0.0,
             "2037": 0.0,
-            "2038": -0.03476313725717095,
+            "2038": 0.0,
             "2039": 0.0,
             "2040": 0.0
           },
-          "critical_shortage_t": 5.909733333719071,
+          "critical_shortage_t": 0.0,
           "delayed_delivery_count": 0,
           "delayed_delivery_t": 0.0,
-          "final_inventory_t": -44.57770000003303,
-          "hard_violation_count": -11,
-          "minimum_annual_critical_service_delta": -0.03476313725717095,
-          "minimum_annual_total_service_delta": -0.16348533333487625,
-          "minimum_inventory_t": -17.300000000009504,
-          "months_with_shortage": 10,
+          "final_inventory_t": -6.409033333752092,
+          "hard_violation_count": -14,
+          "minimum_annual_critical_service_delta": 0.0,
+          "minimum_annual_total_service_delta": 0.0,
+          "minimum_inventory_t": -10.54073333372855,
+          "months_with_shortage": 0,
           "storage_overflow_t": -72.63096666624786,
           "total_service_by_year": {
             "2035": 0.0,
             "2036": 0.0,
             "2037": 0.0,
-            "2038": -0.16348533333487625,
+            "2038": 0.0,
             "2039": 0.0,
             "2040": 0.0
           },
-          "total_shortage_t": 40.87133333371911,
-          "unavailable_requested_supply_t": 160.0,
-          "violation_duration_periods": -12
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 80.0,
+          "violation_duration_periods": -14
         },
         "risk": {
           "costs": {
             "capex_mln": 1790.0,
-            "discounted_cost_mln": 11306.479182670006,
+            "discounted_cost_mln": 11361.851134890921,
             "fixed_opex_mln": 270.0,
-            "holding_mln": 120.58023199968983,
-            "procurement_mln": 9843.328795808742,
+            "holding_mln": 188.54379199891454,
+            "procurement_mln": 9843.32879580874,
             "reservation_mln": 498.6,
-            "total_cost_mln": 12522.509027808432
+            "total_cost_mln": 12590.472587807655
           },
           "critical_service_by_year": {
             "2035": 1.0,
             "2036": 1.0,
             "2037": 1.0,
-            "2038": 0.965236862742829,
+            "2038": 1.0,
             "2039": 1.0,
             "2040": 1.0
           },
-          "critical_shortage_t": 5.909733333719071,
+          "critical_shortage_t": 0.0,
           "delayed_delivery_count": 0,
           "delayed_delivery_t": 0.0,
-          "final_inventory_t": 36.92799999960462,
+          "final_inventory_t": 75.09666666588556,
           "first_violation": {
-            "actual": 0.965236862742829,
-            "code": "BASE_CRITICAL_SERVICE",
-            "constraint_id": "BASE_CRITICAL_SERVICE",
-            "excess_or_gap": 0.024763137257170942,
-            "human_message": "Critical service is 96.52%; shortage is 5.910 t.",
-            "limit": 0.99,
+            "actual": 43.53613541622673,
+            "code": "RESERVE_45D",
+            "constraint_id": "RESERVE_45D",
+            "excess_or_gap": 1.4638645837732724,
+            "human_message": "Reserve equivalence is 43.536 days; required 45.000 days.",
+            "limit": 45.0,
             "operator": ">=",
-            "period": "2038",
-            "reason": "critical demand service minimum",
-            "scenario": "BASE+R-CORE-OUTAGE",
+            "period": "2039-01",
+            "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+            "scenario": "BASE",
             "severity": "hard",
             "source_id": null,
-            "unit": "share"
+            "unit": "days"
           },
-          "hard_violation_count": 4,
+          "hard_violation_count": 1,
           "hard_violation_periods": [
-            "2038",
-            "2039-01",
-            "2040-01"
+            "2039-01"
           ],
-          "minimum_inventory_t": 0.0,
-          "months_with_shortage": 10,
+          "minimum_inventory_t": 6.759266666280954,
+          "months_with_shortage": 0,
           "reserve_breaches": [
             {
-              "actual": 0.0,
+              "actual": 43.53613541622673,
               "code": "RESERVE_45D",
               "constraint_id": "RESERVE_45D",
-              "excess_or_gap": 45.0,
-              "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+              "excess_or_gap": 1.4638645837732724,
+              "human_message": "Reserve equivalence is 43.536 days; required 45.000 days.",
               "limit": 45.0,
               "operator": ">=",
               "period": "2039-01",
               "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-              "scenario": "BASE+R-CORE-OUTAGE",
-              "severity": "hard",
-              "source_id": null,
-              "unit": "days"
-            },
-            {
-              "actual": 42.13092051282042,
-              "code": "RESERVE_45D",
-              "constraint_id": "RESERVE_45D",
-              "excess_or_gap": 2.869079487179583,
-              "human_message": "Reserve equivalence is 42.131 days; required 45.000 days.",
-              "limit": 45.0,
-              "operator": ">=",
-              "period": "2040-01",
-              "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-              "scenario": "BASE+R-CORE-OUTAGE",
+              "scenario": "BASE",
               "severity": "hard",
               "source_id": null,
               "unit": "days"
             }
           ],
-          "run_id": "run-96b5f2b25a1f528f",
+          "run_id": "run-8d81574749be0881",
           "storage_overflow_t": 0.0,
           "total_demand_t": 1390.0,
           "total_service_by_year": {
             "2035": 1.0000000000000002,
             "2036": 1.0,
             "2037": 1.0,
-            "2038": 0.8365146666651236,
+            "2038": 0.9999999999999999,
             "2039": 1.0000000000000002,
             "2040": 1.0000000000000002
           },
-          "total_shortage_t": 40.87133333371911,
-          "unavailable_requested_supply_t": 160.00000000040006,
-          "violation_duration_periods": 3,
+          "total_shortage_t": 0.0,
+          "unavailable_requested_supply_t": 80.00000000040008,
+          "violation_duration_periods": 1,
           "violations": [
             {
-              "actual": 0.965236862742829,
-              "code": "BASE_CRITICAL_SERVICE",
-              "constraint_id": "BASE_CRITICAL_SERVICE",
-              "excess_or_gap": 0.024763137257170942,
-              "human_message": "Critical service is 96.52%; shortage is 5.910 t.",
-              "limit": 0.99,
-              "operator": ">=",
-              "period": "2038",
-              "reason": "critical demand service minimum",
-              "scenario": "BASE+R-CORE-OUTAGE",
-              "severity": "hard",
-              "source_id": null,
-              "unit": "share"
-            },
-            {
-              "actual": 0.8365146666651236,
-              "code": "BASE_TOTAL_SERVICE",
-              "constraint_id": "BASE_TOTAL_SERVICE",
-              "excess_or_gap": 0.13348533333487633,
-              "human_message": "Total service is 83.65%; shortage is 40.871 t.",
-              "limit": 0.97,
-              "operator": ">=",
-              "period": "2038",
-              "reason": "total demand service minimum",
-              "scenario": "BASE+R-CORE-OUTAGE",
-              "severity": "hard",
-              "source_id": null,
-              "unit": "share"
-            },
-            {
-              "actual": 0.0,
+              "actual": 43.53613541622673,
               "code": "RESERVE_45D",
               "constraint_id": "RESERVE_45D",
-              "excess_or_gap": 45.0,
-              "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+              "excess_or_gap": 1.4638645837732724,
+              "human_message": "Reserve equivalence is 43.536 days; required 45.000 days.",
               "limit": 45.0,
               "operator": ">=",
               "period": "2039-01",
               "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-              "scenario": "BASE+R-CORE-OUTAGE",
-              "severity": "hard",
-              "source_id": null,
-              "unit": "days"
-            },
-            {
-              "actual": 42.13092051282042,
-              "code": "RESERVE_45D",
-              "constraint_id": "RESERVE_45D",
-              "excess_or_gap": 2.869079487179583,
-              "human_message": "Reserve equivalence is 42.131 days; required 45.000 days.",
-              "limit": 45.0,
-              "operator": ">=",
-              "period": "2040-01",
-              "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-              "scenario": "BASE+R-CORE-OUTAGE",
+              "scenario": "BASE",
               "severity": "hard",
               "source_id": null,
               "unit": "days"
@@ -1403,12 +1359,12 @@
         "aggregation": "maximum_dimension_score",
         "dimensions": {
           "critical_service_degradation_pp": {
-            "score": 4,
-            "value": 3.476313725717095
+            "score": 1,
+            "value": 0.0
           },
           "disruption_duration_months": {
-            "score": 5,
-            "value": 10.0
+            "score": 1,
+            "value": 0.0
           },
           "hard_violation_count": {
             "score": 1,
@@ -1419,11 +1375,11 @@
             "value": 0.0
           },
           "shortage_share": {
-            "score": 3,
-            "value": 0.02940383693073317
+            "score": 1,
+            "value": 0.0
           }
         },
-        "impact_score": 5,
+        "impact_score": 1,
         "provenance": {
           "config_id": "team-risk-scoring-v1",
           "physical_consequences_source": "DIGITAL_TWIN_RESULT",
@@ -1439,12 +1395,12 @@
     },
     "name": "Earth-Core temporary unavailability",
     "ordinal_risk_score": null,
-    "owner": "Operations lead",
-    "period_end": "2038-12",
-    "period_start": "2038-01",
+    "owner": "operations",
+    "period_end": "2038-09",
+    "period_start": "2038-04",
     "provenance": {
       "impact": "DIGITAL_TWIN_RESULT",
-      "impact_run_id": "run-964e9491bbcb724f",
+      "impact_run_id": "run-47d05c145fdbd7d8",
       "impact_score": "TEAM_ASSUMPTION_SCORING_RULE",
       "likelihood": "UNKNOWN",
       "risk_definition": "TEAM_ASSUMPTION"
@@ -1452,77 +1408,78 @@
     "quantitative_delta": {
       "costs": {
         "capex_mln": 0.0,
-        "discounted_cost_mln": -68.22999176499252,
+        "discounted_cost_mln": -62.114609929001745,
         "fixed_opex_mln": 0.0,
-        "holding_mln": -83.13140799922468,
+        "holding_mln": -76.00662999929412,
         "procurement_mln": 0.0,
         "reservation_mln": 0.0,
-        "total_cost_mln": -83.13140799922257
+        "total_cost_mln": -76.00662999929409
       },
       "critical_service_by_year": {
         "2035": 0.0,
         "2036": 0.0,
         "2037": 0.0,
-        "2038": -0.27445882353168094,
+        "2038": -0.08988588235294126,
         "2039": 0.0,
         "2040": 0.0
       },
-      "critical_shortage_t": 46.65800000038574,
+      "critical_shortage_t": 15.280600000000005,
       "delayed_delivery_count": 0,
       "delayed_delivery_t": 0.0,
-      "final_inventory_t": -40.854933332947596,
+      "final_inventory_t": -40.5159333329476,
       "hard_violation_count": 4,
-      "minimum_annual_critical_service_delta": -0.27445882353168094,
-      "minimum_annual_total_service_delta": -0.4532986666682096,
+      "minimum_annual_critical_service_delta": -0.08988588235294126,
+      "minimum_annual_total_service_delta": -0.15409626666820964,
       "minimum_inventory_t": -17.300000000009504,
-      "months_with_shortage": 12,
+      "months_with_shortage": 4,
       "storage_overflow_t": 0.0,
       "total_service_by_year": {
         "2035": 0.0,
         "2036": 0.0,
         "2037": 0.0,
-        "2038": -0.4532986666682096,
-        "2039": -0.012188750000000192,
+        "2038": -0.15409626666820964,
+        "2039": 0.0,
         "2040": 0.0
       },
-      "total_shortage_t": 117.2250666670524,
-      "unavailable_requested_supply_t": 160.0,
+      "total_shortage_t": 38.52406666705238,
+      "unavailable_requested_supply_t": 80.0,
       "violation_duration_periods": 3
     },
+    "residual_consequence_statement": "Residual shortage and mitigation cost are recomputed through the same digital twin.",
     "risk_id": "R-CORE-OUTAGE",
     "risk_metrics": {
       "costs": {
         "capex_mln": 1790.0,
-        "discounted_cost_mln": 10412.52794312916,
+        "discounted_cost_mln": 10418.64332496515,
         "fixed_opex_mln": 270.0,
-        "holding_mln": 78.1435839996899,
-        "procurement_mln": 8864.328795808742,
+        "holding_mln": 85.26836199962045,
+        "procurement_mln": 8864.32879580874,
         "reservation_mln": 482.1,
-        "total_cost_mln": 11484.572379808433
+        "total_cost_mln": 11491.697157808361
       },
       "critical_service_by_year": {
         "2035": 1.0,
         "2036": 1.0,
         "2037": 1.0,
-        "2038": 0.7255411764683191,
+        "2038": 0.9101141176470587,
         "2039": 1.0,
         "2040": 1.0
       },
-      "critical_shortage_t": 46.65800000038574,
+      "critical_shortage_t": 15.280600000000005,
       "delayed_delivery_count": 0,
       "delayed_delivery_t": 0.0,
-      "final_inventory_t": 4.601733332937997,
+      "final_inventory_t": 4.940733332937995,
       "first_violation": {
-        "actual": 0.7255411764683191,
+        "actual": 0.9101141176470587,
         "code": "BASE_CRITICAL_SERVICE",
         "constraint_id": "BASE_CRITICAL_SERVICE",
-        "excess_or_gap": 0.26445882353168093,
-        "human_message": "Critical service is 72.55%; shortage is 46.658 t.",
+        "excess_or_gap": 0.07988588235294125,
+        "human_message": "Critical service is 91.01%; shortage is 15.281 t.",
         "limit": 0.99,
         "operator": ">=",
         "period": "2038",
         "reason": "critical demand service minimum",
-        "scenario": "BASE+R-CORE-OUTAGE",
+        "scenario": "BASE",
         "severity": "hard",
         "source_id": null,
         "unit": "share"
@@ -1534,117 +1491,1447 @@
         "2040-01"
       ],
       "minimum_inventory_t": 0.0,
-      "months_with_shortage": 12,
+      "months_with_shortage": 4,
       "reserve_breaches": [
         {
-          "actual": 0.0,
+          "actual": 4.835565625000004,
           "code": "RESERVE_45D",
           "constraint_id": "RESERVE_45D",
-          "excess_or_gap": 45.0,
-          "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+          "excess_or_gap": 40.164434375,
+          "human_message": "Reserve equivalence is 4.836 days; required 45.000 days.",
           "limit": 45.0,
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+R-CORE-OUTAGE",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
         },
         {
-          "actual": 11.876850427350371,
+          "actual": 12.194119658119602,
           "code": "RESERVE_45D",
           "constraint_id": "RESERVE_45D",
-          "excess_or_gap": 33.12314957264963,
-          "human_message": "Reserve equivalence is 11.877 days; required 45.000 days.",
+          "excess_or_gap": 32.805880341880396,
+          "human_message": "Reserve equivalence is 12.194 days; required 45.000 days.",
           "limit": 45.0,
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+R-CORE-OUTAGE",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
         }
       ],
-      "run_id": "run-964e9491bbcb724f",
+      "run_id": "run-47d05c145fdbd7d8",
       "storage_overflow_t": 0.0,
       "total_demand_t": 1390.0,
       "total_service_by_year": {
         "2035": 1.0000000000000002,
         "2036": 1.0,
         "2037": 1.0,
-        "2038": 0.5467013333317903,
-        "2039": 0.98781125,
+        "2038": 0.8459037333317903,
+        "2039": 1.0000000000000002,
         "2040": 1.0000000000000002
       },
-      "total_shortage_t": 117.2250666670524,
-      "unavailable_requested_supply_t": 160.00000000040006,
+      "total_shortage_t": 38.52406666705238,
+      "unavailable_requested_supply_t": 80.00000000040005,
       "violation_duration_periods": 3,
       "violations": [
         {
-          "actual": 0.7255411764683191,
+          "actual": 0.9101141176470587,
           "code": "BASE_CRITICAL_SERVICE",
           "constraint_id": "BASE_CRITICAL_SERVICE",
-          "excess_or_gap": 0.26445882353168093,
-          "human_message": "Critical service is 72.55%; shortage is 46.658 t.",
+          "excess_or_gap": 0.07988588235294125,
+          "human_message": "Critical service is 91.01%; shortage is 15.281 t.",
           "limit": 0.99,
           "operator": ">=",
           "period": "2038",
           "reason": "critical demand service minimum",
-          "scenario": "BASE+R-CORE-OUTAGE",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
         },
         {
-          "actual": 0.5467013333317903,
+          "actual": 0.8459037333317903,
           "code": "BASE_TOTAL_SERVICE",
           "constraint_id": "BASE_TOTAL_SERVICE",
-          "excess_or_gap": 0.4232986666682097,
-          "human_message": "Total service is 54.67%; shortage is 113.325 t.",
+          "excess_or_gap": 0.12409626666820972,
+          "human_message": "Total service is 84.59%; shortage is 38.524 t.",
           "limit": 0.97,
           "operator": ">=",
           "period": "2038",
           "reason": "total demand service minimum",
-          "scenario": "BASE+R-CORE-OUTAGE",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "share"
         },
         {
-          "actual": 0.0,
+          "actual": 4.835565625000004,
           "code": "RESERVE_45D",
           "constraint_id": "RESERVE_45D",
-          "excess_or_gap": 45.0,
-          "human_message": "Reserve equivalence is 0.000 days; required 45.000 days.",
+          "excess_or_gap": 40.164434375,
+          "human_message": "Reserve equivalence is 4.836 days; required 45.000 days.",
           "limit": 45.0,
           "operator": ">=",
           "period": "2039-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+R-CORE-OUTAGE",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
         },
         {
-          "actual": 11.876850427350371,
+          "actual": 12.194119658119602,
           "code": "RESERVE_45D",
           "constraint_id": "RESERVE_45D",
-          "excess_or_gap": 33.12314957264963,
-          "human_message": "Reserve equivalence is 11.877 days; required 45.000 days.",
+          "excess_or_gap": 32.805880341880396,
+          "human_message": "Reserve equivalence is 12.194 days; required 45.000 days.",
           "limit": 45.0,
           "operator": ">=",
           "period": "2040-01",
           "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
-          "scenario": "BASE+R-CORE-OUTAGE",
+          "scenario": "BASE",
           "severity": "hard",
           "source_id": null,
           "unit": "days"
         }
       ]
     },
-    "risk_run_id": "run-964e9491bbcb724f",
-    "source_references": []
+    "risk_run_id": "run-47d05c145fdbd7d8",
+    "source_references": [],
+    "stakeholder_ids": [
+      "operator",
+      "critical_consumers",
+      "commercial_consumers",
+      "launch_logistics"
+    ]
+  },
+  {
+    "affected_parameters": [
+      "investment_commissioning_delay_months"
+    ],
+    "all_violations": [],
+    "anticipated_consequence": "Early Earth-New orders become unavailable and service/inventory may deteriorate.",
+    "applied_overrides": [
+      {
+        "application_order": 1,
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+        "factor": "investment_commissioning_delay_months",
+        "factor_order": 1,
+        "investment_id": "EARTH_NEW",
+        "period_end": "2035-02",
+        "period_start": "2035-02",
+        "risk_id": "R-EARTH-NEW-DELAY",
+        "risk_order": 1,
+        "status": "TEAM_ASSUMPTION",
+        "value": 6
+      }
+    ],
+    "base_scenario_id": "BASE",
+    "baseline_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10480.757934894153,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 161.27499199891457,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11567.703787807655
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 45.45666666588559,
+      "first_violation": null,
+      "hard_violation_count": 0,
+      "hard_violation_periods": [],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [],
+      "run_id": "run-12c6690efb5ebdd0",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 0,
+      "violations": []
+    },
+    "baseline_run_id": "run-12c6690efb5ebdd0",
+    "cause": "Integration and readiness uncertainty",
+    "dependencies": [],
+    "environment_id": "BASE+R-EARTH-NEW-DELAY",
+    "event": "Earth-New commissioning slips by six months",
+    "first_violation": null,
+    "impact_dimensions": {
+      "critical_service_degradation_pp": {
+        "score": 1,
+        "value": 0.0
+      },
+      "disruption_duration_months": {
+        "score": 1,
+        "value": 0.0
+      },
+      "hard_violation_count": {
+        "score": 1,
+        "value": 0.0
+      },
+      "incremental_cost_pct": {
+        "score": 1,
+        "value": 0.0
+      },
+      "shortage_share": {
+        "score": 1,
+        "value": 0.0
+      }
+    },
+    "impact_score": 1,
+    "likelihood": {
+      "basis": null,
+      "likelihood_type": "unknown"
+    },
+    "likelihood_basis": null,
+    "likelihood_score": null,
+    "likelihood_status": "UNKNOWN",
+    "mitigation": {
+      "description": "Assess temporary flexible supply only through an explicit plan patch.",
+      "mitigation_id": "M-EARTH-NEW-BRIDGE"
+    },
+    "name": "Earth-New commissioning delay",
+    "ordinal_risk_score": null,
+    "owner": "investment_program",
+    "period_end": "2035-02",
+    "period_start": "2035-02",
+    "provenance": {
+      "impact": "DIGITAL_TWIN_RESULT",
+      "impact_run_id": "run-3cee29c4d5e52be1",
+      "impact_score": "TEAM_ASSUMPTION_SCORING_RULE",
+      "likelihood": "UNKNOWN",
+      "risk_definition": "TEAM_ASSUMPTION"
+    },
+    "quantitative_delta": {
+      "costs": {
+        "capex_mln": 0.0,
+        "discounted_cost_mln": 0.0,
+        "fixed_opex_mln": 0.0,
+        "holding_mln": 0.0,
+        "procurement_mln": 0.0,
+        "reservation_mln": 0.0,
+        "total_cost_mln": 0.0
+      },
+      "critical_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 0.0,
+      "hard_violation_count": 0,
+      "minimum_annual_critical_service_delta": 0.0,
+      "minimum_annual_total_service_delta": 0.0,
+      "minimum_inventory_t": 0.0,
+      "months_with_shortage": 0,
+      "storage_overflow_t": 0.0,
+      "total_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 0.0,
+      "violation_duration_periods": 0
+    },
+    "residual_consequence_statement": "Unknown until a bridge plan is approved and simulated.",
+    "risk_id": "R-EARTH-NEW-DELAY",
+    "risk_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10480.757934894153,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 161.27499199891457,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11567.703787807655
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 45.45666666588559,
+      "first_violation": null,
+      "hard_violation_count": 0,
+      "hard_violation_periods": [],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [],
+      "run_id": "run-3cee29c4d5e52be1",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 0,
+      "violations": []
+    },
+    "risk_run_id": "run-3cee29c4d5e52be1",
+    "source_references": [],
+    "stakeholder_ids": [
+      "operator",
+      "fuel_suppliers",
+      "launch_logistics",
+      "financing"
+    ]
+  },
+  {
+    "affected_parameters": [
+      "storage_loss_rate_override"
+    ],
+    "all_violations": [
+      {
+        "actual": 42.878374999638936,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 2.121625000361064,
+        "human_message": "Reserve equivalence is 42.878 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2040-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      }
+    ],
+    "anticipated_consequence": "Higher throughput loss reduces accepted net fuel and inventory.",
+    "applied_overrides": [
+      {
+        "application_order": 1,
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+        "factor": "storage_loss_rate_override",
+        "factor_order": 1,
+        "period_end": "2040-12",
+        "period_start": "2038-01",
+        "risk_id": "R-STORAGE-DEGRADATION",
+        "risk_order": 1,
+        "status": "TEAM_ASSUMPTION",
+        "storage_id": "ZBO",
+        "value": 0.025
+      }
+    ],
+    "base_scenario_id": "BASE",
+    "baseline_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10480.757934894153,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 161.27499199891457,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11567.703787807655
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 45.45666666588559,
+      "first_violation": null,
+      "hard_violation_count": 0,
+      "hard_violation_periods": [],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [],
+      "run_id": "run-12c6690efb5ebdd0",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 0,
+      "violations": []
+    },
+    "baseline_run_id": "run-12c6690efb5ebdd0",
+    "cause": "Illustrative equipment degradation",
+    "dependencies": [],
+    "environment_id": "BASE+R-STORAGE-DEGRADATION",
+    "event": "Active ZBO throughput loss rises to 2.5%",
+    "first_violation": {
+      "actual": 42.878374999638936,
+      "code": "RESERVE_45D",
+      "constraint_id": "RESERVE_45D",
+      "excess_or_gap": 2.121625000361064,
+      "human_message": "Reserve equivalence is 42.878 days; required 45.000 days.",
+      "limit": 45.0,
+      "operator": ">=",
+      "period": "2040-01",
+      "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+      "scenario": "BASE",
+      "severity": "hard",
+      "source_id": null,
+      "unit": "days"
+    },
+    "impact_dimensions": {
+      "critical_service_degradation_pp": {
+        "score": 1,
+        "value": 0.0
+      },
+      "disruption_duration_months": {
+        "score": 1,
+        "value": 0.0
+      },
+      "hard_violation_count": {
+        "score": 2,
+        "value": 1.0
+      },
+      "incremental_cost_pct": {
+        "score": 1,
+        "value": 0.0
+      },
+      "shortage_share": {
+        "score": 1,
+        "value": 0.0
+      }
+    },
+    "impact_score": 2,
+    "likelihood": {
+      "basis": null,
+      "likelihood_type": "unknown"
+    },
+    "likelihood_basis": null,
+    "likelihood_score": null,
+    "likelihood_status": "UNKNOWN",
+    "mitigation": {
+      "description": "Evaluate additional gross supply or maintenance timing as operator decisions.",
+      "mitigation_id": "M-STORAGE-MARGIN"
+    },
+    "name": "Storage degradation",
+    "ordinal_risk_score": null,
+    "owner": "storage_operations",
+    "period_end": "2040-12",
+    "period_start": "2038-01",
+    "provenance": {
+      "impact": "DIGITAL_TWIN_RESULT",
+      "impact_run_id": "run-ceb5676688d6b449",
+      "impact_score": "TEAM_ASSUMPTION_SCORING_RULE",
+      "likelihood": "UNKNOWN",
+      "risk_definition": "TEAM_ASSUMPTION"
+    },
+    "quantitative_delta": {
+      "costs": {
+        "capex_mln": 0.0,
+        "discounted_cost_mln": -10.074679289271444,
+        "fixed_opex_mln": 0.0,
+        "holding_mln": -12.536731999998068,
+        "procurement_mln": 0.0,
+        "reservation_mln": 0.0,
+        "total_cost_mln": -12.536731999996846
+      },
+      "critical_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": -12.755166666661381,
+      "hard_violation_count": 1,
+      "minimum_annual_critical_service_delta": 0.0,
+      "minimum_annual_total_service_delta": 0.0,
+      "minimum_inventory_t": 0.0,
+      "months_with_shortage": 0,
+      "storage_overflow_t": 0.0,
+      "total_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 0.0,
+      "violation_duration_periods": 1
+    },
+    "residual_consequence_statement": "Not monetized beyond calculated supply and operating effects.",
+    "risk_id": "R-STORAGE-DEGRADATION",
+    "risk_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10470.683255604881,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 148.7382599989165,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11555.167055807658
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 32.70149999922421,
+      "first_violation": {
+        "actual": 42.878374999638936,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 2.121625000361064,
+        "human_message": "Reserve equivalence is 42.878 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2040-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      },
+      "hard_violation_count": 1,
+      "hard_violation_periods": [
+        "2040-01"
+      ],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [
+        {
+          "actual": 42.878374999638936,
+          "code": "RESERVE_45D",
+          "constraint_id": "RESERVE_45D",
+          "excess_or_gap": 2.121625000361064,
+          "human_message": "Reserve equivalence is 42.878 days; required 45.000 days.",
+          "limit": 45.0,
+          "operator": ">=",
+          "period": "2040-01",
+          "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "days"
+        }
+      ],
+      "run_id": "run-ceb5676688d6b449",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 1,
+      "violations": [
+        {
+          "actual": 42.878374999638936,
+          "code": "RESERVE_45D",
+          "constraint_id": "RESERVE_45D",
+          "excess_or_gap": 2.121625000361064,
+          "human_message": "Reserve equivalence is 42.878 days; required 45.000 days.",
+          "limit": 45.0,
+          "operator": ">=",
+          "period": "2040-01",
+          "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "days"
+        }
+      ]
+    },
+    "risk_run_id": "run-ceb5676688d6b449",
+    "source_references": [],
+    "stakeholder_ids": [
+      "operator",
+      "critical_consumers",
+      "financing"
+    ]
+  },
+  {
+    "affected_parameters": [
+      "total_demand_multiplier",
+      "critical_demand_multiplier"
+    ],
+    "all_violations": [
+      {
+        "actual": 0.9404584304566097,
+        "code": "BASE_TOTAL_SERVICE",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.029541569543390267,
+        "human_message": "Total service is 94.05%; shortage is 25.543 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2040",
+        "reason": "total demand service minimum",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "share"
+      },
+      {
+        "actual": 18.331054389726237,
+        "code": "RESERVE_45D",
+        "constraint_id": "RESERVE_45D",
+        "excess_or_gap": 26.668945610273763,
+        "human_message": "Reserve equivalence is 18.331 days; required 45.000 days.",
+        "limit": 45.0,
+        "operator": ">=",
+        "period": "2040-01",
+        "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "days"
+      }
+    ],
+    "anticipated_consequence": "Service requirements rise and available inventory is consumed faster.",
+    "applied_overrides": [
+      {
+        "application_order": 1,
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+        "factor": "total_demand_multiplier",
+        "factor_order": 1,
+        "period_end": "2040-12",
+        "period_start": "2039-01",
+        "risk_id": "R-DEMAND-UPSIDE",
+        "risk_order": 1,
+        "status": "TEAM_ASSUMPTION",
+        "value": 1.1
+      },
+      {
+        "application_order": 2,
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+        "factor": "critical_demand_multiplier",
+        "factor_order": 2,
+        "period_end": "2040-12",
+        "period_start": "2039-01",
+        "risk_id": "R-DEMAND-UPSIDE",
+        "risk_order": 1,
+        "status": "TEAM_ASSUMPTION",
+        "value": 1.1
+      }
+    ],
+    "base_scenario_id": "BASE",
+    "baseline_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10480.757934894153,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 161.27499199891457,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11567.703787807655
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 45.45666666588559,
+      "first_violation": null,
+      "hard_violation_count": 0,
+      "hard_violation_periods": [],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [],
+      "run_id": "run-12c6690efb5ebdd0",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 0,
+      "violations": []
+    },
+    "baseline_run_id": "run-12c6690efb5ebdd0",
+    "cause": "Research demand-growth assumption",
+    "dependencies": [],
+    "environment_id": "BASE+R-DEMAND-UPSIDE",
+    "event": "Total and critical demand rise by 10%",
+    "first_violation": {
+      "actual": 0.9404584304566097,
+      "code": "BASE_TOTAL_SERVICE",
+      "constraint_id": "BASE_TOTAL_SERVICE",
+      "excess_or_gap": 0.029541569543390267,
+      "human_message": "Total service is 94.05%; shortage is 25.543 t.",
+      "limit": 0.97,
+      "operator": ">=",
+      "period": "2040",
+      "reason": "total demand service minimum",
+      "scenario": "BASE",
+      "severity": "hard",
+      "source_id": null,
+      "unit": "share"
+    },
+    "impact_dimensions": {
+      "critical_service_degradation_pp": {
+        "score": 1,
+        "value": 0.0
+      },
+      "disruption_duration_months": {
+        "score": 5,
+        "value": 8.0
+      },
+      "hard_violation_count": {
+        "score": 3,
+        "value": 2.0
+      },
+      "incremental_cost_pct": {
+        "score": 1,
+        "value": 0.0
+      },
+      "shortage_share": {
+        "score": 3,
+        "value": 0.017483458818695678
+      }
+    },
+    "impact_score": 5,
+    "likelihood": {
+      "basis": null,
+      "likelihood_type": "unknown"
+    },
+    "likelihood_basis": null,
+    "likelihood_score": null,
+    "likelihood_status": "UNKNOWN",
+    "mitigation": {
+      "description": "Retain contract headroom; exact volumes require an approved patch.",
+      "mitigation_id": "M-DEMAND-OPTIONS"
+    },
+    "name": "Demand upside",
+    "ordinal_risk_score": null,
+    "owner": "demand_planning",
+    "period_end": "2040-12",
+    "period_start": "2039-01",
+    "provenance": {
+      "impact": "DIGITAL_TWIN_RESULT",
+      "impact_run_id": "run-b6e6981ed0d57785",
+      "impact_score": "TEAM_ASSUMPTION_SCORING_RULE",
+      "likelihood": "UNKNOWN",
+      "risk_definition": "TEAM_ASSUMPTION"
+    },
+    "quantitative_delta": {
+      "costs": {
+        "capex_mln": 0.0,
+        "discounted_cost_mln": -34.31586045473705,
+        "fixed_opex_mln": 0.0,
+        "holding_mln": -43.22069999970378,
+        "procurement_mln": 0.0,
+        "reservation_mln": 0.0,
+        "total_cost_mln": -43.220699999703356
+      },
+      "critical_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": -45.45666666588559,
+      "hard_violation_count": 2,
+      "minimum_annual_critical_service_delta": 0.0,
+      "minimum_annual_total_service_delta": -0.059541569543390516,
+      "minimum_inventory_t": -17.300000000009504,
+      "months_with_shortage": 8,
+      "storage_overflow_t": 0.0,
+      "total_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": -0.059541569543390516
+      },
+      "total_shortage_t": 25.543333334114386,
+      "unavailable_requested_supply_t": 0.0,
+      "violation_duration_periods": 2
+    },
+    "residual_consequence_statement": "Calculated only after explicit demand-response decisions.",
+    "risk_id": "R-DEMAND-UPSIDE",
+    "risk_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10446.442074439416,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 118.05429199921079,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11524.483087807952
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 0.0,
+      "first_violation": {
+        "actual": 0.9404584304566097,
+        "code": "BASE_TOTAL_SERVICE",
+        "constraint_id": "BASE_TOTAL_SERVICE",
+        "excess_or_gap": 0.029541569543390267,
+        "human_message": "Total service is 94.05%; shortage is 25.543 t.",
+        "limit": 0.97,
+        "operator": ">=",
+        "period": "2040",
+        "reason": "total demand service minimum",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "share"
+      },
+      "hard_violation_count": 2,
+      "hard_violation_periods": [
+        "2040",
+        "2040-01"
+      ],
+      "minimum_inventory_t": 0.0,
+      "months_with_shortage": 8,
+      "reserve_breaches": [
+        {
+          "actual": 18.331054389726237,
+          "code": "RESERVE_45D",
+          "constraint_id": "RESERVE_45D",
+          "excess_or_gap": 26.668945610273763,
+          "human_message": "Reserve equivalence is 18.331 days; required 45.000 days.",
+          "limit": 45.0,
+          "operator": ">=",
+          "period": "2040-01",
+          "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "days"
+        }
+      ],
+      "run_id": "run-b6e6981ed0d57785",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1461.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 0.9404584304566097
+      },
+      "total_shortage_t": 25.543333334114386,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 2,
+      "violations": [
+        {
+          "actual": 0.9404584304566097,
+          "code": "BASE_TOTAL_SERVICE",
+          "constraint_id": "BASE_TOTAL_SERVICE",
+          "excess_or_gap": 0.029541569543390267,
+          "human_message": "Total service is 94.05%; shortage is 25.543 t.",
+          "limit": 0.97,
+          "operator": ">=",
+          "period": "2040",
+          "reason": "total demand service minimum",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "share"
+        },
+        {
+          "actual": 18.331054389726237,
+          "code": "RESERVE_45D",
+          "constraint_id": "RESERVE_45D",
+          "excess_or_gap": 26.668945610273763,
+          "human_message": "Reserve equivalence is 18.331 days; required 45.000 days.",
+          "limit": 45.0,
+          "operator": ">=",
+          "period": "2040-01",
+          "reason": "physical stock or demonstrably equivalent contracted emergency reserve",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "days"
+        }
+      ]
+    },
+    "risk_run_id": "run-b6e6981ed0d57785",
+    "source_references": [],
+    "stakeholder_ids": [
+      "operator",
+      "critical_consumers",
+      "commercial_consumers",
+      "fuel_suppliers"
+    ]
+  },
+  {
+    "affected_parameters": [
+      "additional_lead_time_months"
+    ],
+    "all_violations": [],
+    "anticipated_consequence": "Deliveries shift later; total physical volume is not fabricated or deleted.",
+    "applied_overrides": [
+      {
+        "application_order": 1,
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+        "factor": "additional_lead_time_months",
+        "factor_order": 1,
+        "period_end": "2039-12",
+        "period_start": "2037-01",
+        "risk_id": "R-LOGISTICS-DELAY",
+        "risk_order": 1,
+        "source_id": "B",
+        "status": "TEAM_ASSUMPTION",
+        "value": 3
+      }
+    ],
+    "base_scenario_id": "BASE",
+    "baseline_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10480.757934894153,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 161.27499199891457,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11567.703787807655
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 45.45666666588559,
+      "first_violation": null,
+      "hard_violation_count": 0,
+      "hard_violation_periods": [],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [],
+      "run_id": "run-12c6690efb5ebdd0",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 0,
+      "violations": []
+    },
+    "baseline_run_id": "run-12c6690efb5ebdd0",
+    "cause": "Illustrative launch/logistics disruption",
+    "dependencies": [],
+    "environment_id": "BASE+R-LOGISTICS-DELAY",
+    "event": "Earth-Flex shipments gain three months of lead time",
+    "first_violation": null,
+    "impact_dimensions": {
+      "critical_service_degradation_pp": {
+        "score": 1,
+        "value": 0.0
+      },
+      "disruption_duration_months": {
+        "score": 1,
+        "value": 0.0
+      },
+      "hard_violation_count": {
+        "score": 1,
+        "value": 0.0
+      },
+      "incremental_cost_pct": {
+        "score": 1,
+        "value": 0.0
+      },
+      "shortage_share": {
+        "score": 1,
+        "value": 0.0
+      }
+    },
+    "impact_score": 1,
+    "likelihood": {
+      "basis": null,
+      "likelihood_type": "unknown"
+    },
+    "likelihood_basis": null,
+    "likelihood_score": null,
+    "likelihood_status": "UNKNOWN",
+    "mitigation": {
+      "description": "Test earlier ordering as an explicit plan patch.",
+      "mitigation_id": "M-LOGISTICS-EARLY-ORDER"
+    },
+    "name": "Launch and logistics delay",
+    "ordinal_risk_score": null,
+    "owner": "launch_logistics",
+    "period_end": "2039-12",
+    "period_start": "2037-01",
+    "provenance": {
+      "impact": "DIGITAL_TWIN_RESULT",
+      "impact_run_id": "run-79c499ce3781cc8e",
+      "impact_score": "TEAM_ASSUMPTION_SCORING_RULE",
+      "likelihood": "UNKNOWN",
+      "risk_definition": "TEAM_ASSUMPTION"
+    },
+    "quantitative_delta": {
+      "costs": {
+        "capex_mln": 0.0,
+        "discounted_cost_mln": 0.0,
+        "fixed_opex_mln": 0.0,
+        "holding_mln": 0.0,
+        "procurement_mln": 0.0,
+        "reservation_mln": 0.0,
+        "total_cost_mln": 0.0
+      },
+      "critical_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 0.0,
+      "hard_violation_count": 0,
+      "minimum_annual_critical_service_delta": 0.0,
+      "minimum_annual_total_service_delta": 0.0,
+      "minimum_inventory_t": 0.0,
+      "months_with_shortage": 0,
+      "storage_overflow_t": 0.0,
+      "total_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 0.0,
+      "violation_duration_periods": 0
+    },
+    "residual_consequence_statement": "Depends on inventory at the delayed arrival boundary.",
+    "risk_id": "R-LOGISTICS-DELAY",
+    "risk_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10480.757934894153,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 161.27499199891457,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11567.703787807655
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 45.45666666588559,
+      "first_violation": null,
+      "hard_violation_count": 0,
+      "hard_violation_periods": [],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [],
+      "run_id": "run-79c499ce3781cc8e",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 0,
+      "violations": []
+    },
+    "risk_run_id": "run-79c499ce3781cc8e",
+    "source_references": [],
+    "stakeholder_ids": [
+      "operator",
+      "critical_consumers",
+      "launch_logistics",
+      "fuel_suppliers"
+    ]
+  },
+  {
+    "affected_parameters": [
+      "capex_multiplier"
+    ],
+    "all_violations": [
+      {
+        "actual": 2102.5,
+        "code": "CAPEX_2037",
+        "constraint_id": "CAPEX_2037",
+        "excess_or_gap": 302.5,
+        "human_message": "Cumulative CAPEX through 2037 is 2102.500 mln units.",
+        "limit": 1800.0,
+        "operator": "<=",
+        "period": "2037",
+        "reason": "CAPEX through end-2037",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "mln_units"
+      }
+    ],
+    "anticipated_consequence": "CAPEX and possibly the official cumulative CAPEX constraint change; physics remains identical.",
+    "applied_overrides": [
+      {
+        "application_order": 1,
+        "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+        "factor": "capex_multiplier",
+        "factor_order": 1,
+        "investment_id": "LUNAR_ISRU",
+        "period_end": "2035-03",
+        "period_start": "2035-03",
+        "risk_id": "R-CAPEX-OVERRUN",
+        "risk_order": 1,
+        "status": "TEAM_ASSUMPTION",
+        "value": 1.25
+      }
+    ],
+    "base_scenario_id": "BASE",
+    "baseline_metrics": {
+      "costs": {
+        "capex_mln": 1790.0,
+        "discounted_cost_mln": 10480.757934894153,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 161.27499199891457,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11567.703787807655
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 45.45666666588559,
+      "first_violation": null,
+      "hard_violation_count": 0,
+      "hard_violation_periods": [],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [],
+      "run_id": "run-12c6690efb5ebdd0",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 0,
+      "violations": []
+    },
+    "baseline_run_id": "run-12c6690efb5ebdd0",
+    "cause": "Illustrative investment cost sensitivity",
+    "dependencies": [],
+    "environment_id": "BASE+R-CAPEX-OVERRUN",
+    "event": "Lunar-ISRU CAPEX rises by 25%",
+    "first_violation": {
+      "actual": 2102.5,
+      "code": "CAPEX_2037",
+      "constraint_id": "CAPEX_2037",
+      "excess_or_gap": 302.5,
+      "human_message": "Cumulative CAPEX through 2037 is 2102.500 mln units.",
+      "limit": 1800.0,
+      "operator": "<=",
+      "period": "2037",
+      "reason": "CAPEX through end-2037",
+      "scenario": "BASE",
+      "severity": "hard",
+      "source_id": null,
+      "unit": "mln_units"
+    },
+    "impact_dimensions": {
+      "critical_service_degradation_pp": {
+        "score": 1,
+        "value": 0.0
+      },
+      "disruption_duration_months": {
+        "score": 1,
+        "value": 0.0
+      },
+      "hard_violation_count": {
+        "score": 2,
+        "value": 1.0
+      },
+      "incremental_cost_pct": {
+        "score": 2,
+        "value": 2.701486878747488
+      },
+      "shortage_share": {
+        "score": 1,
+        "value": 0.0
+      }
+    },
+    "impact_score": 2,
+    "likelihood": {
+      "basis": null,
+      "likelihood_type": "unknown"
+    },
+    "likelihood_basis": null,
+    "likelihood_score": null,
+    "likelihood_status": "UNKNOWN",
+    "mitigation": {
+      "description": "Reconsider investment timing only through an operator-approved plan.",
+      "mitigation_id": "M-CAPEX-GATE"
+    },
+    "name": "Lunar-ISRU CAPEX overrun",
+    "ordinal_risk_score": null,
+    "owner": "financing",
+    "period_end": "2035-03",
+    "period_start": "2035-03",
+    "provenance": {
+      "impact": "DIGITAL_TWIN_RESULT",
+      "impact_run_id": "run-2f122681fdf92de4",
+      "impact_score": "TEAM_ASSUMPTION_SCORING_RULE",
+      "likelihood": "UNKNOWN",
+      "risk_definition": "TEAM_ASSUMPTION"
+    },
+    "quantitative_delta": {
+      "costs": {
+        "capex_mln": 312.5,
+        "discounted_cost_mln": 312.5,
+        "fixed_opex_mln": 0.0,
+        "holding_mln": 0.0,
+        "procurement_mln": 0.0,
+        "reservation_mln": 0.0,
+        "total_cost_mln": 312.5
+      },
+      "critical_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 0.0,
+      "hard_violation_count": 1,
+      "minimum_annual_critical_service_delta": 0.0,
+      "minimum_annual_total_service_delta": 0.0,
+      "minimum_inventory_t": 0.0,
+      "months_with_shortage": 0,
+      "storage_overflow_t": 0.0,
+      "total_service_by_year": {
+        "2035": 0.0,
+        "2036": 0.0,
+        "2037": 0.0,
+        "2038": 0.0,
+        "2039": 0.0,
+        "2040": 0.0
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 0.0,
+      "violation_duration_periods": 1
+    },
+    "residual_consequence_statement": "No financing benefit or penalty is invented beyond case economics.",
+    "risk_id": "R-CAPEX-OVERRUN",
+    "risk_metrics": {
+      "costs": {
+        "capex_mln": 2102.5,
+        "discounted_cost_mln": 10793.257934894153,
+        "fixed_opex_mln": 270.0,
+        "holding_mln": 161.27499199891457,
+        "procurement_mln": 8864.32879580874,
+        "reservation_mln": 482.1,
+        "total_cost_mln": 11880.203787807655
+      },
+      "critical_service_by_year": {
+        "2035": 1.0,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 1.0,
+        "2039": 1.0,
+        "2040": 1.0
+      },
+      "critical_shortage_t": 0.0,
+      "delayed_delivery_count": 0,
+      "delayed_delivery_t": 0.0,
+      "final_inventory_t": 45.45666666588559,
+      "first_violation": {
+        "actual": 2102.5,
+        "code": "CAPEX_2037",
+        "constraint_id": "CAPEX_2037",
+        "excess_or_gap": 302.5,
+        "human_message": "Cumulative CAPEX through 2037 is 2102.500 mln units.",
+        "limit": 1800.0,
+        "operator": "<=",
+        "period": "2037",
+        "reason": "CAPEX through end-2037",
+        "scenario": "BASE",
+        "severity": "hard",
+        "source_id": null,
+        "unit": "mln_units"
+      },
+      "hard_violation_count": 1,
+      "hard_violation_periods": [
+        "2037"
+      ],
+      "minimum_inventory_t": 17.300000000009504,
+      "months_with_shortage": 0,
+      "reserve_breaches": [],
+      "run_id": "run-2f122681fdf92de4",
+      "storage_overflow_t": 0.0,
+      "total_demand_t": 1390.0,
+      "total_service_by_year": {
+        "2035": 1.0000000000000002,
+        "2036": 1.0,
+        "2037": 1.0,
+        "2038": 0.9999999999999999,
+        "2039": 1.0000000000000002,
+        "2040": 1.0000000000000002
+      },
+      "total_shortage_t": 0.0,
+      "unavailable_requested_supply_t": 4.000533238013304e-10,
+      "violation_duration_periods": 1,
+      "violations": [
+        {
+          "actual": 2102.5,
+          "code": "CAPEX_2037",
+          "constraint_id": "CAPEX_2037",
+          "excess_or_gap": 302.5,
+          "human_message": "Cumulative CAPEX through 2037 is 2102.500 mln units.",
+          "limit": 1800.0,
+          "operator": "<=",
+          "period": "2037",
+          "reason": "CAPEX through end-2037",
+          "scenario": "BASE",
+          "severity": "hard",
+          "source_id": null,
+          "unit": "mln_units"
+        }
+      ]
+    },
+    "risk_run_id": "run-2f122681fdf92de4",
+    "source_references": [],
+    "stakeholder_ids": [
+      "operator",
+      "fuel_suppliers",
+      "financing"
+    ]
   }
 ]

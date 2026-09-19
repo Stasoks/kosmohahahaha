@@ -92,7 +92,7 @@ class ConstraintChecker:
                     code="STORAGE_CAPACITY_EXCEEDED",
                     constraint_id="STRUCTURAL_STORAGE_CAPACITY",
                     severity="hard",
-                    scenario=self.scenario.scenario_id,
+        scenario=self.scenario.base_scenario_id,
                     period=month,
                     source_id=None,
                     actual=attempted_inventory_t,
@@ -114,7 +114,7 @@ class ConstraintChecker:
                     code="INITIAL_STORAGE_CAPACITY_EXCEEDED",
                     constraint_id="STRUCTURAL_STORAGE_CAPACITY",
                     severity="hard",
-                    scenario=self.scenario.scenario_id,
+                    scenario=self.scenario.base_scenario_id,
                     period=self.case_data.start_month,
                     source_id=None,
                     actual=planned_t,
@@ -143,7 +143,7 @@ class ConstraintChecker:
                     code=code or definition.constraint_id,
                     constraint_id=definition.constraint_id,
                     severity=severity or definition.severity,
-                    scenario=self.scenario.scenario_id,
+                    scenario=self.scenario.base_scenario_id,
                     period=period,
                     source_id=source_id,
                     actual=actual,
@@ -174,7 +174,7 @@ class ConstraintChecker:
                 effective_capacity = (
                     info["physical_limit_t"] / active_fraction
                     if active_fraction > 0
-                    else source.capacity_t_per_year
+                    else self.case_data.source_capacity(source_id, year)
                 )
                 effective_capacity = round(effective_capacity, 12)
                 violation = capacity_violation(
@@ -182,7 +182,7 @@ class ConstraintChecker:
                     effective_capacity,
                     source_id=source_id,
                     year=year,
-                    scenario=self.scenario.scenario_id,
+                    scenario=self.scenario.base_scenario_id,
                 )
                 if violation:
                     self.violations.append(violation)
@@ -192,7 +192,7 @@ class ConstraintChecker:
                             code="ORDER_CAPACITY_EXCEEDED",
                             constraint_id="STRUCTURAL_ORDER_CAPACITY",
                             severity="hard",
-                            scenario=self.scenario.scenario_id,
+                            scenario=self.scenario.base_scenario_id,
                             period=str(year),
                             source_id=source_id,
                             actual=info["ordered_t"],
@@ -213,7 +213,7 @@ class ConstraintChecker:
                             code="SOURCE_UNAVAILABLE",
                             constraint_id="STRUCTURAL_SOURCE_AVAILABILITY",
                             severity="hard",
-                            scenario=self.scenario.scenario_id,
+                            scenario=self.scenario.base_scenario_id,
                             period=str(year),
                             source_id=source_id,
                             actual=unavailable,
@@ -229,24 +229,32 @@ class ConstraintChecker:
         critical_def = self.case_data.constraints["BASE_CRITICAL_SERVICE"]
         total_def = self.case_data.constraints["BASE_TOTAL_SERVICE"]
         for row in annual:
+            if not self.case_data.constraint_applies(
+                critical_def.constraint_id, int(row["year"])
+            ) and not self.case_data.constraint_applies(
+                total_def.constraint_id, int(row["year"])
+            ):
+                continue
             year = str(row["year"])
             severity = "hard" if self.scenario.base_scenario_id == "BASE" else "benchmark"
-            self._definition_violation(
-                critical_def,
-                year,
-                row["critical_service_level"],
-                f"Critical service is {row['critical_service_level']:.2%}; shortage is {row['critical_shortage_t']:.3f} t.",
-                severity=severity,
-                code=critical_def.constraint_id if severity == "hard" else "STRESS_CRITICAL_SERVICE_BENCHMARK",
-            )
-            self._definition_violation(
-                total_def,
-                year,
-                row["total_service_level"],
-                f"Total service is {row['total_service_level']:.2%}; shortage is {row['shortage_t']:.3f} t.",
-                severity=severity,
-                code=total_def.constraint_id if severity == "hard" else "STRESS_TOTAL_SERVICE_BENCHMARK",
-            )
+            if self.case_data.constraint_applies(critical_def.constraint_id, int(year)):
+                self._definition_violation(
+                    critical_def,
+                    year,
+                    row["critical_service_level"],
+                    f"Critical service is {row['critical_service_level']:.2%}; shortage is {row['critical_shortage_t']:.3f} t.",
+                    severity=severity,
+                    code=critical_def.constraint_id if severity == "hard" else "STRESS_CRITICAL_SERVICE_BENCHMARK",
+                )
+            if self.case_data.constraint_applies(total_def.constraint_id, int(year)):
+                self._definition_violation(
+                    total_def,
+                    year,
+                    row["total_service_level"],
+                    f"Total service is {row['total_service_level']:.2%}; shortage is {row['shortage_t']:.3f} t.",
+                    severity=severity,
+                    code=total_def.constraint_id if severity == "hard" else "STRESS_TOTAL_SERVICE_BENCHMARK",
+                )
 
         for constraint_id in ("CAPEX_2037", "CAPEX_2040"):
             definition = self.case_data.constraints[constraint_id]
@@ -264,6 +272,8 @@ class ConstraintChecker:
         emergency_lead = assumptions.source_delivery_lead_months(self.case_data.sources["E"])
         for row in annual:
             year = int(row["year"])
+            if not self.case_data.constraint_applies(reserve_def.constraint_id, year):
+                continue
             actual_days = row["reserve_actual_days"]
             if plan.reserve_strategy(year) == "emergency_contract":
                 reserved = plan.reservation("E", year)
@@ -287,7 +297,13 @@ class ConstraintChecker:
 
         emergency_def = self.case_data.constraints["EMERGENCY_BASE_STREAK"]
         run: list[int] = []
-        for year in self.case_data.years:
+        emergency_years = [
+            year
+            for year in self.case_data.years
+            if year in self.case_data.official_years
+            or self.case_data.constraint_applies(emergency_def.constraint_id, year)
+        ]
+        for year in emergency_years:
             if plan.emergency_role_by_year.get(year) == "planned_supply":
                 run = run + [year] if run and year == run[-1] + 1 else [year]
                 if len(run) == int(emergency_def.value) + 1:
@@ -306,7 +322,9 @@ class ConstraintChecker:
             definition = self.case_data.constraints["STRESS_LOSS_LIMIT"]
             from_year = int(loss["from_year"])
             for row in annual:
-                if row["year"] >= from_year:
+                if row["year"] >= from_year and self.case_data.constraint_applies(
+                    definition.constraint_id, int(row["year"])
+                ):
                     actual = row["losses_divided_by_throughput"]
                     self._definition_violation(
                         definition,

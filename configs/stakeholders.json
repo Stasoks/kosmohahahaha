@@ -1,0 +1,173 @@
+{
+  "status": "TEAM_ASSUMPTION",
+  "config_id": "competition-stakeholders-v1",
+  "participants": [
+    {
+      "stakeholder_id": "operator",
+      "name": "Orbital fuel-node operator",
+      "interests": [
+        "continuous service",
+        "feasible contracts",
+        "transparent cost"
+      ],
+      "kpis": [
+        "total_service_level",
+        "critical_service_level",
+        "cost_per_served_ton_mln",
+        "reserve_actual_days"
+      ],
+      "obligations": [
+        "operate within case constraints"
+      ],
+      "cost_bearer": [
+        "procurement",
+        "reservation",
+        "holding",
+        "OPEX",
+        "CAPEX"
+      ],
+      "risk_bearer": [
+        "service shortage",
+        "storage loss",
+        "contract underuse"
+      ],
+      "relevant_risks": [
+        "R-CORE-OUTAGE",
+        "R-DEMAND-UPSIDE",
+        "R-STORAGE-DEGRADATION"
+      ]
+    },
+    {
+      "stakeholder_id": "critical_consumers",
+      "name": "Critical consumers",
+      "interests": [
+        "priority service",
+        "45-day resilience"
+      ],
+      "kpis": [
+        "critical_service_level",
+        "critical_shortage_t"
+      ],
+      "obligations": [
+        "provide demand requirements"
+      ],
+      "cost_bearer": [],
+      "risk_bearer": [
+        "critical shortage",
+        "delayed service"
+      ],
+      "relevant_risks": [
+        "R-CORE-OUTAGE",
+        "R-ISRU-UNDERDELIVERY",
+        "R-DEMAND-UPSIDE",
+        "R-LOGISTICS-DELAY"
+      ]
+    },
+    {
+      "stakeholder_id": "commercial_consumers",
+      "name": "Commercial consumers",
+      "interests": [
+        "predictable available fuel",
+        "transparent curtailment"
+      ],
+      "kpis": [
+        "total_service_level",
+        "total_shortage_t"
+      ],
+      "obligations": [
+        "provide demand plans"
+      ],
+      "cost_bearer": [],
+      "risk_bearer": [
+        "noncritical curtailment"
+      ],
+      "relevant_risks": [
+        "R-CORE-OUTAGE",
+        "R-DEMAND-UPSIDE"
+      ]
+    },
+    {
+      "stakeholder_id": "fuel_suppliers",
+      "name": "Fuel suppliers",
+      "interests": [
+        "contract utilization",
+        "credible reservations"
+      ],
+      "kpis": [
+        "payable_volume_t",
+        "utilization",
+        "gross_delivery_t"
+      ],
+      "obligations": [
+        "deliver feasible contracted supply"
+      ],
+      "cost_bearer": [
+        "supplier-side costs outside case"
+      ],
+      "risk_bearer": [
+        "underdelivery consequences"
+      ],
+      "relevant_risks": [
+        "R-ISRU-UNDERDELIVERY",
+        "R-EARTH-NEW-DELAY",
+        "R-EARTH-PRICE"
+      ]
+    },
+    {
+      "stakeholder_id": "launch_logistics",
+      "name": "Launch and logistics suppliers",
+      "interests": [
+        "stable schedule",
+        "capacity visibility"
+      ],
+      "kpis": [
+        "delayed_delivery_count",
+        "delayed_delivery_t"
+      ],
+      "obligations": [
+        "execute declared lead times"
+      ],
+      "cost_bearer": [
+        "no separate allocation in case"
+      ],
+      "risk_bearer": [
+        "schedule delay"
+      ],
+      "relevant_risks": [
+        "R-CORE-OUTAGE",
+        "R-EARTH-NEW-DELAY",
+        "R-LOGISTICS-DELAY"
+      ]
+    },
+    {
+      "stakeholder_id": "financing",
+      "name": "Financing and investor side",
+      "interests": [
+        "CAPEX discipline",
+        "cost transparency",
+        "investment resilience"
+      ],
+      "kpis": [
+        "capex_mln",
+        "discounted_cost_mln",
+        "cost_per_served_ton_mln"
+      ],
+      "obligations": [
+        "fund approved investments"
+      ],
+      "cost_bearer": [
+        "CAPEX according to plan"
+      ],
+      "risk_bearer": [
+        "CAPEX overrun",
+        "stranded investment"
+      ],
+      "relevant_risks": [
+        "R-CAPEX-OVERRUN",
+        "R-EARTH-NEW-DELAY",
+        "R-STORAGE-DEGRADATION"
+      ]
+    }
+  ],
+  "disclaimer": "No revenue, penalty, or stakeholder-specific monetary transfer is invented without case data."
+}
