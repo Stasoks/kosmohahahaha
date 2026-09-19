@@ -26,19 +26,107 @@ def _next_source_id(metadata: dict) -> str:
     return f"R{len(metadata['sources']) + 1}"
 
 
+def _remove_source_from_plan(raw: dict, source_id: str) -> dict:
+    updated = copy.deepcopy(raw)
+    decisions = updated.setdefault("decisions", {})
+    decisions["supply_orders"] = [
+        item
+        for item in decisions.get("supply_orders", [])
+        if str(item.get("source_id")) != str(source_id)
+    ]
+    decisions["capacity_reservations"] = [
+        item
+        for item in decisions.get("capacity_reservations", [])
+        if str(item.get("source_id")) != str(source_id)
+    ]
+    stock = decisions.get("initial_stock_acquisition", {})
+    if str(stock.get("source_id")) == str(source_id):
+        updated["decisions"]["initial_stock_acquisition"] = copy.deepcopy(
+            st.session_state.calculated_plan["decisions"].get(
+                "initial_stock_acquisition", {}
+            )
+        )
+    return updated
+
+
+def _research_source_list(metadata: dict) -> None:
+    source_ids = list(metadata.get("research_source_ids", []))
+    st.subheader("Добавленные вами источники")
+    st.caption(
+        "Официальные источники A–E являются частью кейса и не удаляются. "
+        "Здесь можно удалить только источники, добавленные в рабочую копию."
+    )
+    if not source_ids:
+        st.info("Дополнительных источников пока нет.")
+        return
+
+    for source_id in source_ids:
+        source = metadata["sources"][source_id]
+        cols = st.columns([2.2, 1, 1, 0.8])
+        cols[0].markdown(f"**{source_id} · {source['name']}**")
+        cols[1].caption(f"{source['capacity_t_per_year']:.1f} т/год")
+        cols[2].caption(f"{source['variable_cost_mln_per_t']:.2f} млн/т")
+        if cols[3].button("Удалить", key=f"remove-research-source-{source_id}"):
+            try:
+                st.session_state.workspace = runtime.workspace_remove_source(
+                    st.session_state.workspace,
+                    source_id,
+                )
+                current_plan = (
+                    st.session_state.research_plan
+                    or st.session_state.calculated_plan
+                )
+                cleaned = _remove_source_from_plan(current_plan, source_id)
+                st.session_state.research_plan = research_plan_template(
+                    cleaned,
+                    st.session_state.workspace,
+                )
+                st.session_state.research_result = None
+                st.success(f"Источник {source_id} удалён из рабочей копии.")
+                st.rerun()
+            except Exception as exc:
+                render_error(exc, "Источник не удалён")
+
+
 def _add_source() -> None:
     workspace = st.session_state.workspace
     metadata = case_metadata(workspace)
     with st.form("research-source"):
-        st.subheader("Добавить исследовательский источник")
+        st.subheader("Добавить новый источник в рабочую копию")
+        st.caption(
+            "Этот источник существует только в вашем варианте модели и не изменяет "
+            "официальные данные кейса."
+        )
         cols = st.columns(2)
         source_id = cols[0].text_input("Код источника", _next_source_id(metadata))
         name = cols[1].text_input("Название", "Новый источник")
-        capacity = cols[0].number_input("Мощность, т/год", min_value=0.0, value=25.0)
-        price = cols[1].number_input("Переменная цена, млн/т", min_value=0.0, value=8.0)
+        capacity = cols[0].number_input(
+            "Мощность, т/год",
+            min_value=0.0,
+            value=25.0,
+            help="Максимальный физический объём, который источник может поставить за год.",
+        )
+        price = cols[1].number_input(
+            "Переменная цена, млн/т",
+            min_value=0.0,
+            value=8.0,
+            help="Стоимость одной реально оплачиваемой тонны по этому источнику.",
+        )
         cols = st.columns(2)
-        reservation = cols[0].number_input("Плата за резерв, млн/(т/год)", min_value=0.0, value=0.2)
-        top = cols[1].number_input("Минимально оплачиваемая доля", 0.0, 1.0, 0.0, 0.05)
+        reservation = cols[0].number_input(
+            "Плата за резерв, млн/(т/год)",
+            min_value=0.0,
+            value=0.2,
+            help="Плата за закреплённую мощность даже до фактического отбора топлива.",
+        )
+        top = cols[1].number_input(
+            "Минимально оплачиваемая доля",
+            0.0,
+            1.0,
+            0.0,
+            0.05,
+            help="Take-or-pay: доля зарезервированной мощности, которую всё равно надо оплатить.",
+        )
         units = {"month": "месяцы", "week": "недели", "day": "дни", "year": "годы"}
         unit = cols[0].selectbox("Единица срока поставки", list(units), format_func=units.get)
         availability_labels = {"calendar": "С заданной даты", "always": "Всегда"}
@@ -242,13 +330,18 @@ def _workspace_io() -> None:
 
 
 def render() -> None:
-    st.title("Исследования")
+    st.title("Новые источники и горизонт")
+    st.caption(
+        "Рабочая копия для проверки вариантов, которых нет в официальном кейсе: "
+        "дополнительных поставщиков и будущих лет. Контрольный BASE не изменяется."
+    )
     _workspace_io()
     metadata = case_metadata(st.session_state.workspace)
     cols = st.columns(3)
     cols[0].metric("Всего источников", len(metadata["sources"]))
     cols[1].metric("Добавлено источников", len(metadata["research_source_ids"]))
     cols[2].metric("Горизонт", f"{min(metadata['years'])}–{max(metadata['years'])}")
+    _research_source_list(metadata)
     tabs = st.tabs(["Добавить источник", "Продлить горизонт", "План и расчёт"])
     with tabs[0]:
         _add_source()
