@@ -527,10 +527,19 @@ def _investment_timing_mutations(
 
         elif investment_id == "LUNAR_ISRU" and item.get("funding_month"):
             current = str(item["funding_month"])
-            source_d = case_data.sources.get("D")
-            if source_d is None or source_d.available_from_year is None:
+            linked_sources = [
+                source
+                for source in case_data.sources.values()
+                if str(source.availability_rule.get("investment_id", ""))
+                == investment_id
+                and source.available_from_year is not None
+            ]
+            if not linked_sources:
                 continue
-            latest = f"{int(source_d.available_from_year) - 1:04d}-12"
+            latest_available_year = min(
+                int(source.available_from_year) for source in linked_sources
+            )
+            latest = f"{latest_available_year - 1:04d}-12"
             for delta in (-12, 12):
                 target_month = add_months(current, delta)
                 if not case_data.start_month <= target_month <= latest:
