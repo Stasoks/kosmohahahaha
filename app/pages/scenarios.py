@@ -51,7 +51,7 @@ def render() -> None:
                         int(beam_width),
                         int(iterations),
                         int(seed),
-                        runtime.bridge.canonical_json(st.session_state.get("source_overrides", {})),
+                        st.session_state.get("source_overrides", {}),
                     )
                 st.session_state.builder_result = built
                 if built["solutions"]:
