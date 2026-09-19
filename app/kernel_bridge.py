@@ -602,6 +602,44 @@ def workspace_add_source(workspace: dict[str, Any], source: dict[str, Any]) -> d
     return add_workspace_source(value, build_research_source_spec(source)).to_dict()
 
 
+def workspace_remove_source(
+    workspace: dict[str, Any],
+    source_id: str,
+) -> dict[str, Any]:
+    """Remove only a research source; official organizer sources are immutable."""
+
+    official_ids = set(application_context().case_data.sources)
+    if source_id in official_ids:
+        raise BridgeError(
+            "OFFICIAL_SOURCE_IMMUTABLE",
+            f"Официальный источник {source_id} нельзя удалить.",
+            field="source_id",
+        )
+    raw = copy.deepcopy(workspace)
+    sources = list(raw.get("sources", []))
+    kept = [item for item in sources if str(item.get("source_id")) != str(source_id)]
+    if len(kept) == len(sources):
+        raise BridgeError(
+            "RESEARCH_SOURCE_NOT_FOUND",
+            f"Добавленный источник {source_id} не найден.",
+            field="source_id",
+        )
+    raw["sources"] = kept
+    for year in raw.get("future_years", []):
+        for field in (
+            "source_price_assumptions",
+            "source_capacity_assumptions",
+            "source_availability_assumptions",
+            "reliability_assumptions",
+        ):
+            mapping = year.get(field)
+            if isinstance(mapping, dict):
+                mapping.pop(str(source_id), None)
+    value = _workspace(raw)
+    assert value is not None
+    return value.to_dict()
+
+
 def workspace_extend_year(
     workspace: dict[str, Any], future_year: dict[str, Any]
 ) -> dict[str, Any]:
