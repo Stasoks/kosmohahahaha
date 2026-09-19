@@ -480,6 +480,263 @@ def _transfer_mutations(
     return output
 
 
+def _stress_repair_requirements(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+) -> dict[str, float]:
+    """Return net tons that must be recovered in shortage months to hit annual targets."""
+    total_target = config.stress_total_service_target
+    critical_target = config.stress_critical_service_target
+    if total_target is None and critical_target is None:
+        return {}
+
+    monthly_by_year: dict[int, list[dict[str, Any]]] = {}
+    for row in candidate.stress_result.monthly:
+        monthly_by_year.setdefault(int(str(row["month"])[:4]), []).append(row)
+
+    requirements: dict[str, float] = {}
+    for annual in candidate.stress_result.annual:
+        year = int(annual["year"])
+        rows = sorted(monthly_by_year.get(year, []), key=lambda item: item["month"])
+        total_need = 0.0
+        critical_need = 0.0
+        if total_target is not None:
+            total_need = max(
+                0.0,
+                float(total_target) * float(annual["demand_total_t"])
+                - float(annual["served_total_t"]),
+            )
+        if critical_target is not None:
+            critical_need = max(
+                0.0,
+                float(critical_target) * float(annual["demand_critical_t"])
+                - float(annual["served_critical_t"]),
+            )
+        if total_need <= 1e-10 and critical_need <= 1e-10:
+            continue
+
+        used_by_month: dict[str, float] = {}
+        remaining_critical = critical_need
+        for row in sorted(
+            rows,
+            key=lambda item: (
+                -float(item["shortage_critical_t"]),
+                item["month"],
+            ),
+        ):
+            if remaining_critical <= 1e-10:
+                break
+            available = float(row["shortage_critical_t"])
+            if available <= 1e-10:
+                continue
+            amount = min(remaining_critical, available)
+            month = str(row["month"])
+            requirements[month] = requirements.get(month, 0.0) + amount
+            used_by_month[month] = used_by_month.get(month, 0.0) + amount
+            remaining_critical -= amount
+
+        remaining_total = max(0.0, total_need - (critical_need - remaining_critical))
+        for row in sorted(
+            rows,
+            key=lambda item: (
+                -(
+                    float(item["shortage_critical_t"])
+                    + float(item["shortage_noncritical_t"])
+                ),
+                item["month"],
+            ),
+        ):
+            if remaining_total <= 1e-10:
+                break
+            month = str(row["month"])
+            shortage = (
+                float(row["shortage_critical_t"])
+                + float(row["shortage_noncritical_t"])
+            )
+            available = max(0.0, shortage - used_by_month.get(month, 0.0))
+            if available <= 1e-10:
+                continue
+            amount = min(remaining_total, available)
+            requirements[month] = requirements.get(month, 0.0) + amount
+            used_by_month[month] = used_by_month.get(month, 0.0) + amount
+            remaining_total -= amount
+
+    return {month: amount for month, amount in requirements.items() if amount > 1e-10}
+
+
+def _target_repair_candidate(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+    profile: str,
+    base_scenario: Scenario,
+    stress_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> tuple[dict[str, Any], str] | None:
+    requirements = _stress_repair_requirements(candidate, config)
+    if not requirements:
+        return None
+
+    value = copy.deepcopy(candidate.plan.raw)
+    commissions = _commissions(value, base_scenario, case_data, assumptions)
+    stress_env = ensure_environment(stress_scenario)
+    stress_rows = {
+        str(row["month"]): row for row in candidate.stress_result.monthly
+    }
+
+    for delivery_month, required_net in sorted(requirements.items()):
+        remaining = required_net
+        while remaining > 1e-8:
+            choices: list[dict[str, Any]] = []
+            for source_id in sorted(case_data.sources):
+                source = case_data.sources[source_id]
+                delivery_year = int(delivery_month[:4])
+                if (
+                    source_id == "E"
+                    and candidate.plan.emergency_role_by_year.get(delivery_year)
+                    == "reserve_only"
+                ):
+                    continue
+                lead = stress_env.lead_time_months(
+                    source_id,
+                    delivery_month,
+                    assumptions.source_delivery_lead_months(source),
+                )
+                order_month = add_months(delivery_month, -lead)
+                commission = commissions.get(source_id)
+                if (
+                    commission is None
+                    or order_month < case_data.start_month
+                    or order_month > case_data.end_month
+                    or order_month < str(commission)
+                ):
+                    continue
+                order_year = int(order_month[:4])
+                active = active_order_months(source_id, order_year, commissions)
+                if not active:
+                    continue
+                schedule = _schedule(value, source_id)
+                physical_limit = (
+                    case_data.source_capacity(source_id, order_year)
+                    * len(active)
+                    / 12.0
+                )
+                current = _year_total(schedule, order_year)
+                room = max(0.0, physical_limit - current)
+                if room <= 1e-10:
+                    continue
+                delivery_share = stress_env.actual_delivery_share(
+                    source.name,
+                    delivery_month,
+                    source_id=source_id,
+                )
+                delivery_share *= stress_env.availability_share(
+                    source_id, delivery_month
+                )
+                loss_rate = float(stress_rows[delivery_month]["active_loss_rate"])
+                net_per_order = delivery_share * max(0.0, 1.0 - loss_rate)
+                if net_per_order <= 1e-10:
+                    continue
+                variable_cost = stress_env.variable_price_for_month(
+                    source_id,
+                    source.name,
+                    order_month,
+                    source.variable_cost_mln_per_t,
+                )
+                effective_cost = (
+                    variable_cost + source.reservation_rate_mln_per_t_year_capacity
+                ) / net_per_order
+                choices.append(
+                    {
+                        "source_id": source_id,
+                        "order_month": order_month,
+                        "room": room,
+                        "net_per_order": net_per_order,
+                        "effective_cost": effective_cost,
+                        "delivery_share": delivery_share,
+                        "used_fraction": current / physical_limit if physical_limit else 1.0,
+                    }
+                )
+            if not choices:
+                break
+            if profile == "RELIABILITY":
+                choices.sort(
+                    key=lambda item: (
+                        -item["delivery_share"],
+                        item["effective_cost"],
+                        item["used_fraction"],
+                        item["source_id"],
+                    )
+                )
+            elif profile == "DIVERSIFIED":
+                choices.sort(
+                    key=lambda item: (
+                        item["used_fraction"],
+                        item["effective_cost"],
+                        -item["delivery_share"],
+                        item["source_id"],
+                    )
+                )
+            else:
+                choices.sort(
+                    key=lambda item: (
+                        item["effective_cost"],
+                        -item["delivery_share"],
+                        item["used_fraction"],
+                        item["source_id"],
+                    )
+                )
+            choice = choices[0]
+            requested = min(
+                float(choice["room"]),
+                remaining / float(choice["net_per_order"]),
+            )
+            if requested <= 1e-10:
+                break
+            schedule = _schedule(value, str(choice["source_id"]))
+            order_month = str(choice["order_month"])
+            schedule["values"][order_month] = float(
+                schedule["values"].get(order_month, 0.0)
+            ) + requested
+            remaining -= requested * float(choice["net_per_order"])
+
+    _rebuild_reservations(value, commissions, case_data)
+    canonical_before = _canonical_decisions(candidate.plan.raw)
+    canonical_after = _canonical_decisions(value)
+    if canonical_before == canonical_after:
+        return None
+    return (
+        value,
+        "target_repair:"
+        f"{profile.lower()}:"
+        f"{sum(requirements.values()):.6f}net_t",
+    )
+
+
+def _target_repair_mutations(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+    base_scenario: Scenario,
+    stress_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> list[tuple[dict[str, Any], str]]:
+    values: list[tuple[dict[str, Any], str]] = []
+    for profile in ("COST", "RELIABILITY", "DIVERSIFIED"):
+        item = _target_repair_candidate(
+            candidate,
+            config,
+            profile,
+            base_scenario,
+            stress_scenario,
+            case_data,
+            assumptions,
+        )
+        if item is not None:
+            values.append(item)
+    return values
+
+
 def _investment_timing_mutations(
     candidate: _Candidate,
     case_data: CaseData,
