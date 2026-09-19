@@ -6,8 +6,8 @@ import streamlit as st
 
 from app import charts, runtime
 from app.components import render_chart, render_error
-from app.kernel_bridge import risk_catalog, stakeholder_data
-from app.state import analysis_is_stale, is_dirty
+from app.kernel_bridge import input_hash, plan_hash, risk_catalog, stakeholder_data
+from app.state import is_dirty
 from app.view_models import (
     minimum_annual_metrics,
     risk_stakeholder_impact_rows,
@@ -60,23 +60,80 @@ STAKEHOLDER_TEXT = {
 }
 
 
-def _stale(value: dict | None) -> None:
-    if analysis_is_stale(value):
-        st.warning("Результат относится к предыдущей версии плана.")
+def _selected_analysis() -> tuple[dict, str]:
+    choice = st.session_state.get("analysis-plan-choice", "operator")
+    plan = (
+        st.session_state.stress_plan
+        if choice == "adapted" and st.session_state.get("stress_plan")
+        else st.session_state.calculated_plan
+    )
+    environment_key = st.session_state.get("analysis-environment-choice", "BASE")
+    return plan, environment_key
+
+
+def _stale(value: dict | None) -> bool:
+    if not value:
+        return False
+    analysis_plan, environment_key = _selected_analysis()
+    stale = (
+        value.get("plan_hash") != plan_hash(analysis_plan)
+        or value.get("input_hash", input_hash({}))
+        != input_hash(st.session_state.get("source_overrides", {}))
+        or value.get("analysis_environment", "BASE") != environment_key
+    )
+    if stale:
+        st.warning(
+            "Результат относится к другому плану или среде анализа. "
+            "Запустите расчёт заново."
+        )
+    return stale
+
+
+def _analysis_controls() -> None:
+    choices = {"operator": "Текущий рассчитанный план оператора"}
+    if st.session_state.get("stress_plan"):
+        choices["adapted"] = "Адаптированный план C"
+    cols = st.columns(2)
+    cols[0].selectbox(
+        "Анализируемый план",
+        list(choices),
+        format_func=choices.get,
+        key="analysis-plan-choice",
+    )
+    environment_labels = {
+        "BASE": "Обычные условия (BASE)",
+        "MANDATORY_STRESS": "Обязательный стресс",
+    }
+    cols[1].selectbox(
+        "Среда анализа",
+        list(environment_labels),
+        format_func=environment_labels.get,
+        key="analysis-environment-choice",
+    )
+    plan, environment_key = _selected_analysis()
+    st.caption(
+        f"Анализируется план «{plan.get('plan_id', 'plan')}» в среде "
+        f"{environment_labels[environment_key]}. Риски, чувствительность и предел "
+        "устойчивости используют именно эту комбинацию."
+    )
 
 
 def _risk_tab() -> None:
+    analysis_plan, environment_key = _selected_analysis()
     if st.button("Рассчитать портфель рисков", type="primary"):
         try:
             with st.spinner("Каждый риск рассчитывается отдельным прогоном цифрового двойника…"):
                 st.session_state.risk_result = runtime.risks(
-                    st.session_state.calculated_plan,
+                    analysis_plan,
                     st.session_state.get("source_overrides", {}),
+                    environment_key,
                 )
         except Exception as exc:
             render_error(exc, "Не удалось рассчитать портфель")
     data = st.session_state.get("risk_result")
-    _stale(data)
+    if data and _stale(data):
+        st.info("Нажмите «Рассчитать портфель рисков» для выбранной комбинации.")
+        return
     if not data:
         st.info("Запустите портфель явно. Открытие страницы не запускает тяжёлые расчёты.")
         return
@@ -142,33 +199,35 @@ def _risk_tab() -> None:
             render_error(exc, "Не удалось рассчитать риск")
     detail = st.session_state.get("risk_detail")
     if detail and detail.get("risk", {}).get("risk_id") == selected:
-        _stale(detail)
-        before = minimum_annual_metrics(detail["baseline"])
-        after = minimum_annual_metrics(detail["risk_result"])
-        metrics = [
-            ("Стоимость, млн", "undiscounted_cost_mln"),
-            ("Мин. годовой сервис", "minimum_annual_total_service"),
-            ("Мин. критический сервис", "minimum_annual_critical_service"),
-            ("Дефицит, т", "total_shortage_t"),
-            ("Критический дефицит, т", "critical_shortage_t"),
-            ("Критические нарушения", "hard_violation_count"),
-        ]
-        table = [
-            {"Показатель": label, "До риска": before[key], "В риске": after[key], "Δ": after[key] - before[key]}
-            for label, key in metrics
-        ]
-        st.dataframe(pd.DataFrame(table), hide_index=True, width="stretch")
-        with st.expander("Изменённые параметры"):
-            override_rows = []
-            for item in detail["applied_overrides"]:
-                override_rows.append({
-                    "Параметр": PARAMETER_LABELS.get(item.get("factor"), item.get("factor")),
-                    "Источник": item.get("source_id") or item.get("storage_id") or "—",
-                    "Значение": item.get("value"),
-                    "Начало": item.get("period_start", "—"),
-                    "Конец": item.get("period_end", "—"),
-                })
-            st.dataframe(pd.DataFrame(override_rows), hide_index=True, width="stretch")
+        if _stale(detail):
+            st.info("Пересчитайте выбранный риск для текущего плана и среды.")
+        else:
+            before = minimum_annual_metrics(detail["baseline"])
+            after = minimum_annual_metrics(detail["risk_result"])
+            metrics = [
+                ("Стоимость, млн", "undiscounted_cost_mln"),
+                ("Мин. годовой сервис", "minimum_annual_total_service"),
+                ("Мин. критический сервис", "minimum_annual_critical_service"),
+                ("Дефицит, т", "total_shortage_t"),
+                ("Критический дефицит, т", "critical_shortage_t"),
+                ("Критические нарушения", "hard_violation_count"),
+            ]
+            table = [
+                {"Показатель": label, "До риска": before[key], "В риске": after[key], "Δ": after[key] - before[key]}
+                for label, key in metrics
+            ]
+            st.dataframe(pd.DataFrame(table), hide_index=True, width="stretch")
+            with st.expander("Изменённые параметры"):
+                override_rows = []
+                for item in detail["applied_overrides"]:
+                    override_rows.append({
+                        "Параметр": PARAMETER_LABELS.get(item.get("factor"), item.get("factor")),
+                        "Источник": item.get("source_id") or item.get("storage_id") or "—",
+                        "Значение": item.get("value"),
+                        "Начало": item.get("period_start", "—"),
+                        "Конец": item.get("period_end", "—"),
+                    })
+                st.dataframe(pd.DataFrame(override_rows), hide_index=True, width="stretch")
 
     definition = next(item for item in risk_catalog() if item["risk_id"] == selected)
     mitigation = definition.get("mitigation") or {}
@@ -187,19 +246,22 @@ def _risk_tab() -> None:
                 render_error(exc, "Не удалось рассчитать меру")
         value = st.session_state.get("mitigation_result")
         if value and value.get("risk_id") == selected:
-            _stale(value)
-            original = value["original_risk_metrics"]
-            residual = value["residual_consequence"]["risk"]
-            cols = st.columns(4)
-            cols[0].metric("Стоимость меры", f"{value['mitigation_cost_mln']:.1f} млн у.е.")
-            cols[1].metric("Дефицит до", f"{original['total_shortage_t']:.2f} т")
-            cols[2].metric("Дефицит после", f"{residual['total_shortage_t']:.2f} т")
-            cols[3].metric("Остаточное влияние", value["residual_impact"]["impact_score"])
-            residual_violations = violations_view(value["risk_result"])
-            if residual_violations:
-                st.dataframe(pd.DataFrame(residual_violations), hide_index=True, width="stretch")
-            else:
-                st.success("После меры критических нарушений нет.")
+            if _stale(value):
+                st.info("Пересчитайте меру для текущего плана и среды.")
+                value = None
+            if value:
+                original = value["original_risk_metrics"]
+                residual = value["residual_consequence"]["risk"]
+                cols = st.columns(4)
+                cols[0].metric("Стоимость меры", f"{value['mitigation_cost_mln']:.1f} млн у.е.")
+                cols[1].metric("Дефицит до", f"{original['total_shortage_t']:.2f} т")
+                cols[2].metric("Дефицит после", f"{residual['total_shortage_t']:.2f} т")
+                cols[3].metric("Остаточное влияние", value["residual_impact"]["impact_score"])
+                residual_violations = violations_view(value["risk_result"])
+                if residual_violations:
+                    st.dataframe(pd.DataFrame(residual_violations), hide_index=True, width="stretch")
+                else:
+                    st.success("После меры критических нарушений нет.")
     else:
         st.info("Для этой меры количественный пересчёт не задан.")
 
@@ -236,15 +298,26 @@ def _risk_tab() -> None:
 
 
 def _sensitivity_tab() -> None:
-    if st.button("Проверить нижний, базовый и верхний спрос", type="primary"):
+    analysis_plan, environment_key = _selected_analysis()
+    official_disabled = environment_key != "BASE"
+    if st.button(
+        "Проверить нижний, базовый и верхний спрос",
+        type="primary",
+        disabled=official_disabled,
+    ):
         try:
             with st.spinner("Три официальные точки спроса…"):
                 st.session_state.sensitivity_result = runtime.official_sensitivity(
-                    st.session_state.calculated_plan,
+                    analysis_plan,
                     st.session_state.get("source_overrides", {}),
                 )
         except Exception as exc:
             render_error(exc, "Не удалось выполнить проверку")
+    if official_disabled:
+        st.caption(
+            "Официальные LOW/BASE/HIGH проверяются отдельно только поверх BASE. "
+            "Для обязательного стресса используйте дополнительную проверку ниже."
+        )
     preset = st.selectbox(
         "Дополнительная проверка",
         ["Множитель спроса", "Задержка Earth-Flex", "Потери в ZBO", "Другой параметр"],
@@ -295,7 +368,9 @@ def _sensitivity_tab() -> None:
         except Exception as exc:
             render_error(exc, "Не удалось выполнить проверку")
     result = st.session_state.get("sensitivity_result")
-    _stale(result)
+    if result and _stale(result):
+        st.info("Запустите чувствительность заново для выбранной комбинации.")
+        result = None
     if result:
         points = result["points"]
         left, right = charts.sensitivity_lines(points, str(result["parameter"].get("name", "parameter")))
@@ -322,6 +397,7 @@ def _sensitivity_tab() -> None:
 
 
 def _reverse_tab() -> None:
+    analysis_plan, environment_key = _selected_analysis()
     preset = st.selectbox("Искомый предел", ["Рост спроса", "Задержка Earth-Flex"])
     if preset == "Рост спроса":
         parameter: str | dict = "demand_multiplier"
@@ -347,7 +423,9 @@ def _reverse_tab() -> None:
         except Exception as exc:
             render_error(exc, "Поиск предела не выполнен")
     result = st.session_state.get("reverse_result")
-    _stale(result)
+    if result and _stale(result):
+        st.info("Запустите поиск предела заново для выбранной комбинации.")
+        return
     if not result:
         return
     cols = st.columns(3)
@@ -442,7 +520,12 @@ def render() -> None:
         "ищет первое значение, при котором план нарушает ограничение."
     )
     if is_dirty():
-        st.warning("В форме есть несчитанные изменения. Новые анализы запускаются для последнего подтверждённого плана.")
+        st.warning(
+            "В форме есть несчитанные изменения. «Текущий план оператора» ниже означает "
+            "последнюю пересчитанную версию."
+        )
+    st.subheader("Параметры анализа")
+    _analysis_controls()
     tabs = st.tabs(["Реестр рисков", "Чувствительность", "Предел устойчивости", "Участники"])
     with tabs[0]:
         _risk_tab()
