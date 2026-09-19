@@ -610,6 +610,145 @@ def _stress_repair_requirements(
     return {month: amount for month, amount in requirements.items() if amount > 1e-10}
 
 
+def _base_overflow_trim_repair(
+    candidate: _Candidate,
+    config: StrategyBuilderConfig,
+    base_scenario: Scenario,
+    stress_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> tuple[dict[str, Any], str] | None:
+    """Trim deliveries that cause BASE overflow while spending only stress-service slack."""
+    total_target = config.stress_total_service_target
+    overflow = [
+        item
+        for item in candidate.base_result.violations
+        if item.severity == "hard"
+        and item.code == "STORAGE_CAPACITY_EXCEEDED"
+        and item.excess_or_gap is not None
+    ]
+    if total_target is None or not overflow:
+        return None
+
+    first_overflow_month = min(str(item.period)[:7] for item in overflow)
+    relief_needed = max(float(item.excess_or_gap or 0.0) for item in overflow) + 0.05
+    raw = copy.deepcopy(candidate.plan.raw)
+    base_env = ensure_environment(base_scenario)
+    stress_env = ensure_environment(stress_scenario)
+    base_rows = {str(row["month"]): row for row in candidate.base_result.monthly}
+    stress_rows = {str(row["month"]): row for row in candidate.stress_result.monthly}
+    annual_slack = {
+        int(row["year"]): max(
+            0.0,
+            float(row["served_total_t"])
+            - float(total_target) * float(row["demand_total_t"]),
+        )
+        for row in candidate.stress_result.annual
+    }
+
+    choices: list[dict[str, Any]] = []
+    for source_id in sorted(case_data.sources):
+        source = case_data.sources[source_id]
+        lead = assumptions.source_delivery_lead_months(source)
+        schedule = _schedule(raw, source_id)
+        for order_month, raw_amount in list(schedule.get("values", {}).items()):
+            amount = float(raw_amount)
+            if amount <= 1e-10:
+                continue
+            arrival_month = add_months(str(order_month), lead)
+            if (
+                arrival_month < case_data.start_month
+                or arrival_month > first_overflow_month
+                or arrival_month not in base_rows
+                or arrival_month not in stress_rows
+            ):
+                continue
+            year = int(arrival_month[:4])
+            if annual_slack.get(year, 0.0) <= 1e-10:
+                continue
+            base_share = base_env.actual_delivery_share(
+                source.name, arrival_month, source_id=source_id
+            ) * base_env.availability_share(source_id, arrival_month)
+            stress_share = stress_env.actual_delivery_share(
+                source.name, arrival_month, source_id=source_id
+            ) * stress_env.availability_share(source_id, arrival_month)
+            base_net = base_share * max(
+                0.0, 1.0 - float(base_rows[arrival_month]["active_loss_rate"])
+            )
+            stress_net = stress_share * max(
+                0.0, 1.0 - float(stress_rows[arrival_month]["active_loss_rate"])
+            )
+            if base_net <= 1e-10:
+                continue
+            choices.append(
+                {
+                    "source_id": source_id,
+                    "order_month": str(order_month),
+                    "arrival_month": arrival_month,
+                    "year": year,
+                    "available_order": amount,
+                    "base_net": base_net,
+                    "stress_net": stress_net,
+                    "stress_cost_per_base_relief": (
+                        stress_net / base_net if stress_net > 0 else 0.0
+                    ),
+                }
+            )
+
+    choices.sort(
+        key=lambda item: (
+            item["stress_cost_per_base_relief"],
+            -int(item["arrival_month"].replace("-", "")),
+            item["source_id"],
+            item["order_month"],
+        )
+    )
+    removed_base_net = 0.0
+    removed_stress_net = 0.0
+    for choice in choices:
+        if relief_needed <= 1e-8:
+            break
+        year = int(choice["year"])
+        slack = annual_slack.get(year, 0.0)
+        if slack <= 1e-10:
+            continue
+        max_by_relief = relief_needed / float(choice["base_net"])
+        max_by_stress = (
+            slack / float(choice["stress_net"])
+            if float(choice["stress_net"]) > 1e-10
+            else float(choice["available_order"])
+        )
+        reduction = min(
+            float(choice["available_order"]),
+            max_by_relief,
+            max_by_stress,
+        )
+        if reduction <= 1e-10:
+            continue
+        schedule = _schedule(raw, str(choice["source_id"]))
+        order_month = str(choice["order_month"])
+        schedule["values"][order_month] = max(
+            0.0, float(schedule["values"][order_month]) - reduction
+        )
+        base_relief = reduction * float(choice["base_net"])
+        stress_loss = reduction * float(choice["stress_net"])
+        relief_needed -= base_relief
+        annual_slack[year] = max(0.0, slack - stress_loss)
+        removed_base_net += base_relief
+        removed_stress_net += stress_loss
+
+    if removed_base_net <= 1e-8:
+        return None
+    commissions = _commissions(raw, base_scenario, case_data, assumptions)
+    _rebuild_reservations(raw, commissions, case_data)
+    return (
+        raw,
+        "base_overflow_trim:"
+        f"{removed_base_net:.6f}base_net/"
+        f"{removed_stress_net:.6f}stress_net",
+    )
+
+
 def _initial_stock_rightsize_repair(
     candidate: _Candidate,
     base_scenario: Scenario,
@@ -846,6 +985,16 @@ def _target_repair_mutations(
     assumptions: ModelAssumptions,
 ) -> list[tuple[dict[str, Any], str]]:
     values: list[tuple[dict[str, Any], str]] = []
+    overflow_repair = _base_overflow_trim_repair(
+        candidate,
+        config,
+        base_scenario,
+        stress_scenario,
+        case_data,
+        assumptions,
+    )
+    if overflow_repair is not None:
+        values.append(overflow_repair)
     stock_repair = _initial_stock_rightsize_repair(
         candidate,
         base_scenario,
