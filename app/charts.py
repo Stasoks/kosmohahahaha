@@ -51,7 +51,7 @@ def demand_service(result: dict[str, Any]) -> go.Figure:
                 "<br>Критический дефицит: %{customdata[2]:.2f} т<extra></extra>"
             ),
         )
-    fig.update_layout(title="Спрос, обслуживание и дефицит", barmode="group", yaxis_title="т")
+    fig.update_layout(title="Хватает ли поставок, чтобы покрыть спрос?", barmode="group", yaxis_title="т")
     return style(fig)
 
 
@@ -96,7 +96,7 @@ def inventory(result: dict[str, Any]) -> go.Figure:
             x0=f"{year}-01", x1=f"{year}-12", fillcolor="#FDAEAD", opacity=0.12,
             line_width=0, annotation_text=f"НАРУШЕНИЕ {year}", annotation_position="top left"
         )
-    fig.update_layout(title="Запас, ёмкость и рассчитанный резерв", yaxis_title="т")
+    fig.update_layout(title="Когда запас приближается к опасной границе?", yaxis_title="т")
     return style(fig)
 
 
@@ -113,7 +113,7 @@ def supply_mix(result: dict[str, Any], names: dict[str, str]) -> go.Figure:
         barmode="stack",
         color_discrete_map=named_colors,
         labels={"gross_delivery_t": "Доставлено, т", "year": "Год"},
-        title="Доставленный объём по источникам",
+        title="От каких источников зависит снабжение?",
     )
     fig.update_traces(hovertemplate="%{fullData.name}<br>%{x}: %{y:.2f} т<extra></extra>")
     return style(fig)
@@ -139,7 +139,7 @@ def costs(result: dict[str, Any]) -> go.Figure:
                 marker_color=color,
                 hovertemplate=f"%{{x}}<br>{label}: %{{y:.2f}} млн у.е.<extra></extra>",
             )
-    fig.update_layout(title="Стоимость по категориям", barmode="stack", yaxis_title="млн у.е.")
+    fig.update_layout(title="Из чего складывается стоимость стратегии?", barmode="stack", yaxis_title="млн у.е.")
     return style(fig)
 
 
