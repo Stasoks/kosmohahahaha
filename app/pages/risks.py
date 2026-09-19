@@ -191,9 +191,10 @@ def _risk_tab() -> None:
         try:
             with st.spinner("Рассчитываются исходное состояние и последствия риска…"):
                 st.session_state.risk_detail = runtime.risk_detail(
-                    st.session_state.calculated_plan,
+                    analysis_plan,
                     selected,
                     st.session_state.get("source_overrides", {}),
+                    environment_key,
                 )
         except Exception as exc:
             render_error(exc, "Не удалось рассчитать риск")
@@ -238,9 +239,10 @@ def _risk_tab() -> None:
             try:
                 with st.spinner("Мера проверяется в тех же условиях риска…"):
                     st.session_state.mitigation_result = runtime.mitigation(
-                        st.session_state.calculated_plan,
+                        analysis_plan,
                         selected,
                         st.session_state.get("source_overrides", {}),
+                        environment_key,
                     )
             except Exception as exc:
                 render_error(exc, "Не удалось рассчитать меру")
@@ -360,10 +362,11 @@ def _sensitivity_tab() -> None:
             values = [float(item.strip()) for item in values_text.split(",") if item.strip()]
             with st.spinner("Рассчитываются точки чувствительности…"):
                 st.session_state.sensitivity_result = runtime.sensitivity(
-                    st.session_state.calculated_plan,
+                    analysis_plan,
                     parameter,
                     values,
                     st.session_state.get("source_overrides", {}),
+                    environment_key,
                 )
         except Exception as exc:
             render_error(exc, "Не удалось выполнить проверку")
@@ -413,12 +416,13 @@ def _reverse_tab() -> None:
         try:
             with st.spinner("Проверяется упорядоченная сетка…"):
                 st.session_state.reverse_result = runtime.reverse(
-                    st.session_state.calculated_plan,
+                    analysis_plan,
                     parameter,
                     start,
                     stop,
                     step,
                     st.session_state.get("source_overrides", {}),
+                    environment_key,
                 )
         except Exception as exc:
             render_error(exc, "Поиск предела не выполнен")
