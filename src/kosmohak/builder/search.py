@@ -1942,6 +1942,39 @@ def build_strategies(
                 if closest_base_valid is not None
                 else None
             ),
+            "released_then_targeted_candidates": [
+                {
+                    "plan_id": item.plan.plan_id,
+                    "metrics": copy.deepcopy(item.metrics),
+                    "annual_target_deficit": _annual_target_deficit(item),
+                    "search_depth": item.depth,
+                    "mutation_history": list(item.history),
+                    "base_violations": [
+                        violation.to_dict()
+                        for violation in item.base_result.violations
+                        if violation.severity == "hard"
+                    ],
+                    "stress_violations": [
+                        violation.to_dict()
+                        for violation in item.stress_result.violations
+                        if violation.severity == "hard"
+                    ],
+                    "stress_annual": copy.deepcopy(item.stress_result.annual),
+                }
+                for item in sorted(
+                    [
+                        candidate
+                        for candidate in all_candidates
+                        if any(
+                            "pre_stress_inventory_release:" in step
+                            for step in candidate.history
+                        )
+                        and candidate.history
+                        and "target_repair:" in candidate.history[-1]
+                    ],
+                    key=_target_first_rank,
+                )[:5]
+            ],
             "overflow_repair_candidates": [
                 {
                     "plan_id": item.plan.plan_id,
