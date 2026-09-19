@@ -1,0 +1,82 @@
+{
+  "rows": [
+    {
+      "aggregate_critical_service": 1.0,
+      "aggregate_total_service": 1.0,
+      "case": "A_BASE_PLAN_IN_BASE",
+      "cost_per_served_ton_mln": 7.632411158182395,
+      "critical_shortage_t": 0.0,
+      "discounted_cost_mln": 9678.56148367706,
+      "final_inventory_t": 9.915525114155358,
+      "hard_violation_count": 0,
+      "min_annual_critical_service": 1.0,
+      "min_annual_total_service": 1.0,
+      "minimum_inventory_t": 9.915525114155358,
+      "plan_id": "final-base-plan",
+      "run_id": "run-8690d38591556cda",
+      "scenario_id": "BASE",
+      "source_mix_t": {
+        "A": 844.7368421052631,
+        "B": 131.5260614282383,
+        "C": 0.0,
+        "D": 360.0,
+        "E": 34.904013961605585
+      },
+      "total_shortage_t": 0.0,
+      "undiscounted_cost_mln": 10609.051509873529,
+      "valid": true
+    },
+    {
+      "aggregate_critical_service": 0.993041008456997,
+      "aggregate_total_service": 0.8584899120692017,
+      "case": "B_BASE_PLAN_REPLAYED_IN_STRESS",
+      "cost_per_served_ton_mln": 8.437668444893768,
+      "critical_shortage_t": 7.268666666666643,
+      "discounted_cost_mln": 10104.24520953114,
+      "final_inventory_t": 0.0,
+      "hard_violation_count": 2,
+      "min_annual_critical_service": 0.965377664109122,
+      "min_annual_total_service": 0.7810434782608697,
+      "minimum_inventory_t": 0.0,
+      "plan_id": "final-base-plan",
+      "run_id": "run-326f5bc9759327ac",
+      "scenario_id": "MANDATORY_STRESS",
+      "source_mix_t": {
+        "A": 844.7368421052631,
+        "B": 131.5260614282383,
+        "C": 0.0,
+        "D": 276.0,
+        "E": 34.904013961605585
+      },
+      "total_shortage_t": 217.0764748858446,
+      "undiscounted_cost_mln": 11111.764072193975,
+      "valid": false
+    },
+    {
+      "aggregate_critical_service": 1.0,
+      "aggregate_total_service": 0.991920591404571,
+      "case": "C_STRESS_ADAPTATION_IN_STRESS",
+      "cost_per_served_ton_mln": 8.432210683282733,
+      "critical_shortage_t": 0.0,
+      "discounted_cost_mln": 11359.639617587758,
+      "final_inventory_t": 0.0,
+      "hard_violation_count": 0,
+      "min_annual_critical_service": 1.0,
+      "min_annual_total_service": 0.9723660807460693,
+      "minimum_inventory_t": 0.0,
+      "plan_id": "final-stress-adaptation",
+      "run_id": "run-c417c7e9163c1e5f",
+      "scenario_id": "MANDATORY_STRESS",
+      "source_mix_t": {
+        "A": 858.9504048582996,
+        "B": 221.27766355074155,
+        "C": 363.2995951417004,
+        "D": 0.0,
+        "E": 43.58087627445572
+      },
+      "total_shortage_t": 12.39381278538798,
+      "undiscounted_cost_mln": 12830.503947580159,
+      "valid": true
+    }
+  ]
+}

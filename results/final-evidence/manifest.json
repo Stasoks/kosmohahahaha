@@ -1,0 +1,41 @@
+{
+  "additional_evidence": {
+    "alternative_comparison": "results/final-evidence/alternatives/",
+    "earth_flex_lead_time_sensitivity": "results/final-evidence/sensitivity/earth_flex_lead_time_delay_months.json",
+    "official_low_base_high": "results/final-evidence/sensitivity/official_low_base_high.json",
+    "reverse_demand": "results/final-evidence/reverse_stress/demand_multiplier.json",
+    "reverse_flex_delay": "results/final-evidence/reverse_stress/earth_flex_lead_time_delay_months.json",
+    "risk_portfolio": "results/final-evidence/risks/risk_portfolio.json",
+    "zbo_loss_sensitivity": "results/final-evidence/sensitivity/zbo_loss_multiplier.json"
+  },
+  "builder_config": {
+    "beam_width": 24,
+    "max_candidates": 1200,
+    "max_iterations": 8,
+    "max_results": 3,
+    "seed": 17
+  },
+  "case_input_root": ".",
+  "plans": {
+    "BASE_PLAN": "plans/final_base.json",
+    "STRESS_ADAPTATION": "plans/final_stress_adaptation.json"
+  },
+  "provenance": {
+    "generated_plans": "TEAM_DECISION",
+    "official_inputs": "CASE_INPUT",
+    "outputs": "DIGITAL_TWIN_RESULT",
+    "stress_97_99": "RESILIENCE_BENCHMARK"
+  },
+  "purpose": "Final reproducible evidence pack for competition deliverables",
+  "run_ids": {
+    "A": "run-8690d38591556cda",
+    "B": "run-326f5bc9759327ac",
+    "C": "run-c417c7e9163c1e5f"
+  },
+  "status": "DIGITAL_TWIN_RESULT",
+  "three_way_comparison": {
+    "A": "FINAL_BASE_PLAN simulated in BASE",
+    "B": "the exact same FINAL_BASE_PLAN replayed in MANDATORY_STRESS",
+    "C": "FINAL_STRESS_ADAPTATION simulated in MANDATORY_STRESS"
+  }
+}

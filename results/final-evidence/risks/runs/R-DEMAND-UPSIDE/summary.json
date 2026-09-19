@@ -1,0 +1,70 @@
+{
+  "applied_overrides": [
+    {
+      "application_order": 1,
+      "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+      "factor": "total_demand_multiplier",
+      "factor_order": 1,
+      "period_end": "2040-12",
+      "period_start": "2039-01",
+      "risk_id": "R-DEMAND-UPSIDE",
+      "risk_order": 1,
+      "status": "TEAM_ASSUMPTION",
+      "value": 1.1
+    },
+    {
+      "application_order": 2,
+      "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+      "factor": "critical_demand_multiplier",
+      "factor_order": 2,
+      "period_end": "2040-12",
+      "period_start": "2039-01",
+      "risk_id": "R-DEMAND-UPSIDE",
+      "risk_order": 1,
+      "status": "TEAM_ASSUMPTION",
+      "value": 1.1
+    }
+  ],
+  "base_scenario_id": "BASE",
+  "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+  "cost_per_served_ton_mln": 7.552322795479514,
+  "critical_service_level": 1.0,
+  "critical_shortage_t": 0.0,
+  "delayed_delivery_count": 0,
+  "delayed_delivery_t": 0,
+  "discounted_cost_mln": 9649.560376949703,
+  "discounted_cost_per_served_ton_mln": 6.892959042055652,
+  "emergency_usage_t": 34.904013961605585,
+  "environment_id": "BASE+R-DEMAND-UPSIDE",
+  "final_inventory_t": 0.0,
+  "hard_violation_count": 2,
+  "initial_stock_total_cost_mln": 334.81316789786985,
+  "minimum_inventory_t": 0.0,
+  "months_with_shortage": 9,
+  "official_horizon_years": [
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040
+  ],
+  "opening_inventory_t": 48.082191780821915,
+  "plan_id": "final-base-plan",
+  "research_extension_years": [],
+  "research_source_ids": [],
+  "risk_ids": [
+    "R-DEMAND-UPSIDE"
+  ],
+  "run_id": "run-c9c0fb399e62e9c1",
+  "scenario_id": "BASE+R-DEMAND-UPSIDE",
+  "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+  "total_losses_t": 19.333584161773747,
+  "total_overflow_t": 0.0,
+  "total_service_level": 0.9581899555880597,
+  "total_shortage_t": 61.084474885844685,
+  "unavailable_requested_supply_t": 2.4868995751603507e-14,
+  "undiscounted_cost_mln": 10572.61393206531,
+  "valid": false,
+  "violation_count": 2
+}

@@ -1,0 +1,14 @@
+{
+  "adaptation_effect_C_minus_B": {
+    "cost_delta_mln": 1718.7398753861835,
+    "min_critical_service_delta_pp": 3.462233589087804,
+    "min_total_service_delta_pp": 19.132260248519962,
+    "shortage_delta_t": -204.6826621004566
+  },
+  "stress_effect_B_minus_A": {
+    "cost_delta_mln": 502.7125623204465,
+    "min_critical_service_delta_pp": -3.462233589087804,
+    "min_total_service_delta_pp": -21.895652173913028,
+    "shortage_delta_t": 217.0764748858446
+  }
+}
