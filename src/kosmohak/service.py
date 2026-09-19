@@ -456,13 +456,7 @@ def synthesize_strategy(
     *,
     config: StrategyBuilderConfig | None = None,
 ) -> StrategyBuilderResult:
-    """Build new strategies from CASE_INPUT and operator search targets.
-
-    Unlike the Strategy Advisor, this does not require or modify an existing
-    OperatorPlan. Every accepted candidate is validated and evaluated by the
-    normal digital-twin path inside the Strategy Builder.
-    """
-    return build_strategies(
+    """Build a standard plan or a separate mandatory-stress adaptation.\n\n    BASE_PLAN returns plans valid under official BASE hard constraints.\n    STRESS_ADAPTATION returns plans valid under MANDATORY_STRESS hard\n    constraints while reporting 97%/99% service as resilience benchmarks.\n    Unlike Strategy Advisor, no existing OperatorPlan is required. Every\n    candidate is evaluated by the normal digital twin.\n    """    return build_strategies(
         base_scenario=base_scenario,
         stress_scenario=stress_scenario,
         case_data=case_data,
