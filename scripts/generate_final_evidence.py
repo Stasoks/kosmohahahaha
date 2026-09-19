@@ -39,6 +39,7 @@ from kosmohak.service import (
 
 OUTPUT = PROJECT_ROOT / "results" / "final-evidence"
 PLAN_DIR = PROJECT_ROOT / "plans"
+# Keep this generator deterministic: final reports and UI must consume these outputs.
 
 
 def _json(path: Path, value: Any) -> None:
