@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 from pathlib import Path
 from typing import Any
@@ -13,7 +14,18 @@ from kosmohak.domain.time import parse_month
 
 
 class PlanValidationError(ValueError):
-    pass
+    """A plan input error suitable for presentation at the service boundary."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        field: str | None = None,
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.field = field
+        self.details = details
 
 
 def _month(value: Any, field: str) -> str:
@@ -36,11 +48,37 @@ class PlanLoader:
     ) -> OperatorPlan:
         plan_path = Path(path)
         raw = json.loads(plan_path.read_text(encoding="utf-8"))
+        return cls.from_dict(raw, case_data, assumptions)
+
+    @classmethod
+    def from_dict(
+        cls,
+        raw: dict[str, Any],
+        case_data: CaseData,
+        assumptions: ModelAssumptions,
+    ) -> OperatorPlan:
+        """Build a plan through the same schema/domain path used by ``load``."""
+        if not isinstance(raw, dict):
+            raise PlanValidationError(
+                "Plan must be a JSON object",
+                field="$",
+                details={"received_type": type(raw).__name__},
+            )
+        value = copy.deepcopy(raw)
         schema = json.loads((case_data.root / "schemas" / "plan.schema.json").read_text(encoding="utf-8"))
-        errors = sorted(Draft202012Validator(schema).iter_errors(raw), key=lambda item: list(item.path))
+        errors = sorted(
+            Draft202012Validator(schema).iter_errors(value),
+            key=lambda item: list(item.path),
+        )
         if errors:
-            raise PlanValidationError(f"Plan does not match official envelope: {errors[0].message}")
-        plan = OperatorPlan.from_dict(raw)
+            error = errors[0]
+            field = ".".join(str(part) for part in error.absolute_path) or "$"
+            raise PlanValidationError(
+                f"Plan does not match official envelope: {error.message}",
+                field=field,
+                details={"validator": error.validator},
+            )
+        plan = OperatorPlan.from_dict(value)
         cls.validate(plan, case_data, assumptions)
         return plan
 

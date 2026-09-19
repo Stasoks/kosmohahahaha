@@ -16,7 +16,22 @@ from kosmohak.optimization import (
     improve_resilience,
     repair_plan,
 )
-from kosmohak.service import compare_plans, evaluate_both_scenarios, evaluate_plan
+from kosmohak.service import (
+    UI_BACKEND_API_VERSION,
+    ApplicationContext,
+    ServiceError,
+    ValidationResult,
+    build_download_bundle,
+    build_plan,
+    compare_plans,
+    evaluate_both_scenarios,
+    evaluate_plan,
+    load_application_context,
+    load_plan,
+    save_plan,
+    to_service_error,
+    validate_plan,
+)
 from kosmohak.workspace import (
     CaseWorkspace,
     FutureYearSpec,
@@ -26,6 +41,17 @@ from kosmohak.workspace import (
 )
 
 __all__ = [
+    "UI_BACKEND_API_VERSION",
+    "ApplicationContext",
+    "ServiceError",
+    "ValidationResult",
+    "load_application_context",
+    "build_plan",
+    "load_plan",
+    "save_plan",
+    "validate_plan",
+    "build_download_bundle",
+    "to_service_error",
     "simulate",
     "evaluate_risk",
     "evaluate_risk_set",

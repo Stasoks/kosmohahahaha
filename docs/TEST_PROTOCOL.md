@@ -9,6 +9,9 @@
 - `tests/official`: unchanged organizer V01–V10 vectors.
 - `tests/acceptance`: independent remaining-core, EXT/HOR, advisor, product API, and
   save/reopen properties.
+- `tests/service`: the stable UI facade, including context, plan validation and
+  round-trip, real BASE/STRESS/risk/sensitivity/advisor calls, workspace persistence,
+  and the downloadable ZIP contract.
 
 ## Independent expected results
 
@@ -55,7 +58,7 @@ guard explicitly.
 
 ```text
 python3 -m pytest
-86 passed, 0 failed
+96 passed, 0 failed
 
 python3 -m pytest tests/official
 10 passed, 0 failed
@@ -75,6 +78,9 @@ python3 -m pytest tests/integration/test_reproducibility_and_export.py \
 
 python3 -m pytest tests/integration/test_sensitivity_reverse.py
 4 passed, 0 failed
+
+python3 -m pytest tests/service/test_ui_service_api.py
+10 passed, 0 failed
 ```
 
 `python3 tools/validate_participant_repo.py` passed all 10 applicable organizer
