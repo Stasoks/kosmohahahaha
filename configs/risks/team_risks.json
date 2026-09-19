@@ -127,27 +127,37 @@
       "anticipated_consequence": "No Earth-Core arrivals in the declared disruption months; inventory may bridge part of the outage.",
       "mitigation": {
         "mitigation_id": "M-FLEX-2038",
-        "description": "Operator-specified additional Earth-Flex reservation and orders.",
+        "description": "Pre-book targeted Earth-Flex cover for the Earth-Core outage window. Six 4.75 t orders are placed four months ahead so deliveries arrive across 2038-04..09; reservations are increased only for the required order-year headroom. This mitigation is tied to the selected final BASE plan and is re-simulated through the same digital twin.",
         "plan_patch": {
           "capacity_reservations": [
             {
               "source_id": "B",
+              "year": 2037,
+              "reserved_capacity_t": 6.4807692309
+            },
+            {
+              "source_id": "B",
               "year": 2038,
-              "reserved_capacity_t": 110
+              "reserved_capacity_t": 23.75
             }
           ],
           "supply_orders": [
             {
               "source_id": "B",
-              "mode": "annual_even",
+              "mode": "monthly",
               "values": {
-                "2038": 110
+                "2037-12": 4.75,
+                "2038-01": 4.75,
+                "2038-02": 4.75,
+                "2038-03": 4.75,
+                "2038-04": 4.75,
+                "2038-05": 4.75
               }
             }
           ]
         }
       },
-      "residual_consequence": "Residual shortage and mitigation cost are recomputed through the same digital twin.",
+      "residual_consequence": "Recomputed for the selected final BASE plan; mitigation must preserve normal-plan feasibility and reduce outage-driven shortage/reserve breaches.",
       "stakeholder_ids": [
         "operator",
         "critical_consumers",
@@ -155,7 +165,8 @@
         "launch_logistics"
       ],
       "metadata": {
-        "status": "TEAM_ASSUMPTION"
+        "status": "TEAM_ASSUMPTION",
+        "mitigation_scope": "FINAL_BASE_PLAN"
       }
     },
     {

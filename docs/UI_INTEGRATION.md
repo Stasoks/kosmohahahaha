@@ -414,3 +414,26 @@ Internal implementation details:
   `workspace`, `reporting`, and `loading`;
 - advisor candidate-generation/search internals;
 - internal serialization mechanics used to produce the stable exported artifacts.
+
+## Implemented Streamlit presentation layer
+
+The competition dashboard is started with `streamlit run streamlit_app.py`. Its
+application chain is deliberately one-way:
+
+    Streamlit pages
+        -> app/kernel_bridge.py
+        -> kosmohak.service
+        -> PlanLoader / simulator / risk / workspace / Builder
+        -> serialized domain result
+        -> charts and Russian display tables
+
+`app/kernel_bridge.py` contains only validation, service orchestration and
+serialization. Pure display transformations live in `app/view_models.py`; Plotly
+figures consume already-calculated rows in `app/charts.py`. The dashboard does not
+maintain a second material-balance or cost model.
+
+The active UI contract additionally provides wrappers for the final BASE/stress
+plans, structured validation, A/B/C, stress Builder, official and custom
+sensitivity, reverse stress, single-risk detail, mitigation, workspace roundtrip,
+research-case evaluation, CSV files and ZIP bytes. See `docs/OPERATOR_DASHBOARD.md`
+for state, caching and user-flow details.

@@ -1,0 +1,59 @@
+{
+  "applied_overrides": [
+    {
+      "application_order": 1,
+      "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+      "factor": "actual_delivery_share",
+      "factor_order": 1,
+      "period_end": "2039-12",
+      "period_start": "2038-01",
+      "risk_id": "R-ISRU-UNDERDELIVERY",
+      "risk_order": 1,
+      "source_id": "D",
+      "status": "TEAM_ASSUMPTION",
+      "value": 0.4
+    }
+  ],
+  "base_scenario_id": "BASE",
+  "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+  "cost_per_served_ton_mln": 8.367238878727148,
+  "critical_service_level": 0.9630147368421053,
+  "critical_shortage_t": 35.135999999999996,
+  "delayed_delivery_count": 0,
+  "delayed_delivery_t": 0,
+  "discounted_cost_mln": 9607.825797225072,
+  "discounted_cost_per_served_ton_mln": 7.639546187265566,
+  "emergency_usage_t": 34.904013961605585,
+  "environment_id": "BASE+R-ISRU-UNDERDELIVERY",
+  "final_inventory_t": 0.0,
+  "hard_violation_count": 7,
+  "initial_stock_total_cost_mln": 334.81316789786985,
+  "minimum_inventory_t": 0.0,
+  "months_with_shortage": 17,
+  "official_horizon_years": [
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040
+  ],
+  "opening_inventory_t": 48.082191780821915,
+  "plan_id": "final-base-plan",
+  "research_extension_years": [],
+  "research_source_ids": [],
+  "risk_ids": [
+    "R-ISRU-UNDERDELIVERY"
+  ],
+  "run_id": "run-ff4a9b55919431ec",
+  "scenario_id": "BASE+R-ISRU-UNDERDELIVERY",
+  "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+  "total_losses_t": 17.605584161773745,
+  "total_overflow_t": 0.0,
+  "total_service_level": 0.9047795144706154,
+  "total_shortage_t": 132.35647488584468,
+  "unavailable_requested_supply_t": 144.00000000000003,
+  "undiscounted_cost_mln": 10523.003798914624,
+  "valid": false,
+  "violation_count": 7
+}

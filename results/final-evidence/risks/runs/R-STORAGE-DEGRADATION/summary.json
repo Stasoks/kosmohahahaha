@@ -1,0 +1,59 @@
+{
+  "applied_overrides": [
+    {
+      "application_order": 1,
+      "basis": "Illustrative deterministic consequence assumption; not an asserted probability.",
+      "factor": "storage_loss_rate_override",
+      "factor_order": 1,
+      "period_end": "2040-12",
+      "period_start": "2038-01",
+      "risk_id": "R-STORAGE-DEGRADATION",
+      "risk_order": 1,
+      "status": "TEAM_ASSUMPTION",
+      "storage_id": "ZBO",
+      "value": 0.025
+    }
+  ],
+  "base_scenario_id": "BASE",
+  "case_input_root": "/home/runner/work/kosmohahahaha/kosmohahahaha",
+  "cost_per_served_ton_mln": 7.635736312353069,
+  "critical_service_level": 1.0,
+  "critical_shortage_t": 0.0,
+  "delayed_delivery_count": 0,
+  "delayed_delivery_t": 0,
+  "discounted_cost_mln": 9668.811417083029,
+  "discounted_cost_per_served_ton_mln": 6.966974520946105,
+  "emergency_usage_t": 34.904013961605585,
+  "environment_id": "BASE+R-STORAGE-DEGRADATION",
+  "final_inventory_t": 0.0,
+  "hard_violation_count": 1,
+  "initial_stock_total_cost_mln": 334.81316789786985,
+  "minimum_inventory_t": 0.0,
+  "months_with_shortage": 1,
+  "official_horizon_years": [
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040
+  ],
+  "opening_inventory_t": 48.082191780821915,
+  "plan_id": "final-base-plan",
+  "research_extension_years": [],
+  "research_source_ids": [],
+  "risk_ids": [
+    "R-STORAGE-DEGRADATION"
+  ],
+  "run_id": "run-8941e4843ffe6c87",
+  "scenario_id": "BASE+R-STORAGE-DEGRADATION",
+  "scenario_source": "/home/runner/work/kosmohahahaha/kosmohahahaha/scenarios/base.yaml",
+  "total_losses_t": 31.442768372300065,
+  "total_overflow_t": 0.0,
+  "total_service_level": 0.9984218279882223,
+  "total_shortage_t": 2.193659096370979,
+  "unavailable_requested_supply_t": 2.4868995751603507e-14,
+  "undiscounted_cost_mln": 10596.923271751682,
+  "valid": false,
+  "violation_count": 1
+}
