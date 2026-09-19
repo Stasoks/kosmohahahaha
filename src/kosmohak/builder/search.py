@@ -785,6 +785,153 @@ def _initial_stock_rightsize_repair(
     )
 
 
+def _emergency_bridge_repair(
+    candidate: _Candidate,
+    base_scenario: Scenario,
+    stress_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> tuple[dict[str, Any], str] | None:
+    """Supply the Emergency lead-time bridge with non-E channels for contract reserve."""
+    if "E" not in case_data.sources:
+        return None
+    emergency_lead = assumptions.source_delivery_lead_months(case_data.sources["E"])
+    violating_years = sorted(
+        {
+            int(str(item.period)[:4])
+            for item in candidate.stress_result.violations
+            if item.severity == "hard" and item.code == "RESERVE_45D"
+            and candidate.plan.reserve_strategy(int(str(item.period)[:4]))
+            == "emergency_contract"
+        }
+    )
+    if not violating_years:
+        return None
+
+    value = copy.deepcopy(candidate.plan.raw)
+    commissions = _commissions(value, base_scenario, case_data, assumptions)
+    stress_env = ensure_environment(stress_scenario)
+    monthly = {
+        str(row["month"]): row for row in candidate.stress_result.monthly
+    }
+    repaired_years: list[int] = []
+
+    for year in violating_years:
+        bridge_months = [
+            f"{year:04d}-{number:02d}"
+            for number in range(1, emergency_lead + 1)
+        ]
+        bridge_demand = sum(float(monthly[m]["demand_total_t"]) for m in bridge_months)
+        bridge_supply = float(monthly[bridge_months[0]]["opening_inventory_t"])
+        for month in bridge_months:
+            row = monthly[month]
+            gross = float(row["gross_delivery_t"])
+            emergency_gross = float(
+                row["gross_delivery_by_source"].get("E", 0.0)
+            )
+            if gross > 1e-12:
+                bridge_supply += float(row["accepted_delivery_t"]) * (
+                    (gross - emergency_gross) / gross
+                )
+        remaining = max(0.0, bridge_demand - bridge_supply)
+        if remaining <= 1e-8:
+            continue
+
+        delivery_month = bridge_months[-1]
+        loss_rate = float(monthly[delivery_month]["active_loss_rate"])
+        while remaining > 1e-8:
+            choices: list[dict[str, Any]] = []
+            for source_id in sorted(case_data.sources):
+                if source_id == "E":
+                    continue
+                source = case_data.sources[source_id]
+                lead = assumptions.source_delivery_lead_months(source)
+                order_month = add_months(delivery_month, -lead)
+                commission = commissions.get(source_id)
+                if (
+                    commission is None
+                    or order_month < case_data.start_month
+                    or order_month > case_data.end_month
+                    or order_month < str(commission)
+                ):
+                    continue
+                order_year = int(order_month[:4])
+                active = active_order_months(source_id, order_year, commissions)
+                if not active:
+                    continue
+                schedule = _schedule(value, source_id)
+                physical_limit = (
+                    case_data.source_capacity(source_id, order_year)
+                    * len(active)
+                    / 12.0
+                )
+                current = _year_total(schedule, order_year)
+                room = max(0.0, physical_limit - current)
+                if room <= 1e-10:
+                    continue
+                share = stress_env.actual_delivery_share(
+                    source.name,
+                    delivery_month,
+                    source_id=source_id,
+                )
+                share *= stress_env.availability_share(source_id, delivery_month)
+                net_per_order = share * max(0.0, 1.0 - loss_rate)
+                if net_per_order <= 1e-10:
+                    continue
+                price = stress_env.variable_price_for_month(
+                    source_id,
+                    source.name,
+                    order_month,
+                    source.variable_cost_mln_per_t,
+                )
+                choices.append(
+                    {
+                        "source_id": source_id,
+                        "order_month": order_month,
+                        "room": room,
+                        "net_per_order": net_per_order,
+                        "effective_cost": (
+                            price
+                            + source.reservation_rate_mln_per_t_year_capacity
+                        )
+                        / net_per_order,
+                    }
+                )
+            if not choices:
+                break
+            choices.sort(
+                key=lambda item: (
+                    item["effective_cost"],
+                    -item["net_per_order"],
+                    item["source_id"],
+                )
+            )
+            choice = choices[0]
+            requested = min(
+                float(choice["room"]),
+                remaining / float(choice["net_per_order"]),
+            )
+            if requested <= 1e-10:
+                break
+            schedule = _schedule(value, str(choice["source_id"]))
+            order_month = str(choice["order_month"])
+            schedule["values"][order_month] = float(
+                schedule["values"].get(order_month, 0.0)
+            ) + requested
+            remaining -= requested * float(choice["net_per_order"])
+
+        if remaining <= 1e-6:
+            repaired_years.append(year)
+
+    if not repaired_years:
+        return None
+    _rebuild_reservations(value, commissions, case_data)
+    return (
+        value,
+        "emergency_bridge_repair:" + ",".join(str(year) for year in repaired_years),
+    )
+
+
 def _reserve_contract_repair(
     candidate: _Candidate,
     base_scenario: Scenario,
@@ -985,6 +1132,15 @@ def _hard_repair_mutations(
     assumptions: ModelAssumptions,
 ) -> list[tuple[dict[str, Any], str]]:
     values: list[tuple[dict[str, Any], str]] = []
+    bridge_repair = _emergency_bridge_repair(
+        candidate,
+        base_scenario,
+        stress_scenario,
+        case_data,
+        assumptions,
+    )
+    if bridge_repair is not None:
+        values.append(bridge_repair)
     reserve_repair = _reserve_contract_repair(
         candidate,
         base_scenario,
