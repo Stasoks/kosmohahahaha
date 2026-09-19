@@ -950,3 +950,30 @@ synthesize_strategy / StrategyBuilderConfig / StrategyBuilderResult
 [`STRATEGY_BUILDER.md`](docs/STRATEGY_BUILDER.md),
 [`UI_INTEGRATION.md`](docs/UI_INTEGRATION.md),
 [`TEST_PROTOCOL.md`](docs/TEST_PROTOCOL.md).
+
+---
+
+## 37. Операторский Streamlit dashboard
+
+Ветка `web` содержит presentation layer над публичным `kosmohak.service`. Интерфейс
+не дублирует материальный баланс, экономику, ограничения или семантику сценариев.
+
+```bash
+python3 -m pip install -r requirements.txt
+streamlit run streamlit_app.py
+```
+
+При чистом запуске открывается `plans/final_base.json`; если файла нет, используется
+`configs/operator_plan_example.json`. В интерфейсе доступны:
+
+- редактор TEAM_DECISION с отдельной validation и явным пересчётом;
+- BASE/STRESS и A/B/C с отдельным stress-specific планом;
+- Strategy Builder как bounded deterministic heuristic;
+- риски, количественная mitigation, sensitivity и reverse stress;
+- stakeholder consequences без выдуманных revenue/probability;
+- non-destructive Research Workspace с источниками и будущими годами;
+- portable plan/workspace JSON, CSV и воспроизводимый ZIP.
+
+Все тяжёлые операции запускаются кнопкой. После изменения плана прежние результаты
+помечаются как устаревшие. Подробный пользовательский и архитектурный контракт:
+[`OPERATOR_DASHBOARD.md`](docs/OPERATOR_DASHBOARD.md).
