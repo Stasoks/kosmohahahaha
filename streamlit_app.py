@@ -47,7 +47,7 @@ PAGES = {
     "Результаты": results.render,
     "Сценарии": scenarios.render,
     "Риски и чувствительность": risks.render,
-    "Исследования": research.render,
+    "Новые источники и горизонт": research.render,
     "Данные и экспорт": export.render,
 }
 
