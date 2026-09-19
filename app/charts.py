@@ -57,48 +57,91 @@ def demand_service(result: dict[str, Any]) -> go.Figure:
 
 def inventory(result: dict[str, Any]) -> go.Figure:
     monthly = pd.DataFrame(result["monthly"])
-    annual = {int(row["year"]): row for row in result["annual"]}
-    required = [annual[int(str(month)[:4])]["reserve_requirement_t"] for month in monthly.month]
-    breach_years = {
-        int(row["year"]) for row in result["annual"] if float(row["reserve_actual_days"]) < 45 - 1e-9
-    }
+    annual = pd.DataFrame(result["annual"]).copy()
+    annual["jan"] = annual["year"].astype(str) + "-01"
+    annual["reserve_ok"] = annual["reserve_actual_days"].astype(float) >= 45 - 1e-9
+
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
             x=monthly.month,
             y=monthly.closing_inventory_t,
-            name="Закрывающий запас",
+            name="Физический запас на конец месяца",
             fill="tozeroy",
             line=dict(color="#5B4BFF", width=2),
-            hovertemplate="%{x}<br>Запас: %{y:.2f} т<extra></extra>",
+            hovertemplate="%{x}<br>Запас на конец месяца: %{y:.2f} т<extra></extra>",
         )
     )
     fig.add_trace(
         go.Scatter(
             x=monthly.month,
             y=monthly.active_storage_capacity_t,
-            name="Ёмкость",
+            name="Доступная ёмкость хранилища",
             line=dict(color="#17151A", dash="dot"),
             hovertemplate="%{x}<br>Ёмкость: %{y:.2f} т<extra></extra>",
         )
     )
     fig.add_trace(
         go.Scatter(
-            x=monthly.month,
-            y=required,
-            name="Расчётный резерв 45 дней",
+            x=annual.jan,
+            y=annual.reserve_requirement_t,
+            name="Нужно на 45 дней к началу года",
+            mode="lines+markers",
             line=dict(color="#9B72FF", dash="dash"),
-            hovertemplate="%{x}<br>Годовая расчётная потребность резерва: %{y:.2f} т<extra></extra>",
+            marker=dict(size=8),
+            hovertemplate="%{x}<br>Требуемый запас: %{y:.2f} т<extra></extra>",
         )
     )
-    for year in sorted(breach_years):
-        fig.add_vrect(
-            x0=f"{year}-01", x1=f"{year}-12", fillcolor="#FDAEAD", opacity=0.12,
-            line_width=0, annotation_text=f"НАРУШЕНИЕ {year}", annotation_position="top left"
-        )
-    fig.update_layout(title="Когда запас приближается к опасной границе?", yaxis_title="т")
-    return style(fig)
 
+    marker_colors = [
+        "#278D63" if bool(ok) else "#D06B6B"
+        for ok in annual.reserve_ok
+    ]
+    marker_symbols = [
+        "circle" if bool(ok) else "x"
+        for ok in annual.reserve_ok
+    ]
+    custom = annual[["reserve_actual_days", "reserve_requirement_t"]]
+    fig.add_trace(
+        go.Scatter(
+            x=annual.jan,
+            y=annual.opening_inventory_t,
+            name="Фактический запас на начало года",
+            mode="markers",
+            marker=dict(
+                color=marker_colors,
+                symbol=marker_symbols,
+                size=12,
+                line=dict(width=1, color="#ffffff"),
+            ),
+            customdata=custom,
+            hovertemplate=(
+                "%{x}<br>Запас на начало года: %{y:.2f} т"
+                "<br>Покрытие: %{customdata[0]:.1f} дней"
+                "<br>Нужно на 45 дней: %{customdata[1]:.2f} т<extra></extra>"
+            ),
+        )
+    )
+
+    zero_rows = monthly[monthly.closing_inventory_t.astype(float) <= 1e-9]
+    if not zero_rows.empty:
+        first_zero = zero_rows.iloc[0]
+        fig.add_annotation(
+            x=first_zero.month,
+            y=0,
+            text="запас исчерпан",
+            showarrow=True,
+            arrowhead=2,
+            ax=0,
+            ay=-45,
+            font=dict(color="#9A3E1A"),
+        )
+
+    fig.update_layout(
+        title="Хватает ли физического запаса на 45 дней к началу каждого года?",
+        yaxis_title="т",
+    )
+    return style(fig)
 
 def supply_mix(result: dict[str, Any], names: dict[str, str]) -> go.Figure:
     df = pd.DataFrame(result["sources"])
@@ -197,11 +240,38 @@ def abc_metric(rows: list[dict[str, Any]], field: str, title: str, unit: str) ->
 
 
 def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figure, go.Figure]:
-    df = pd.DataFrame(points)
+    df = pd.DataFrame(points).copy()
+
+    numeric_values: list[float] = []
+    numeric_axis = True
+    for value in df.value:
+        try:
+            numeric_values.append(float(value))
+        except (TypeError, ValueError):
+            numeric_axis = False
+            break
+
+    if numeric_axis:
+        df["plot_value"] = numeric_values
+        x_title = title
+        service_title = "Когда изменение параметра начинает ухудшать обслуживание?"
+    else:
+        df["plot_value"] = df.value.astype(str)
+        x_title = (
+            "Официальный уровень спроса"
+            if title == "official_demand_point"
+            else title
+        )
+        service_title = (
+            "Как план работает при официальных LOW / BASE / HIGH уровнях спроса?"
+            if title == "official_demand_point"
+            else "Как меняется обслуживание между проверяемыми вариантами?"
+        )
+
     service_fig = go.Figure()
     service_fig.add_trace(
         go.Scatter(
-            x=df.value,
+            x=df.plot_value,
             y=df.total_service_level * 100,
             name="Общий сервис",
             mode="lines+markers",
@@ -210,41 +280,75 @@ def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figu
     )
     service_fig.add_trace(
         go.Scatter(
-            x=df.value,
+            x=df.plot_value,
             y=df.critical_service_level * 100,
             name="Критический сервис",
             mode="lines+markers",
             line=dict(color="#17151A", width=2),
         )
     )
-    service_fig.add_hrect(y0=0, y1=97, fillcolor="#FDAEAD", opacity=0.08, line_width=0)
-    service_fig.add_hline(y=97, line_dash="dash", annotation_text="97% · общий минимум BASE")
-    service_fig.add_hline(y=99, line_dash="dot", annotation_text="99% · критический минимум BASE")
-    if 1.0 in set(float(value) for value in df.value):
-        service_fig.add_vline(
-            x=1.0,
-            line_dash="dot",
-            line_color="#6D6673",
-            annotation_text="исходное значение",
-        )
-    failing = df[df.valid == False]  # noqa: E712
-    if not failing.empty:
-        service_fig.add_vline(
-            x=float(failing.iloc[0].value),
-            line_dash="dash",
-            line_color="#D06B6B",
-            annotation_text="первое нарушение",
-        )
+    service_fig.add_hrect(
+        y0=0,
+        y1=97,
+        fillcolor="#FDAEAD",
+        opacity=0.08,
+        line_width=0,
+    )
+    service_fig.add_hline(
+        y=97,
+        line_dash="dash",
+        annotation_text="97% · общий минимум BASE",
+    )
+    service_fig.add_hline(
+        y=99,
+        line_dash="dot",
+        annotation_text="99% · критический минимум BASE",
+    )
+
+    if numeric_axis:
+        if any(abs(value - 1.0) <= 1e-12 for value in numeric_values):
+            service_fig.add_vline(
+                x=1.0,
+                line_dash="dot",
+                line_color="#6D6673",
+                annotation_text="исходное значение",
+            )
+        failing = df[df.valid == False]  # noqa: E712
+        if not failing.empty:
+            service_fig.add_vline(
+                x=float(failing.iloc[0].plot_value),
+                line_dash="dash",
+                line_color="#D06B6B",
+                annotation_text="первое нарушение",
+            )
+    else:
+        failing = df[df.valid == False]  # noqa: E712
+        if not failing.empty:
+            service_fig.add_trace(
+                go.Scatter(
+                    x=failing.plot_value,
+                    y=failing.total_service_level * 100,
+                    mode="markers",
+                    name="Есть нарушение",
+                    marker=dict(
+                        color="#D06B6B",
+                        symbol="x",
+                        size=13,
+                    ),
+                    hovertemplate="%{x}<br>Этот вариант содержит нарушение<extra></extra>",
+                )
+            )
+
     service_fig.update_layout(
-        title="Когда изменение параметра начинает ухудшать обслуживание?",
-        xaxis_title=title,
+        title=service_title,
+        xaxis_title=x_title,
         yaxis_title="Сервис, %",
     )
 
     impact = go.Figure()
     impact.add_trace(
         go.Bar(
-            x=df.value,
+            x=df.plot_value,
             y=df.total_shortage_t,
             name="Дефицит, т",
             marker_color="#FDAEAD",
@@ -252,18 +356,23 @@ def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figu
     )
     impact.add_trace(
         go.Scatter(
-            x=df.value,
+            x=df.plot_value,
             y=df.total_cost_mln,
             name="Стоимость, млн",
             yaxis="y2",
+            mode="lines+markers",
             line=dict(color="#5B4BFF", width=3),
         )
     )
     impact.update_layout(
         title="Как меняются дефицит и стоимость?",
-        xaxis_title=title,
+        xaxis_title=x_title,
         yaxis_title="Дефицит, т",
-        yaxis2=dict(overlaying="y", side="right", title="Стоимость, млн у.е."),
+        yaxis2=dict(
+            overlaying="y",
+            side="right",
+            title="Стоимость, млн у.е.",
+        ),
     )
     return style(service_fig), style(impact)
 
