@@ -412,17 +412,36 @@ def compare_available_plans(
     }
 
 
+def _analysis_scenario(environment_key: str):
+    """Resolve the explicit official environment used for analysis."""
+
+    ctx = application_context()
+    key = str(environment_key or "BASE").upper()
+    if key == "BASE":
+        return ctx.base_scenario
+    if key == "MANDATORY_STRESS":
+        return ctx.stress_scenario
+    raise BridgeError(
+        "UNKNOWN_ANALYSIS_ENVIRONMENT",
+        f"Неизвестная среда анализа: {environment_key}",
+        field="analysis_environment",
+    )
+
+
 def risks(
     raw: dict[str, Any],
     source_overrides: dict[str, dict[str, Any]] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     ctx = application_context()
     case_data = _case_data_with_source_overrides(source_overrides)
     plan = _validated_plan_for_case(raw, case_data)
-    result = evaluate_risks(plan, ctx.base_scenario, ctx.risks, case_data, ctx.assumptions)
+    environment = _analysis_scenario(environment_key)
+    result = evaluate_risks(plan, environment, ctx.risks, case_data, ctx.assumptions)
     value = result.to_dict()
     value["plan_hash"] = plan_hash(raw)
     value["input_hash"] = input_hash(source_overrides)
+    value["analysis_environment"] = environment.scenario_id
     return value
 
 
@@ -434,6 +453,7 @@ def risk_detail(
     raw: dict[str, Any],
     risk_id: str,
     source_overrides: dict[str, dict[str, Any]] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     ctx = application_context()
     case_data = _case_data_with_source_overrides(source_overrides)
@@ -441,10 +461,12 @@ def risk_detail(
     risk = next((item for item in ctx.risks if item.risk_id == risk_id), None)
     if risk is None:
         raise BridgeError("RISK_NOT_FOUND", f"Риск {risk_id!r} не найден.", field="risk_id")
-    result = evaluate_single_risk(plan, ctx.base_scenario, risk, case_data, ctx.assumptions)
+    environment = _analysis_scenario(environment_key)
+    result = evaluate_single_risk(plan, environment, risk, case_data, ctx.assumptions)
     return {
         "plan_hash": plan_hash(raw),
         "input_hash": input_hash(source_overrides),
+        "analysis_environment": environment.scenario_id,
         "risk": risk.to_dict(),
         "register": result.to_register_entry(),
         "applied_overrides": copy.deepcopy(result.applied_overrides),
@@ -459,6 +481,7 @@ def mitigation_detail(
     raw: dict[str, Any],
     risk_id: str,
     source_overrides: dict[str, dict[str, Any]] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     ctx = application_context()
     case_data = _case_data_with_source_overrides(source_overrides)
@@ -473,10 +496,11 @@ def mitigation_detail(
             "Мера описана качественно, количественный plan_patch не задан.",
             field="mitigation",
         )
-    original = evaluate_single_risk(plan, ctx.base_scenario, risk, case_data, ctx.assumptions)
+    environment = _analysis_scenario(environment_key)
+    original = evaluate_single_risk(plan, environment, risk, case_data, ctx.assumptions)
     result = evaluate_risk_mitigation(
         plan,
-        ctx.base_scenario,
+        environment,
         risk,
         mitigation,
         case_data,
@@ -488,6 +512,7 @@ def mitigation_detail(
         {
             "plan_hash": plan_hash(raw),
             "input_hash": input_hash(source_overrides),
+            "analysis_environment": environment.scenario_id,
             "risk_id": risk_id,
             "mitigated_plan": copy.deepcopy(result.mitigated_plan),
             "risk_result": result.risk_result.to_dict(),
@@ -502,20 +527,23 @@ def sensitivity(
     values: Iterable[Any],
     parameter: str | dict[str, Any] = "demand_multiplier",
     source_overrides: dict[str, dict[str, Any]] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     ctx = application_context()
     case_data = _case_data_with_source_overrides(source_overrides)
     plan = _validated_plan_for_case(raw, case_data)
+    environment = _analysis_scenario(environment_key)
     result = run_sensitivity(
         plan,
         parameter,
         list(values),
-        ctx.base_scenario,
+        environment,
         case_data,
         ctx.assumptions,
     ).to_dict()
     result["plan_hash"] = plan_hash(raw)
     result["input_hash"] = input_hash(source_overrides)
+    result["analysis_environment"] = environment.scenario_id
     return result
 
 
@@ -543,21 +571,24 @@ def reverse_stress(
     parameter: str | dict[str, Any] = "demand_multiplier",
     target: str | dict[str, Any] = "ANY_HARD",
     source_overrides: dict[str, dict[str, Any]] | None = None,
+    environment_key: str = "BASE",
 ) -> dict[str, Any]:
     ctx = application_context()
     case_data = _case_data_with_source_overrides(source_overrides)
     plan = _validated_plan_for_case(raw, case_data)
+    environment = _analysis_scenario(environment_key)
     result = run_reverse_stress(
         plan,
         parameter,
         {"start": start, "stop": stop, "step": step},
         target,
-        ctx.base_scenario,
+        environment,
         case_data,
         ctx.assumptions,
     ).to_dict()
     result["plan_hash"] = plan_hash(raw)
     result["input_hash"] = input_hash(source_overrides)
+    result["analysis_environment"] = environment.scenario_id
     return result
 
 
