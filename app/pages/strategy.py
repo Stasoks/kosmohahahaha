@@ -140,7 +140,11 @@ def render() -> None:
         first, second = st.columns([1, 2])
         plan_id = first.text_input("Название плана", raw.get("plan_id", "operator-plan"))
         notes = second.text_input("Комментарий оператора", raw.get("metadata", {}).get("notes", ""))
-        st.caption("Отметьте строку в последнем столбце, чтобы применить изменённые годовые объёмы.")
+        st.caption(
+            "Заказы — сколько топлива оператор просит поставить из каждого канала. "
+            "Изменение таблицы само по себе не применяется: отметьте строку в последнем "
+            "столбце и затем нажмите «Применить решения»."
+        )
         annual = st.data_editor(
             _annual_orders(raw, metadata),
             hide_index=True,
@@ -170,6 +174,10 @@ def render() -> None:
                 },
             )
         with st.expander("Резервирование мощности", expanded=False):
+            st.caption(
+                "Резерв мощности — это право использовать часть пропускной способности источника. "
+                "Это не физический запас топлива и за резерв может взиматься отдельная плата."
+            )
             reservations = st.data_editor(
                 _reservations(raw, metadata),
                 hide_index=True,
@@ -185,24 +193,71 @@ def render() -> None:
             )
 
         with st.expander("Инвестиционные решения", expanded=False):
+            st.caption(
+                "Инвестиция не даёт мощность мгновенно. Дата решения определяет, когда объект "
+                "может стать доступным, а CAPEX попадает в соответствующий бюджетный период."
+            )
             investments = {item["investment_id"]: item for item in raw["decisions"]["investments"]}
             cols = st.columns(3)
             with cols[0]:
-                zbo = st.checkbox("Хранилище ZBO", investments.get("ZBO", {}).get("enabled", False))
-                zbo_date = st.text_input("Месяц ввода ZBO", investments.get("ZBO", {}).get("commissioning_month", "2036-01"))
-                st.caption("Инвестиции: 180 млн. Мощность доступна после ввода.")
+                zbo = st.checkbox(
+                    "Улучшенное хранилище ZBO",
+                    investments.get("ZBO", {}).get("enabled", False),
+                    help=(
+                        "ZBO снижает потери топлива при хранении и увеличивает доступную ёмкость. "
+                        "Это инфраструктурная инвестиция, а не источник топлива."
+                    ),
+                )
+                zbo_date = st.text_input(
+                    "Месяц ввода ZBO",
+                    investments.get("ZBO", {}).get("commissioning_month", "2036-01"),
+                    help="Месяц, с которого улучшенное хранилище начинает работать.",
+                )
+                st.caption(
+                    "CAPEX 180 млн · ёмкость 120 т · потери 1,2% вместо базовых 4,5% · "
+                    "доп. OPEX 12 млн/год · доступно не ранее 2036."
+                )
             with cols[1]:
-                earth = st.checkbox("Новый земной канал", investments.get("EARTH_NEW", {}).get("enabled", False))
-                earth_buy = st.text_input("Месяц покупки опциона", investments.get("EARTH_NEW", {}).get("option_purchase_month", "2035-01"))
-                earth_ex = st.text_input("Месяц исполнения опциона", investments.get("EARTH_NEW", {}).get("option_exercise_month", "2035-02"))
-                st.caption("Инвестиции: 90 + 270 млн.")
+                earth = st.checkbox(
+                    "Новый земной канал Earth-New",
+                    investments.get("EARTH_NEW", {}).get("enabled", False),
+                    help="Новый источник C. Требует покупки и исполнения инвестиционного опциона.",
+                )
+                earth_buy = st.text_input(
+                    "Месяц покупки опциона",
+                    investments.get("EARTH_NEW", {}).get("option_purchase_month", "2035-01"),
+                    help="Первый инвестиционный платёж: 90 млн.",
+                )
+                earth_ex = st.text_input(
+                    "Месяц исполнения опциона",
+                    investments.get("EARTH_NEW", {}).get("option_exercise_month", "2035-02"),
+                    help="После исполнения начинается срок ввода источника. Второй платёж: 270 млн.",
+                )
+                st.caption(
+                    "CAPEX 90 + 270 млн · ввод через 18–24 месяца после исполнения опциона."
+                )
             with cols[2]:
-                lunar = st.checkbox("Лунное производство", investments.get("LUNAR_ISRU", {}).get("enabled", False))
-                lunar_date = st.text_input("Месяц финансирования", investments.get("LUNAR_ISRU", {}).get("funding_month", "2035-01"))
-                st.caption("Инвестиции: 1 250 млн. Доступность — с 2038 года.")
+                lunar = st.checkbox(
+                    "Лунное производство Lunar-ISRU",
+                    investments.get("LUNAR_ISRU", {}).get("enabled", False),
+                    help="Источник D. Дешёвое топливо после ввода, но крупный CAPEX и отдельный риск недопоставки.",
+                )
+                lunar_date = st.text_input(
+                    "Месяц финансирования",
+                    investments.get("LUNAR_ISRU", {}).get("funding_month", "2035-01"),
+                    help="Когда оператор принимает инвестиционное решение и фиксирует CAPEX.",
+                )
+                st.caption(
+                    "CAPEX 1 250 млн · фиксированный OPEX 70 млн/год после ввода · "
+                    "поставка доступна с 2038 года."
+                )
 
         stock = raw["decisions"].get("initial_stock_acquisition", {})
         with st.expander("Начальный запас", expanded=False):
+            st.caption(
+                "Начальный запас нужен, чтобы начать 2035 год с уже доставленным физическим топливом. "
+                "Заказ и доставка могут относиться к периоду до горизонта модели."
+            )
             cols = st.columns(3)
             stock_source = cols[0].selectbox(
                 "Источник",
@@ -219,6 +274,11 @@ def render() -> None:
             contract_end = cols[1].text_input("Конец контракта", stock.get("contract_period_end", "2034-12"))
 
         st.subheader("Резерв и аварийные поставки")
+        st.caption(
+            "Выберите, чем обеспечивается 45-дневная устойчивость в каждом году. "
+            "Физический запас хранится на узле; аварийный контракт должен реально закрывать "
+            "объём и сроки поставки. Отдельно задаётся, разрешён ли Emergency как плановая поставка."
+        )
         reserve_policy = raw["decisions"].get("inventory_policy", {}).get("reserve_strategy_by_year", {})
         roles = raw["decisions"].get("emergency_role_by_year", {})
         policy_values: dict[str, str] = {}
@@ -228,14 +288,14 @@ def render() -> None:
             with columns[index % len(columns)]:
                 st.markdown(f"**{year}**")
                 policy_values[str(year)] = st.selectbox(
-                    f"Стратегия резерва {year}",
+                    f"Как обеспечить резерв в {year}",
                     list(RESERVE_LABELS),
                     index=list(RESERVE_LABELS).index(reserve_policy.get(str(year), "physical")),
                     format_func=RESERVE_LABELS.get,
                     key=f"reserve-policy-{key}-{year}",
                 )
                 role_values[str(year)] = st.selectbox(
-                    f"Роль аварийного канала {year}",
+                    f"Как использовать Emergency в {year}",
                     list(ROLE_LABELS),
                     index=list(ROLE_LABELS).index(roles.get(str(year), "reserve_only")),
                     format_func=ROLE_LABELS.get,
