@@ -174,19 +174,26 @@ def service(result: dict[str, Any], scenario_id: str) -> go.Figure:
 
 
 def abc_metric(rows: list[dict[str, Any]], field: str, title: str, unit: str) -> go.Figure:
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame(rows).copy()
+    labels = {
+        "A": "Ваш план<br>обычные условия",
+        "B": "Ваш план<br>стресс",
+        "C": "Адаптация<br>стресс",
+    }
+    df["display_case"] = df.case.map(lambda value: labels.get(value, value))
     fig = go.Figure(
         go.Bar(
-            x=df.case,
+            x=df.display_case,
             y=df[field],
             marker_color=[CASE_COLORS[item] for item in df.case],
             text=[f"{value:.2f}" for value in df[field]],
             textposition="outside",
-            hovertemplate=f"%{{x}}: %{{y:.2f}} {unit}<extra></extra>",
+            customdata=df.label,
+            hovertemplate=f"%{{customdata}}<br>%{{y:.2f}} {unit}<extra></extra>",
         )
     )
     fig.update_layout(title=title, showlegend=False, yaxis_title=unit)
-    return style(fig, 300)
+    return style(fig, 320)
 
 
 def sensitivity_lines(points: list[dict[str, Any]], title: str) -> tuple[go.Figure, go.Figure]:
@@ -368,4 +375,3 @@ def risk_impact(rows: list[dict[str, Any]]) -> go.Figure:
         yaxis_title="",
     )
     return style(fig, max(360, 44 * len(df) + 120))
-
