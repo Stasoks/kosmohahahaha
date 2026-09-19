@@ -40,6 +40,28 @@ def test_print_aggressive_seed():
             "gross", row["gross_supply_t"],
             "closing", row["closing_inventory_t"],
         )
+    for row in stress_result.monthly:
+        shortage = row["shortage_critical_t"] + row["shortage_noncritical_t"]
+        if shortage > 1e-9:
+            print(
+                "SHORTAGE_MONTH",
+                row["month"],
+                "shortage", shortage,
+                "critical", row["shortage_critical_t"],
+                "opening", row["opening_inventory_t"],
+                "gross", row["gross_delivery_t"],
+                "closing", row["closing_inventory_t"],
+            )
+    for row in base_result.monthly:
+        if int(row["month"][:4]) >= 2039:
+            print(
+                "BASE_MONTH",
+                row["month"],
+                "opening", row["opening_inventory_t"],
+                "gross", row["gross_delivery_t"],
+                "overflow", row["overflow_t"],
+                "closing", row["closing_inventory_t"],
+            )
     print("ORDERS", raw["decisions"]["supply_orders"])
     print("RESERVATIONS", raw["decisions"]["capacity_reservations"])
     assert True
