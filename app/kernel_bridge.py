@@ -242,9 +242,26 @@ def build_recommended_base(
             diversity_threshold=0.0,
         ),
     )
+    resilience_built = synthesize_strategy(
+        ctx.base_scenario,
+        ctx.stress_scenario,
+        ctx.case_data,
+        ctx.assumptions,
+        config=StrategyBuilderConfig(
+            planning_mode="BASE_PLAN",
+            objective="MAX_RESILIENCE",
+            max_candidates=max_candidates,
+            beam_width=beam_width,
+            max_iterations=max_iterations,
+            max_results=max_results,
+            seed=seed,
+            diversity_threshold=0.0,
+        ),
+    )
 
     candidates: list[tuple[Any, str]] = [
-        (solution.plan, "BUILDER") for solution in built.solutions
+        *((solution.plan, "BUILDER_MIN_COST") for solution in built.solutions),
+        *((solution.plan, "BUILDER_MAX_RESILIENCE") for solution in resilience_built.solutions),
     ]
     for name in ("cost_focused.json", "diversified.json", "resilient.json"):
         path = CORE_ROOT / "plans" / name
@@ -308,9 +325,15 @@ def build_recommended_base(
             "plan": None,
             "candidates": rows,
             "builder": {
-                "status": built.status,
-                "evaluated_candidate_count": built.evaluated_candidate_count,
-                "iterations": built.iterations,
+                "status": {
+                    "MIN_COST": built.status,
+                    "MAX_RESILIENCE": resilience_built.status,
+                },
+                "evaluated_candidate_count": (
+                    built.evaluated_candidate_count
+                    + resilience_built.evaluated_candidate_count
+                ),
+                "iterations": max(built.iterations, resilience_built.iterations),
             },
             "guardrails": {
                 "total_demand_multiplier": total_demand_guardrail,
@@ -351,9 +374,15 @@ def build_recommended_base(
         "MANDATORY_STRESS": pair["MANDATORY_STRESS"].to_dict(),
         "candidates": rows,
         "builder": {
-            "status": built.status,
-            "evaluated_candidate_count": built.evaluated_candidate_count,
-            "iterations": built.iterations,
+            "status": {
+                "MIN_COST": built.status,
+                "MAX_RESILIENCE": resilience_built.status,
+            },
+            "evaluated_candidate_count": (
+                built.evaluated_candidate_count
+                + resilience_built.evaluated_candidate_count
+            ),
+            "iterations": max(built.iterations, resilience_built.iterations),
         },
         "guardrails": raw["metadata"]["guardrails"],
         "global_optimum_claimed": False,
