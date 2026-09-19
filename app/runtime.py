@@ -202,12 +202,12 @@ def reverse(
 
 
 @st.cache_data(show_spinner=False)
-def builder(
+def _builder(
     max_candidates: int,
     beam_width: int,
     iterations: int,
     seed: int,
-    source_payload: str = "{}",
+    source_payload: str,
 ) -> dict[str, Any]:
     return bridge.build_stress_specific(
         max_candidates=max_candidates,
@@ -215,6 +215,22 @@ def builder(
         max_iterations=iterations,
         seed=seed,
         source_overrides=json.loads(source_payload),
+    )
+
+
+def builder(
+    max_candidates: int,
+    beam_width: int,
+    iterations: int,
+    seed: int,
+    source_overrides: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    return _builder(
+        max_candidates,
+        beam_width,
+        iterations,
+        seed,
+        bridge.canonical_json(source_overrides or {}),
     )
 
 
