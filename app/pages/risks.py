@@ -339,8 +339,13 @@ def _sensitivity_tab() -> None:
         "значит план сильно зависит от этого допущения."
     )
     official_disabled = environment_key != "BASE"
+    st.markdown("#### Быстрая проверка официального диапазона спроса")
+    st.caption(
+        "LOW / BASE / HIGH — это три отдельные траектории спроса из исходных данных кейса. "
+        "Это не три значения одного постоянного множителя: отношение к BASE может отличаться по годам."
+    )
     if st.button(
-        "Проверить нижний, базовый и верхний спрос",
+        "Сравнить LOW / BASE / HIGH",
         type="primary",
         disabled=official_disabled,
     ):
@@ -357,8 +362,9 @@ def _sensitivity_tab() -> None:
             "Официальные LOW/BASE/HIGH проверяются отдельно только поверх BASE. "
             "Для обязательного стресса используйте дополнительную проверку ниже."
         )
+    st.markdown("#### Проверить свой диапазон одного параметра")
     preset = st.selectbox(
-        "Дополнительная проверка",
+        "Что менять",
         ["Множитель спроса", "Задержка Earth-Flex", "Потери в ZBO", "Другой параметр"],
     )
     parameter: str | dict = "demand_multiplier"
@@ -413,18 +419,34 @@ def _sensitivity_tab() -> None:
         result = None
     if result:
         points = result["points"]
-        left, right = charts.sensitivity_lines(points, str(result["parameter"].get("name", "parameter")))
+        parameter_name = str(result["parameter"].get("name", "parameter"))
+        left, right = charts.sensitivity_lines(points, parameter_name)
         render_chart(left)
         render_chart(right)
         frame = pd.DataFrame(points)
-        columns = ["value", "valid", "total_service_level", "critical_service_level", "total_shortage_t", "total_cost_mln", "minimum_inventory_t", "hard_violation_count"]
+        columns = [
+            "value",
+            "valid",
+            "total_service_level",
+            "critical_service_level",
+            "total_shortage_t",
+            "total_cost_mln",
+            "minimum_inventory_t",
+            "hard_violation_count",
+        ]
         st.dataframe(
-            frame[columns].rename(columns={
-                "value": "Значение", "valid": "Исполним",
-                "total_service_level": "Общий сервис", "critical_service_level": "Критический сервис",
-                "total_shortage_t": "Дефицит, т", "total_cost_mln": "Стоимость, млн",
-                "minimum_inventory_t": "Минимальный запас, т", "hard_violation_count": "Нарушения",
-            }),
+            frame[columns].rename(
+                columns={
+                    "value": "Проверяемый вариант",
+                    "valid": "Исполним",
+                    "total_service_level": "Общий сервис",
+                    "critical_service_level": "Критический сервис",
+                    "total_shortage_t": "Дефицит, т",
+                    "total_cost_mln": "Стоимость, млн",
+                    "minimum_inventory_t": "Минимальный запас, т",
+                    "hard_violation_count": "Нарушения",
+                }
+            ),
             hide_index=True,
             width="stretch",
             column_config={
@@ -432,12 +454,29 @@ def _sensitivity_tab() -> None:
                 "Критический сервис": st.column_config.NumberColumn(format="percent"),
             },
         )
-        if result.get("first_failing_point"):
+
+        if parameter_name == "official_demand_point":
+            statuses = []
+            for point in points:
+                statuses.append(
+                    f"{point['value']}: "
+                    + ("проходит" if point["valid"] else f"не проходит ({point['hard_violation_count']} наруш.)")
+                    + f", дефицит {point['total_shortage_t']:.1f} т"
+                )
+            st.info(
+                "Как читать результат: каждый столбец — отдельная официальная траектория спроса, "
+                "а не шаг по числовой оси. " + " · ".join(statuses)
+            )
+            st.caption(
+                "LOW тоже может оказаться неисполненным: неизменный план способен, например, "
+                "создать избыточный запас и нарушить вместимость хранилища. Поэтому LOW не означает "
+                "автоматически «легче и всегда лучше»."
+            )
+        elif result.get("first_failing_point"):
             first = result["first_failing_point"]
             st.warning(
                 f"Вывод: первое проверенное значение, при котором план перестаёт проходить "
-                f"ограничения — {first['value']}. До этой точки на выбранной сетке план "
-                "сохранял исполнимость."
+                f"ограничения — {first['value']}. Это граница только на заданной вами сетке."
             )
         else:
             st.success(
