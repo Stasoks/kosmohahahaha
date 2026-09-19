@@ -184,22 +184,19 @@ def _target_deficit(candidate: _Candidate) -> float:
     return total
 
 
-def _annual_target_deficit(
-    candidate: _Candidate,
-    config: StrategyBuilderConfig,
-) -> float:
-    """Measure annual service-target gap in served tons, normalized by demand."""
+def _annual_target_deficit(candidate: _Candidate) -> float:
+    """Measure annual service-target gap, with critical service weighted higher."""
+    total_target = candidate.target_satisfaction["stress_total_service"]["target"]
+    critical_target = candidate.target_satisfaction["stress_critical_service"]["target"]
     total = 0.0
     for row in candidate.stress_result.annual:
-        if config.stress_total_service_target is not None:
-            required = float(config.stress_total_service_target) * float(row["demand_total_t"])
+        if total_target is not None:
+            required = float(total_target) * float(row["demand_total_t"])
             total += max(0.0, required - float(row["served_total_t"])) / max(
                 1.0, float(row["demand_total_t"])
             )
-        if config.stress_critical_service_target is not None:
-            required = float(config.stress_critical_service_target) * float(
-                row["demand_critical_t"]
-            )
+        if critical_target is not None:
+            required = float(critical_target) * float(row["demand_critical_t"])
             total += 4.0 * max(
                 0.0, required - float(row["served_critical_t"])
             ) / max(1.0, float(row["demand_critical_t"]))
@@ -218,7 +215,7 @@ def _rank(candidate: _Candidate, objective: str) -> tuple:
     )
     feasibility = (
         metrics["base_hard_violation_count"],
-        _annual_target_deficit(candidate, config) if has_targets else 0.0,
+        _annual_target_deficit(candidate) if has_targets else 0.0,
         _target_deficit(candidate),
         metrics["base_total_shortage_t"],
     )
