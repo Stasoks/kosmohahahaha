@@ -10,7 +10,12 @@ from app.components import render_chart, render_error
 from app.formatting import mass, money, percentage_points, signed
 from app.kernel_bridge import plan_hash, stakeholder_data, stress_reference_raw
 from app.state import is_dirty
-from app.view_models import (\n    abc_comparison,\n    annual_stress_impact_rows,\n    decision_diff,\n    stakeholder_detail_rows,\n)
+from app.view_models import (
+    abc_comparison,
+    annual_stress_impact_rows,
+    decision_diff,
+    stakeholder_detail_rows,
+)
 
 
 def _delta_cards(value: dict | None) -> None:
