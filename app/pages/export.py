@@ -85,16 +85,16 @@ def _case_data() -> None:
 
 
 def _exports() -> None:
-    if st.button("Подготовить CSV-файлы", type="primary"):
+    if st.button("Подготовить выгрузки", type="primary"):
         try:
-            with st.spinner("Формируются таблицы обычного и стрессового расчётов…"):
+            with st.spinner("Формируются таблицы обычного, стрессового и пользовательского расчётов…"):
                 st.session_state.export_files = runtime.csv_files(
                     st.session_state.calculated_plan,
                     st.session_state.get("source_overrides", {}),
                     st.session_state.get("custom_scenario"),
                 )
         except Exception as exc:
-            render_error(exc, "CSV не подготовлены")
+            render_error(exc, "Выгрузки не подготовлены")
     files = st.session_state.get("export_files")
     if files:
         for name, payload in files.items():
