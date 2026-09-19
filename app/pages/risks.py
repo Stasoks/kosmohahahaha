@@ -200,8 +200,7 @@ def _risk_tab() -> None:
         risk_rows.append({
             "Код": item["risk_id"], "Риск": name, "Событие": event, "Причина": cause,
             "Период": f"{item['period_start']} — {item['period_end']}",
-            "Вероятность": f"{float(likelihood):g}" if likelihood is not None else "не оценена",
-            "Влияние": item["impact_score"],
+            "Вероятность": f"{float(likelihood):g}/5" if likelihood is not None else "не оценена",
         })
     st.dataframe(pd.DataFrame(risk_rows), hide_index=True, width="stretch")
 
