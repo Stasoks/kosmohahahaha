@@ -648,6 +648,39 @@ def workspace_extend_year(
     return extend_workspace_horizon(value, build_future_year_spec(future_year)).to_dict()
 
 
+def workspace_remove_year(
+    workspace: dict[str, Any],
+    year: int,
+) -> dict[str, Any]:
+    """Remove a research year and all later extensions to keep the horizon contiguous."""
+
+    target = int(year)
+    official_years = set(application_context().case_data.years)
+    if target in official_years:
+        raise BridgeError(
+            "OFFICIAL_YEAR_IMMUTABLE",
+            f"Официальный год {target} нельзя удалить.",
+            field="year",
+        )
+
+    raw = copy.deepcopy(workspace)
+    future_years = list(raw.get("future_years", []))
+    available = sorted(int(item.get("year")) for item in future_years)
+    if target not in available:
+        raise BridgeError(
+            "RESEARCH_YEAR_NOT_FOUND",
+            f"Добавленный год {target} не найден.",
+            field="year",
+        )
+
+    raw["future_years"] = [
+        item for item in future_years if int(item.get("year")) < target
+    ]
+    value = _workspace(raw)
+    assert value is not None
+    return value.to_dict()
+
+
 def workspace_bytes(workspace: dict[str, Any]) -> bytes:
     value = _workspace(workspace)
     assert value is not None
