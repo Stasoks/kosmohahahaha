@@ -9,7 +9,7 @@ from app import charts, runtime
 from app.components import badges, note, render_chart, render_error
 from app.formatting import mass, money, percentage_points, signed
 from app.kernel_bridge import plan_hash, stress_reference_raw
-from app.state import is_dirty
+from app.state import apply_plan, is_dirty
 from app.view_models import abc_comparison, decision_diff
 
 
@@ -34,6 +34,47 @@ def render() -> None:
     )
     if is_dirty():
         st.warning("Есть несчитанные изменения. A/B ниже относятся к последнему подтверждённому plan_hash, а не к форме редактора.")
+
+    with st.expander("Recommended BASE · купить небольшой запас гибкости", expanded=False):
+        st.caption(
+            "Текущий FINAL BASE трактуется как nominal minimum-cost benchmark. Здесь система ищет самый дешёвый BASE-valid "
+            "кандидат, который дополнительно проходит TEAM guardrails: +5% общего спроса, +5% критического спроса и +1 месяц "
+            "к lead time Earth-Flex. Эти проверки выполняются отдельно и не являются требованиями организаторов."
+        )
+        cols = st.columns(4)
+        rec_candidates = cols[0].number_input("Search candidates", 200, 3000, 1200, 100, key="rec-candidates")
+        rec_beam = cols[1].number_input("Beam", 8, 50, 24, 2, key="rec-beam")
+        rec_iterations = cols[2].number_input("Iterations", 2, 12, 8, 1, key="rec-iterations")
+        rec_results = cols[3].number_input("BASE candidates to screen", 20, 150, 80, 10, key="rec-results")
+        if st.button("Найти Recommended BASE", type="primary", width="stretch"):
+            try:
+                with st.spinner("Builder ищет BASE-valid кандидатов, затем каждый проходит три независимых guardrail-прогона…"):
+                    st.session_state.recommended_base_result = runtime.recommended_base(
+                        int(rec_candidates), int(rec_beam), int(rec_iterations), int(rec_results), 17
+                    )
+            except Exception as exc:
+                render_error(exc, "Не удалось построить Recommended BASE")
+        recommended = st.session_state.get("recommended_base_result")
+        if recommended:
+            if recommended.get("status") == "success":
+                selected = recommended["selected_candidate"]
+                st.success(
+                    f"Найден кандидат: {selected['plan_id']} · BASE cost {selected['base_cost_mln']:.1f} млн у.е. · все TEAM guardrails пройдены."
+                )
+                st.caption(
+                    f"Проверено кандидатов в Builder: {recommended['builder']['evaluated_candidate_count']} · "
+                    "поиск bounded, global optimum не заявляется."
+                )
+                diag = pd.DataFrame(recommended["candidates"][:12])
+                st.dataframe(diag, hide_index=True, width="stretch")
+                if st.button("Сделать Recommended BASE текущим TEAM_DECISION", width="stretch"):
+                    apply_plan(recommended["plan"])
+                    st.success("Recommended BASE загружен в редактор. Результаты помечены stale до явного пересчёта.")
+                    st.rerun()
+            else:
+                st.warning("В исследованном ограниченном наборе не найден кандидат, проходящий все TEAM guardrails.")
+                if recommended.get("candidates"):
+                    st.dataframe(pd.DataFrame(recommended["candidates"][:12]), hide_index=True, width="stretch")
 
     with st.expander("Построить новый stress-specific вариант"):
         st.caption("Strategy Builder — bounded deterministic heuristic. Результат не является доказанным global optimum.")
