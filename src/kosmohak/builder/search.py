@@ -475,7 +475,7 @@ def _volume_mutations(
                             target["values"][period] = float(
                                 target["values"][period]
                             ) * (1.0 - fraction)
-                    _rebuild_reservations(value, commissions, case_data)
+                    _rebuild_reservations(value, commissions, case_data, base_scenario)
                     output.append(
                         (
                             value,
@@ -572,7 +572,7 @@ def _transfer_mutations(
                     if remaining <= 1e-10:
                         break
                 if moved > 1e-9:
-                    _rebuild_reservations(value, commissions, case_data)
+                    _rebuild_reservations(value, commissions, case_data, base_scenario)
                     output.append(
                         (
                             value,
