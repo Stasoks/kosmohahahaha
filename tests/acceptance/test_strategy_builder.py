@@ -231,7 +231,7 @@ def test_builder_10_service_facade_and_existing_advisor_both_work(
         config=OptimizerConfig(max_candidates=20, seed=17),
     )
     assert advisor.mode == "REPAIR"
-    assert advisor.base_plan_id == plan.plan_id
+    assert advisor.original_plan_id == plan.plan_id
 
 
 def test_builder_11_max_resilience_is_not_worse_than_min_cost_on_stress_service(
