@@ -354,6 +354,7 @@ def _rebuild_reservations(
     raw: dict[str, Any],
     commissions: dict[str, str | None],
     case_data: CaseData,
+    planning_scenario: Scenario,
 ) -> None:
     reservations: list[dict[str, Any]] = []
     for schedule in raw["decisions"]["supply_orders"]:
@@ -377,8 +378,50 @@ def _rebuild_reservations(
                     ),
                 }
             )
+    reserve_strategies = (
+        raw["decisions"]
+        .get("inventory_policy", {})
+        .get("reserve_strategy_by_year", {})
+    )
+    environment = ensure_environment(planning_scenario)
+    reservation_by_key = {
+        (str(item["source_id"]), int(item["year"])): item
+        for item in reservations
+    }
+    if "E" in case_data.sources:
+        reserve_days = float(case_data.constraints["RESERVE_45D"].value)
+        for year in case_data.official_years:
+            strategy = reserve_strategies.get(
+                str(year), reserve_strategies.get(year, "physical")
+            )
+            if strategy != "emergency_contract":
+                continue
+            required = (
+                case_data.demand[year].base_total_t
+                * environment.demand_multiplier(year)
+                * reserve_days
+                / 365.0
+            )
+            key = ("E", year)
+            current = reservation_by_key.get(key)
+            if current is None:
+                reservation_by_key[key] = {
+                    "source_id": "E",
+                    "year": year,
+                    "reserved_capacity_t": min(
+                        required,
+                        case_data.source_capacity("E", year),
+                    ),
+                }
+            else:
+                current["reserved_capacity_t"] = min(
+                    case_data.source_capacity("E", year),
+                    max(float(current["reserved_capacity_t"]), required),
+                )
+
     raw["decisions"]["capacity_reservations"] = sorted(
-        reservations, key=lambda item: (item["source_id"], item["year"])
+        reservation_by_key.values(),
+        key=lambda item: (item["source_id"], item["year"]),
     )
 
 
@@ -417,7 +460,7 @@ def _volume_mutations(
                         target["values"][month] = float(
                             target["values"].get(month, 0.0)
                         ) + increment / len(useful)
-                    _rebuild_reservations(value, commissions, case_data)
+                    _rebuild_reservations(value, commissions, case_data, base_scenario)
                     output.append(
                         (
                             value,
@@ -650,20 +693,21 @@ def _investment_timing_mutations(
 
 def _policy_mutations(
     candidate: _Candidate,
+    planning_scenario: Scenario,
     case_data: CaseData,
+    assumptions: ModelAssumptions,
 ) -> list[tuple[dict[str, Any], str]]:
-    """Explore reserve and Emergency policy choices that belong to TEAM_DECISION."""
+    """Explore reserve/Emergency policy while keeping contract mechanics coherent."""
     raw = candidate.plan.raw
     output: list[tuple[dict[str, Any], str]] = []
-
     strategies = raw["decisions"].setdefault("inventory_policy", {}).setdefault(
         "reserve_strategy_by_year", {}
     )
     emergency_roles = raw["decisions"].setdefault("emergency_role_by_year", {})
+    commissions = _commissions(raw, planning_scenario, case_data, assumptions)
 
     for year in case_data.official_years:
         year_key = str(year)
-
         current_strategy = str(
             strategies.get(year_key, strategies.get(year, "physical"))
         )
@@ -676,6 +720,16 @@ def _policy_mutations(
         value["decisions"]["inventory_policy"]["reserve_strategy_by_year"][
             year_key
         ] = target_strategy
+        if target_strategy == "emergency_contract":
+            value["decisions"].setdefault("emergency_role_by_year", {})[
+                year_key
+            ] = "reserve_only"
+        _rebuild_reservations(
+            value,
+            commissions,
+            case_data,
+            planning_scenario,
+        )
         output.append(
             (
                 value,
@@ -727,7 +781,14 @@ def _mutations(
         )
     )
     values.extend(_investment_timing_mutations(candidate, case_data))
-    values.extend(_policy_mutations(candidate, case_data))
+    values.extend(
+        _policy_mutations(
+            candidate,
+            base_scenario,
+            case_data,
+            assumptions,
+        )
+    )
     return values
 
 
