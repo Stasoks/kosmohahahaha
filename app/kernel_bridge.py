@@ -649,8 +649,19 @@ def evaluate_workspace(raw: dict[str, Any], workspace: dict[str, Any]) -> dict[s
 
 def case_metadata(
     workspace: dict[str, Any] | CaseWorkspace | None = None,
+    *,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    case_data = _case_data(workspace)
+    if workspace is not None and source_overrides:
+        raise BridgeError(
+            "CASE_OVERLAY_CONFLICT",
+            "Research workspace and source editor cannot be applied in one case_metadata call.",
+        )
+    case_data = (
+        _case_data(workspace)
+        if workspace is not None
+        else _case_data_with_source_overrides(source_overrides)
+    )
     return {
         "years": [int(year) for year in case_data.years],
         "official_years": [int(year) for year in case_data.official_years],
@@ -675,8 +686,10 @@ def case_metadata(
 
 def case_tables(
     workspace: dict[str, Any] | CaseWorkspace | None = None,
+    *,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
-    metadata = case_metadata(workspace)
+    metadata = case_metadata(workspace, source_overrides=source_overrides)
     return {
         "demand": metadata["demand"],
         "sources": list(metadata["sources"].values()),
@@ -707,34 +720,74 @@ def plan_from_bytes(payload: bytes) -> dict[str, Any]:
     return copy.deepcopy(checked["plan"])
 
 
-def result_csv_bytes(raw: dict[str, Any]) -> dict[str, bytes]:
+def result_csv_bytes(
+    raw: dict[str, Any],
+    source_overrides: dict[str, dict[str, Any]] | None = None,
+    custom_scenario: dict[str, Any] | None = None,
+) -> dict[str, bytes]:
     """Use backend exporters and return portable CSV payloads for download buttons."""
 
     ctx = application_context()
-    plan = _validated_plan(raw)
+    case_data = _case_data_with_source_overrides(source_overrides)
+    plan = _validated_plan_for_case(raw, case_data)
     pair = evaluate_both_scenarios(
-        plan, ctx.base_scenario, ctx.stress_scenario, ctx.case_data, ctx.assumptions
+        plan, ctx.base_scenario, ctx.stress_scenario, case_data, ctx.assumptions
     )
     files: dict[str, bytes] = {}
     with tempfile.TemporaryDirectory(prefix="kosmohak-ui-csv-") as temporary:
         root = Path(temporary)
         for scenario in ("BASE", "MANDATORY_STRESS"):
-            export_plan_results(pair[scenario], root / scenario, ctx.case_data.root)
+            export_plan_results(pair[scenario], root / scenario, case_data.root)
         export_scenario_comparison(
             pair["BASE"], pair["MANDATORY_STRESS"], root / "comparison"
         )
-        for path in sorted(root.rglob("*.csv")):
-            files[path.relative_to(root).as_posix()] = path.read_bytes()
+        if custom_scenario:
+            base_key = str(custom_scenario.get("base_scenario", "BASE"))
+            base_environment = (
+                ctx.stress_scenario
+                if base_key == "MANDATORY_STRESS"
+                else ctx.base_scenario
+            )
+            environment = build_custom_environment(base_environment, custom_scenario)
+            custom_result = evaluate_plan(plan, environment, case_data, ctx.assumptions)
+            export_plan_results(custom_result, root / "CUSTOM", case_data.root)
+            (root / "CUSTOM" / "scenario.json").write_text(
+                json.dumps(custom_scenario, ensure_ascii=False, indent=2, sort_keys=True),
+                encoding="utf-8",
+            )
+        if source_overrides:
+            (root / "source-overrides.json").write_text(
+                json.dumps(source_overrides, ensure_ascii=False, indent=2, sort_keys=True),
+                encoding="utf-8",
+            )
+        for path in sorted(root.rglob("*")):
+            if path.is_file() and path.suffix in {".csv", ".json"}:
+                files[path.relative_to(root).as_posix()] = path.read_bytes()
     return files
 
 
 def bundle_bytes(
-    raw: dict[str, Any], workspace: dict[str, Any] | None = None
+    raw: dict[str, Any],
+    workspace: dict[str, Any] | None = None,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> bytes:
     ctx = application_context()
     overlay = _workspace(workspace)
-    case_data = build_effective_case(overlay) if overlay is not None else ctx.case_data
-    plan = _validated_plan(raw, overlay)
+    if overlay is not None and source_overrides:
+        raise BridgeError(
+            "CASE_OVERLAY_CONFLICT",
+            "Research workspace and source editor cannot be bundled together.",
+        )
+    case_data = (
+        build_effective_case(overlay)
+        if overlay is not None
+        else _case_data_with_source_overrides(source_overrides)
+    )
+    plan = (
+        _validated_plan(raw, overlay)
+        if overlay is not None
+        else _validated_plan_for_case(raw, case_data)
+    )
     base_result = evaluate_plan(plan, ctx.base_scenario, case_data, ctx.assumptions)
     stress_result = evaluate_plan(plan, ctx.stress_scenario, case_data, ctx.assumptions)
     risk_result = None
