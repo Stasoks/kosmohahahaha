@@ -110,6 +110,7 @@ with st.sidebar:
     )
     if st.button("↻ Пересчитать", type="primary", width="stretch"):
         recalculate()
+        st.rerun()
     cols = st.columns(2)
     if cols[0].button("Снимок", width="stretch", help="Сохранить в текущем сеансе"):
         st.toast(save_snapshot(), icon="💾")

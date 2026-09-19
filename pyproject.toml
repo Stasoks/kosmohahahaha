@@ -5,4 +5,9 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-pythonpath = ["src"]
+pythonpath = ["src", "."]
+markers = [
+    "kernel: core engine and service-facade tests",
+    "web: headless Streamlit UI tests (streamlit.testing.v1.AppTest)",
+    "slow: slower end-to-end tests",
+]

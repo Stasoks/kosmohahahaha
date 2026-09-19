@@ -12,6 +12,20 @@
 - `tests/service`: the stable UI facade, including context, plan validation and
   round-trip, real BASE/STRESS/risk/sensitivity/advisor calls, workspace persistence,
   and the downloadable ZIP contract.
+- `tests/web`: headless dashboard tests using `streamlit.testing.v1.AppTest`. They
+  boot the real `streamlit_app.py`, walk every page, edit/apply/recalculate a plan,
+  run the builder and research flows, prepare CSV/ZIP exports and check that backend
+  failures are rendered as errors instead of crashing the script.
+
+## Markers
+
+- `kernel`: core engine and service-facade tests (invariants, contracts, determinism,
+  formatting/charts).
+- `web`: headless Streamlit UI tests.
+- `slow`: slower end-to-end tests.
+
+The test runner is the project's `dev` extra (`pip install -e '.[dev]'` in
+`setup.cfg`); running the dashboard itself only needs `requirements.txt`.
 
 ## Independent expected results
 
@@ -37,10 +51,29 @@ four-month lead to arrive in 2041-04, 2041 to produce 84 states, and 2042 to pro
 - saved patch/workspace reopens to the same plan/case and result;
 - same effective inputs/config/seed produce identical results.
 
+## Core/UI invariants and contracts
+
+- `tests/unit/test_invariants.py`: monthly inventory conservation, net = gross − losses,
+  accepted + overflow = net, serving bounds, non-negative flows, exact request splits,
+  contiguous timeline, and summary reconciliation with annual/monthly tables.
+- `tests/unit/test_facade_contracts.py`: `kosmohak.service` shapes and structured error
+  mapping (validation, sensitivity levels, plan comparison without a winner, risk
+  portfolio, exports, download bundle, plan round-trip).
+- `tests/unit/test_formatting_charts.py`: number/money/mass/percent formatting and that
+  every Plotly figure builds from a serialized result.
+- `tests/integration/test_determinism.py`: identical runs share `run_id` and byte-equal
+  dictionaries, including across a separate process.
+- `tests/web/*`: dashboard lifecycle (dirty/stale state, recalculation, presets,
+  builder, research workspace, CSV/ZIP exports, error rendering).
+
 ## Commands
 
 ```bash
+pip install -e '.[dev]'                    # pytest (tests only)
 python3 -m pytest
+python3 -m pytest -m web                   # dashboard only
+python3 -m pytest -m kernel                # core only
+python3 -m pytest -m "not slow"            # skip slow end-to-end cases
 python3 tools/validate_reference_repo.py
 python3 tools/validate_participant_repo.py
 bash operator_tests/run_all.sh
@@ -58,7 +91,13 @@ guard explicitly.
 
 ```text
 python3 -m pytest
-116 passed, 0 failed
+187 passed, 0 failed
+
+python3 -m pytest tests/web
+31 passed, 0 failed
+
+python3 -m pytest -m kernel
+32 passed, 0 failed
 
 python3 -m pytest tests/official
 10 passed, 0 failed
@@ -84,7 +123,7 @@ python3 -m pytest tests/service/test_ui_service_api.py
 ```
 
 `python3 tools/validate_participant_repo.py` passed all applicable organizer
-integrity checks with zero failures. The latest full participant CI on the final-evidence branch reports `116 passed`. `bash operator_tests/run_all.sh` exited 0 and ran
+integrity checks with zero failures. The latest full participant CI on the final-evidence branch reports `187 passed` (including the headless dashboard suite). `bash operator_tests/run_all.sh` exited 0 and ran
 all ten operator fixtures. The original reference validator passed those same content
 checks but, as designed, returned 1 only for `check_no_ready_solution` because this is
 now a participant repository containing `src/`, `configs/`, `results/`, and

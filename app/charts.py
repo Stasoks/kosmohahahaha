@@ -102,7 +102,7 @@ def inventory(result: dict[str, Any]) -> go.Figure:
 
 def supply_mix(result: dict[str, Any], names: dict[str, str]) -> go.Figure:
     df = pd.DataFrame(result["sources"])
-    df["Источник"] = df.source_id.map(lambda value: f"{value} · {names.get(value, value)}")
+    df.loc[:, "Источник"] = df["source_id"].map(lambda value: f"{value} · {names.get(value, value)}")
     colors = source_colors(list(names))
     named_colors = {f"{key} · {value}": colors[key] for key, value in names.items()}
     fig = px.bar(
