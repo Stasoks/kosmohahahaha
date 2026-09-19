@@ -125,7 +125,11 @@ def _risk_tab() -> None:
     if st.button("Рассчитать выбранный риск", width="stretch"):
         try:
             with st.spinner("Рассчитываются исходное состояние и последствия риска…"):
-                st.session_state.risk_detail = runtime.risk_detail(st.session_state.calculated_plan, selected)
+                st.session_state.risk_detail = runtime.risk_detail(
+                    st.session_state.calculated_plan,
+                    selected,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Не удалось рассчитать риск")
     detail = st.session_state.get("risk_detail")
@@ -166,7 +170,11 @@ def _risk_tab() -> None:
         if st.button("Рассчитать меру", type="primary"):
             try:
                 with st.spinner("Мера проверяется в тех же условиях риска…"):
-                    st.session_state.mitigation_result = runtime.mitigation(st.session_state.calculated_plan, selected)
+                    st.session_state.mitigation_result = runtime.mitigation(
+                        st.session_state.calculated_plan,
+                        selected,
+                        st.session_state.get("source_overrides", {}),
+                    )
             except Exception as exc:
                 render_error(exc, "Не удалось рассчитать меру")
         value = st.session_state.get("mitigation_result")
@@ -192,7 +200,10 @@ def _sensitivity_tab() -> None:
     if st.button("Проверить нижний, базовый и верхний спрос", type="primary"):
         try:
             with st.spinner("Три официальные точки спроса…"):
-                st.session_state.sensitivity_result = runtime.official_sensitivity(st.session_state.calculated_plan)
+                st.session_state.sensitivity_result = runtime.official_sensitivity(
+                    st.session_state.calculated_plan,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Не удалось выполнить проверку")
     preset = st.selectbox(
@@ -236,7 +247,12 @@ def _sensitivity_tab() -> None:
         try:
             values = [float(item.strip()) for item in values_text.split(",") if item.strip()]
             with st.spinner("Рассчитываются точки чувствительности…"):
-                st.session_state.sensitivity_result = runtime.sensitivity(st.session_state.calculated_plan, parameter, values)
+                st.session_state.sensitivity_result = runtime.sensitivity(
+                    st.session_state.calculated_plan,
+                    parameter,
+                    values,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Не удалось выполнить проверку")
     result = st.session_state.get("sensitivity_result")
@@ -281,7 +297,14 @@ def _reverse_tab() -> None:
     if st.button("Найти первый отказ", type="primary"):
         try:
             with st.spinner("Проверяется упорядоченная сетка…"):
-                st.session_state.reverse_result = runtime.reverse(st.session_state.calculated_plan, parameter, start, stop, step)
+                st.session_state.reverse_result = runtime.reverse(
+                    st.session_state.calculated_plan,
+                    parameter,
+                    start,
+                    stop,
+                    step,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Поиск предела не выполнен")
     result = st.session_state.get("reverse_result")
@@ -307,7 +330,9 @@ def _stakeholders_tab() -> None:
     config = stakeholder_data()
     try:
         abc_payload = st.session_state.get("abc_result") or runtime.abc(
-            st.session_state.calculated_plan, st.session_state.stress_plan
+            st.session_state.calculated_plan,
+            st.session_state.stress_plan,
+            st.session_state.get("source_overrides", {}),
         )
         st.session_state.abc_result = abc_payload
         rows = stakeholder_scenario_rows(config, abc_payload)
