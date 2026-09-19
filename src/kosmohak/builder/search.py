@@ -610,6 +610,55 @@ def _stress_repair_requirements(
     return {month: amount for month, amount in requirements.items() if amount > 1e-10}
 
 
+def _initial_stock_rightsize_repair(
+    candidate: _Candidate,
+    base_scenario: Scenario,
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+) -> tuple[dict[str, Any], str] | None:
+    """Reduce oversized opening stock when a target-near plan overflows BASE storage."""
+    has_overflow = any(
+        item.severity == "hard" and item.code == "STORAGE_CAPACITY_EXCEEDED"
+        for item in candidate.base_result.violations
+    )
+    acquisition = candidate.plan.raw["decisions"].get("initial_stock_acquisition")
+    if not has_overflow or not acquisition:
+        return None
+
+    raw = copy.deepcopy(candidate.plan.raw)
+    commissions = _commissions(raw, base_scenario, case_data, assumptions)
+    eligible_leads = []
+    for source_id, source in case_data.sources.items():
+        if source_id == "E":
+            continue
+        commission = commissions.get(source_id)
+        if commission is None or str(commission) > case_data.start_month:
+            continue
+        eligible_leads.append(assumptions.source_delivery_lead_months(source))
+    if not eligible_leads:
+        return None
+
+    bridge_months = max(1, min(eligible_leads))
+    first_year = case_data.official_years[0]
+    monthly_demand = case_data.demand[first_year].base_total_t / 12.0
+    reserve_days = float(case_data.constraints["RESERVE_45D"].value)
+    reserve_net = case_data.demand[first_year].base_total_t * reserve_days / 365.0
+    desired_net = max(monthly_demand * bridge_months, reserve_net)
+    storage = case_data.storage["BASE"]
+    gross_needed = desired_net / max(1e-12, 1.0 - storage.loss_rate_on_throughput)
+    current = float(acquisition["ordered_volume_t"])
+    if gross_needed >= current - 1e-8:
+        return None
+
+    target = raw["decisions"]["initial_stock_acquisition"]
+    target["ordered_volume_t"] = gross_needed
+    target["reserved_capacity_t_per_year"] = gross_needed
+    return (
+        raw,
+        f"initial_stock_rightsize:{current:.6f}->{gross_needed:.6f}",
+    )
+
+
 def _reserve_contract_repair(
     candidate: _Candidate,
     base_scenario: Scenario,
@@ -810,6 +859,14 @@ def _target_repair_mutations(
     assumptions: ModelAssumptions,
 ) -> list[tuple[dict[str, Any], str]]:
     values: list[tuple[dict[str, Any], str]] = []
+    stock_repair = _initial_stock_rightsize_repair(
+        candidate,
+        base_scenario,
+        case_data,
+        assumptions,
+    )
+    if stock_repair is not None:
+        values.append(stock_repair)
     reserve_repair = _reserve_contract_repair(
         candidate,
         base_scenario,
