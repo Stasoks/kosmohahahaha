@@ -212,6 +212,40 @@ The other modes are `improve_strategy()`, `improve_strategy_resilience()`, and
 `explore_strategy_alternatives()`. All accept the same plan/scenario/case/assumption
 arguments and optional `locks=` and `config=` keyword arguments.
 
+## Strategy Builder
+
+Strategy Builder is separate from the existing Advisor. It creates new plans from
+CASE_INPUT plus operator search targets; it does not require an existing OperatorPlan.
+The UI should call only the service facade:
+
+    from kosmohak.service import StrategyBuilderConfig, synthesize_strategy
+
+    built = synthesize_strategy(
+        ctx.base_scenario,
+        ctx.stress_scenario,
+        ctx.case_data,
+        ctx.assumptions,
+        config=StrategyBuilderConfig(
+            objective="MIN_COST",
+            stress_total_service_target=0.97,
+            stress_critical_service_target=0.99,
+            max_candidates=3000,
+            beam_width=20,
+            max_iterations=8,
+            max_results=3,
+            seed=17,
+        ),
+    )
+
+The stress-service targets above are operator preferences, not organizer hard
+constraints. Returned solutions are BASE-valid and have already been evaluated through
+the normal BASE and MANDATORY_STRESS digital-twin path. The search is bounded and does
+not claim global optimality or global infeasibility.
+
+Each solution exposes its generated plan, BASE/STRESS results, objective metrics,
+target-satisfaction details, provenance, search depth, and mutation history. See
+STRATEGY_BUILDER.md for the search semantics and limitations.
+
 ## Research source and future horizon
 
 The UI passes ordinary dictionaries through factories and works with one persistent
