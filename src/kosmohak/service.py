@@ -270,7 +270,6 @@ EDITABLE_SOURCE_FIELDS = {
     "reservation_rate_mln_per_t_year_capacity",
     "take_or_pay_share",
     "selected_lead_time_months",
-    "available_from_year",
 }
 
 
@@ -323,10 +322,6 @@ def build_case_with_source_overrides(
                         f"{source_id}.selected_lead_time_months cannot be negative"
                     )
                 patch["selected_lead_time_months"] = months
-        if "available_from_year" in raw_patch:
-            value = raw_patch["available_from_year"]
-            patch["available_from_year"] = None if value in (None, "") else int(value)
-
         patch["status"] = "TEAM_ASSUMPTION"
         patch["provenance"] = {
             **source.provenance,
@@ -898,6 +893,8 @@ __all__ = [
     "ResearchSourceSpec",
     "FutureYearSpec",
     "load_application_context",
+    "build_case_with_source_overrides",
+    "build_custom_environment",
     "build_plan",
     "load_plan",
     "save_plan",
