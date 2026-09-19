@@ -11,6 +11,7 @@ import hashlib
 import json
 import sys
 import tempfile
+from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable
@@ -242,14 +243,41 @@ def build_recommended_base(
             diversity_threshold=0.0,
         ),
     )
-    resilience_built = synthesize_strategy(
+    if (
+        total_demand_guardrail <= 0
+        or critical_demand_guardrail <= 0
+        or any(
+            row.base_critical_t * critical_demand_guardrail
+            > row.base_total_t * total_demand_guardrail + 1e-12
+            for row in ctx.case_data.demand.values()
+        )
+    ):
+        raise BridgeError(
+            "INVALID_RECOMMENDED_GUARDRAIL",
+            "Demand guardrails must be positive and keep critical demand within total demand.",
+            field="guardrails",
+        )
+    guardrail_case = replace(
+        ctx.case_data,
+        demand={
+            year: replace(
+                row,
+                base_total_t=row.base_total_t * total_demand_guardrail,
+                base_critical_t=row.base_critical_t * critical_demand_guardrail,
+                status="TEAM_ASSUMPTION",
+            )
+            for year, row in ctx.case_data.demand.items()
+        },
+        status="TEAM_ASSUMPTION",
+    )
+    guardrail_built = synthesize_strategy(
         ctx.base_scenario,
         ctx.stress_scenario,
-        ctx.case_data,
+        guardrail_case,
         ctx.assumptions,
         config=StrategyBuilderConfig(
             planning_mode="BASE_PLAN",
-            objective="MAX_RESILIENCE",
+            objective="MIN_COST",
             max_candidates=max_candidates,
             beam_width=beam_width,
             max_iterations=max_iterations,
@@ -260,8 +288,8 @@ def build_recommended_base(
     )
 
     candidates: list[tuple[Any, str]] = [
-        *((solution.plan, "BUILDER_MIN_COST") for solution in built.solutions),
-        *((solution.plan, "BUILDER_MAX_RESILIENCE") for solution in resilience_built.solutions),
+        *((solution.plan, "BUILDER_OFFICIAL_BASE") for solution in built.solutions),
+        *((solution.plan, "BUILDER_DEMAND_GUARDRAIL") for solution in guardrail_built.solutions),
     ]
     for name in ("cost_focused.json", "diversified.json", "resilient.json"):
         path = CORE_ROOT / "plans" / name
@@ -326,14 +354,14 @@ def build_recommended_base(
             "candidates": rows,
             "builder": {
                 "status": {
-                    "MIN_COST": built.status,
-                    "MAX_RESILIENCE": resilience_built.status,
+                    "OFFICIAL_BASE": built.status,
+                    "DEMAND_GUARDRAIL": guardrail_built.status,
                 },
                 "evaluated_candidate_count": (
                     built.evaluated_candidate_count
-                    + resilience_built.evaluated_candidate_count
+                    + guardrail_built.evaluated_candidate_count
                 ),
-                "iterations": max(built.iterations, resilience_built.iterations),
+                "iterations": max(built.iterations, guardrail_built.iterations),
             },
             "guardrails": {
                 "total_demand_multiplier": total_demand_guardrail,
@@ -375,14 +403,14 @@ def build_recommended_base(
         "candidates": rows,
         "builder": {
             "status": {
-                "MIN_COST": built.status,
-                "MAX_RESILIENCE": resilience_built.status,
+                "OFFICIAL_BASE": built.status,
+                "DEMAND_GUARDRAIL": guardrail_built.status,
             },
             "evaluated_candidate_count": (
                 built.evaluated_candidate_count
-                + resilience_built.evaluated_candidate_count
+                + guardrail_built.evaluated_candidate_count
             ),
-            "iterations": max(built.iterations, resilience_built.iterations),
+            "iterations": max(built.iterations, guardrail_built.iterations),
         },
         "guardrails": raw["metadata"]["guardrails"],
         "global_optimum_claimed": False,
