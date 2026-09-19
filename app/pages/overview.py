@@ -92,13 +92,27 @@ def render() -> None:
     left, right = st.columns([1.12, 1])
     with left:
         render_chart(charts.demand_service(result))
+        st.caption(
+            "Сравните спрос и реально обслуженный объём. Столбец дефицита сразу показывает, "
+            "в каком году поставок не хватает."
+        )
     with right:
         render_chart(charts.inventory(result))
+        st.caption(
+            "Запас должен оставаться внутри ёмкости хранилища и обеспечивать требуемый резерв. "
+            "Подсвеченный год означает нарушение 45-дневного требования."
+        )
     left, right = st.columns(2)
     with left:
         render_chart(charts.supply_mix(result, source_names(metadata)))
+        st.caption(
+            "Чем больше доля одного источника, тем сильнее план зависит от его доступности и сроков."
+        )
     with right:
         render_chart(charts.costs(result))
+        st.caption(
+            "График показывает, что именно формирует расходы: закупка, резервирование, CAPEX, OPEX и хранение."
+        )
     render_chart(charts.service(result, service_basis))
     annual = result.get("annual", [])
     failed_total = [str(row["year"]) for row in annual if float(row["total_service_level"]) < 0.97 - 1e-9]
