@@ -1791,6 +1791,36 @@ def build_strategies(
                 if closest_base_valid is not None
                 else None
             ),
+            "overflow_repair_candidates": [
+                {
+                    "plan_id": item.plan.plan_id,
+                    "metrics": copy.deepcopy(item.metrics),
+                    "annual_target_deficit": _annual_target_deficit(item),
+                    "search_depth": item.depth,
+                    "mutation_history": list(item.history),
+                    "base_violations": [
+                        violation.to_dict()
+                        for violation in item.base_result.violations
+                        if violation.severity == "hard"
+                    ],
+                    "stress_violations": [
+                        violation.to_dict()
+                        for violation in item.stress_result.violations
+                        if violation.severity == "hard"
+                    ],
+                }
+                for item in sorted(
+                    [
+                        candidate
+                        for candidate in all_candidates
+                        if any(
+                            "base_overflow_trim:" in step
+                            for step in candidate.history
+                        )
+                    ],
+                    key=_target_first_rank,
+                )[:5]
+            ],
             "closest_to_target": (
                 {
                     "plan_id": closest_to_target.plan.plan_id,
