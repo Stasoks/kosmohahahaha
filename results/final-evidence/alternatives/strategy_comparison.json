@@ -1,0 +1,94 @@
+{
+  "plans": [
+    {
+      "base_capex_mln": 1790.0,
+      "base_cost_mln": 11441.601547807655,
+      "base_cost_per_served_ton_mln": 8.231368020005508,
+      "base_minimum_inventory_t": 17.300000000009504,
+      "base_service": 1.0,
+      "base_shortage_t": 0.0,
+      "base_valid": true,
+      "plan_id": "cost-focused",
+      "risk_consequences": [],
+      "source_mix_t": {
+        "A": 762.0,
+        "B": 95.0,
+        "C": 287.9999999992,
+        "D": 231.16666666666666,
+        "E": 0
+      },
+      "stress_critical_shortage_t": 0.0,
+      "stress_minimum_inventory_t": 0.0,
+      "stress_service": 0.8987132225114424,
+      "stress_shortage_t": 155.37391666744747
+    },
+    {
+      "base_capex_mln": 1790.0,
+      "base_cost_mln": 11800.711947807655,
+      "base_cost_per_served_ton_mln": 8.489720825760903,
+      "base_minimum_inventory_t": 17.300000000009504,
+      "base_service": 1.0,
+      "base_shortage_t": 0.0,
+      "base_valid": true,
+      "plan_id": "diversified",
+      "risk_consequences": [],
+      "source_mix_t": {
+        "A": 780.0,
+        "B": 117.0,
+        "C": 287.9999999992,
+        "D": 231.16666666666666,
+        "E": 0
+      },
+      "stress_critical_shortage_t": 0.0,
+      "stress_minimum_inventory_t": 0.0,
+      "stress_service": 0.924475934375849,
+      "stress_shortage_t": 115.85391666744752
+    },
+    {
+      "base_capex_mln": 1790.0,
+      "base_cost_mln": 11820.555787807654,
+      "base_cost_per_served_ton_mln": 8.503996969645794,
+      "base_minimum_inventory_t": 17.300000000009504,
+      "base_service": 1.0,
+      "base_shortage_t": 0.0,
+      "base_valid": true,
+      "plan_id": "resilient",
+      "risk_consequences": [],
+      "source_mix_t": {
+        "A": 810.0,
+        "B": 95.0,
+        "C": 287.9999999992,
+        "D": 231.16666666666666,
+        "E": 0
+      },
+      "stress_critical_shortage_t": 0.0,
+      "stress_minimum_inventory_t": 0.0,
+      "stress_service": 0.9296284767487303,
+      "stress_shortage_t": 107.94991666744752
+    },
+    {
+      "base_capex_mln": 1430.0,
+      "base_cost_mln": 10609.051509873529,
+      "base_cost_per_served_ton_mln": 7.632411158182395,
+      "base_minimum_inventory_t": 9.915525114155358,
+      "base_service": 1.0,
+      "base_shortage_t": 0.0,
+      "base_valid": true,
+      "plan_id": "final-base-plan",
+      "risk_consequences": [],
+      "source_mix_t": {
+        "A": 844.7368421052631,
+        "B": 131.5260614282383,
+        "C": 0,
+        "D": 360.0,
+        "E": 34.904013961605585
+      },
+      "stress_critical_shortage_t": 7.268666666666643,
+      "stress_minimum_inventory_t": 0.0,
+      "stress_service": 0.8584899120692017,
+      "stress_shortage_t": 217.0764748858446
+    }
+  ],
+  "status": "DIGITAL_TWIN_RESULT",
+  "winner_selected": false
+}

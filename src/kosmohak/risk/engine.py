@@ -169,6 +169,38 @@ def _upsert(items: list[dict[str, Any]], patches: list[dict[str, Any]], keys: tu
             _merge_mapping(existing, patch)
 
 
+def _upsert_supply_orders(
+    items: list[dict[str, Any]],
+    patches: list[dict[str, Any]],
+) -> None:
+    """Patch source schedules without mixing incompatible schedule modes.
+
+    A mitigation may replace an annual-even schedule with a monthly schedule, or
+    vice versa. In that case the complete schedule must be replaced. Merging the
+    values mappings would create invalid hybrids such as mode=annual_even with
+    keys like "2038-04".
+    """
+    for patch in patches:
+        source_id = patch.get("source_id")
+        existing = next(
+            (item for item in items if item.get("source_id") == source_id),
+            None,
+        )
+        if existing is None:
+            items.append(copy.deepcopy(patch))
+            continue
+        if (
+            "mode" in patch
+            and existing.get("mode") is not None
+            and patch["mode"] != existing.get("mode")
+        ):
+            replacement = copy.deepcopy(patch)
+            existing.clear()
+            existing.update(replacement)
+            continue
+        _merge_mapping(existing, patch)
+
+
 def apply_plan_patch(
     plan: OperatorPlan,
     patch: dict[str, Any],
@@ -180,8 +212,12 @@ def apply_plan_patch(
     raw = copy.deepcopy(plan.raw)
     decisions_patch = patch.get("decisions", patch)
     decisions = raw["decisions"]
+    if "supply_orders" in decisions_patch:
+        _upsert_supply_orders(
+            decisions.setdefault("supply_orders", []),
+            decisions_patch["supply_orders"],
+        )
     for name, keys in (
-        ("supply_orders", ("source_id",)),
         ("capacity_reservations", ("source_id", "year")),
         ("investments", ("investment_id",)),
     ):
