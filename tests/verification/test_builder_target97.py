@@ -35,6 +35,7 @@ def test_builder_finds_97_99_mandatory_stress_strategy():
     print("FAILURE", result.failure_reason)
     print("CLOSEST_BASE_VALID", result.search_metadata.get("closest_base_valid"))
     print("CLOSEST_TARGET", result.search_metadata.get("closest_to_target"))
+    print("OVERFLOW_REPAIRS", result.search_metadata.get("overflow_repair_candidates"))
     if result.solutions:
         solution = result.solutions[0]
         print("METRICS", solution.metrics)
