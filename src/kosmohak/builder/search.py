@@ -697,8 +697,9 @@ def _base_overflow_trim_repair(
 
     choices.sort(
         key=lambda item: (
-            item["stress_cost_per_base_relief"],
+            -int(item["year"]),
             -int(item["arrival_month"].replace("-", "")),
+            item["stress_cost_per_base_relief"],
             item["source_id"],
             item["order_month"],
         )
