@@ -143,6 +143,7 @@ def kpi_grid(result: dict[str, Any], capex_limits: tuple[float, float] = (1800, 
         "Статус",
         "Исполним" if values["valid"] else "Неисполним",
         f"Нарушений: {values['hard_violation_count']}",
+        delta_color="inverse",
     )
     first[1].metric("Мин. общий сервис", percent(values["minimum_annual_total_service"]))
     first[2].metric("Мин. критический сервис", percent(values["minimum_annual_critical_service"]))
