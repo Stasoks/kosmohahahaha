@@ -291,6 +291,13 @@ def workspace_remove_source(
     return bridge.workspace_remove_source(workspace, source_id)
 
 
+def workspace_remove_year(
+    workspace: dict[str, Any],
+    year: int,
+) -> dict[str, Any]:
+    return bridge.workspace_remove_year(workspace, year)
+
+
 @st.cache_data(show_spinner=False)
 def _csv(payload: str, source_payload: str, scenario_payload: str) -> dict[str, bytes]:
     return bridge.result_csv_bytes(
