@@ -73,22 +73,33 @@ def _table(rows: list[dict], columns: list[str]) -> None:
 
 def render() -> None:
     st.title("Результаты расчёта")
+    options = ["BASE", "MANDATORY_STRESS"]
+    if "CUSTOM" in st.session_state.result:
+        options.append("CUSTOM")
+    custom_label = st.session_state.result.get("custom_scenario", {}).get("name", "Пользовательский")
     selected = st.segmented_control(
         "Условия расчёта",
-        ["BASE", "MANDATORY_STRESS"],
+        options,
         default="BASE",
-        format_func=lambda value: "Обычные" if value == "BASE" else "Обязательный стресс",
+        format_func=lambda value: {
+            "BASE": "Обычные",
+            "MANDATORY_STRESS": "Обязательный стресс",
+            "CUSTOM": custom_label,
+        }[value],
     ) or "BASE"
     result = st.session_state.result[selected]
     kpi_grid(result)
-    metadata = case_metadata()
+    metadata = case_metadata(source_overrides=st.session_state.get("source_overrides", {}))
     tabs = st.tabs(["Годовой баланс", "Помесячный баланс", "Источники", "Экономика", "Ограничения"])
     with tabs[0]:
         left, right = st.columns(2)
         with left:
             render_chart(charts.demand_service(result))
         with right:
-            render_chart(charts.service(result, selected))
+            service_basis = selected
+            if selected == "CUSTOM":
+                service_basis = st.session_state.result.get("custom_scenario", {}).get("base_scenario", "BASE")
+            render_chart(charts.service(result, service_basis))
         _table(
             result["annual"],
             [
