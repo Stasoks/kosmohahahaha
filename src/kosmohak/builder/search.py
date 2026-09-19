@@ -933,8 +933,9 @@ def _dominates(first: _Candidate, second: _Candidate) -> bool:
     a, b = first.metrics, second.metrics
     first_vector = (
         a["base_hard_violation_count"],
-        a["base_total_shortage_t"],
+        _annual_target_deficit(first),
         _target_deficit(first),
+        a["base_total_shortage_t"],
         a["total_cost_mln"],
         a["stress_critical_shortage_t"],
         a["stress_total_shortage_t"],
@@ -942,8 +943,9 @@ def _dominates(first: _Candidate, second: _Candidate) -> bool:
     )
     second_vector = (
         b["base_hard_violation_count"],
-        b["base_total_shortage_t"],
+        _annual_target_deficit(second),
         _target_deficit(second),
+        b["base_total_shortage_t"],
         b["total_cost_mln"],
         b["stress_critical_shortage_t"],
         b["stress_total_shortage_t"],
@@ -1124,8 +1126,20 @@ def build_strategies(
     for iteration in range(1, config.max_iterations + 1):
         if budget_exhausted or not beam:
             break
-        generated: list[tuple[dict[str, Any], int, tuple[str, ...]]] = []
+        targeted: list[tuple[dict[str, Any], int, tuple[str, ...]]] = []
+        exploratory: list[tuple[dict[str, Any], int, tuple[str, ...]]] = []
         for parent in beam:
+            for raw, description in _target_repair_mutations(
+                parent,
+                config,
+                base_scenario,
+                stress_scenario,
+                case_data,
+                assumptions,
+            ):
+                targeted.append(
+                    (raw, parent.depth + 1, (*parent.history, description))
+                )
             for raw, description in _mutations(
                 parent,
                 config,
@@ -1134,13 +1148,17 @@ def build_strategies(
                 case_data,
                 assumptions,
             ):
-                generated.append(
+                exploratory.append(
                     (raw, parent.depth + 1, (*parent.history, description))
                 )
-        generated.sort(
+        targeted.sort(
             key=lambda item: (item[2][-1], _canonical_decisions(item[0]))
         )
-        rng.shuffle(generated)
+        exploratory.sort(
+            key=lambda item: (item[2][-1], _canonical_decisions(item[0]))
+        )
+        rng.shuffle(exploratory)
+        generated = [*targeted, *exploratory]
         evaluated_this_round: list[_Candidate] = []
         remaining_iterations = config.max_iterations - iteration + 1
         remaining_budget = config.max_candidates - len(cache)
