@@ -897,12 +897,16 @@ python3 scripts/run_reverse_stress.py \
 
 ---
 
-## 36. Research extension и Strategy Advisor (v0.4)
+## 36. Research extension, Strategy Advisor и Strategy Builder (v0.4)
 
 Текущая версия добавляет неразрушающий `CaseWorkspace`, произвольные research sources,
-явное продолжение горизонта после 2040 и отдельный Strategy Advisor. Цифровой двойник
-остаётся единственным расчётчиком физики, экономики и constraints; advisor только
-создаёт и проверяет новые `OperatorPlan`.
+явное продолжение горизонта после 2040, отдельный Strategy Advisor и отдельный
+Strategy Builder. Цифровой двойник остаётся единственным расчётчиком физики,
+экономики и constraints; Advisor локально улучшает существующий `OperatorPlan`, а
+Builder умеет отдельно синтезировать стандартный `BASE_PLAN` и
+`STRESS_ADAPTATION`. Для BASE официальные 97% общего / 99% критического сервиса
+являются hard constraints; в mandatory stress те же уровни показываются как
+resilience benchmarks. Оба режима проверяются тем же расчётным ядром.
 
 ```bash
 # Три содержательно разные BASE-valid стратегии, BASE + mandatory stress + 8 risks
@@ -922,9 +926,11 @@ python3 scripts/advise_plan.py \
 add_research_source / extend_horizon
 evaluate_plan / evaluate_both_scenarios / compare_plans
 repair_plan / improve_plan / improve_resilience / explore_alternatives
+synthesize_strategy / StrategyBuilderConfig / StrategyBuilderResult
 ```
 
 Документы: [`RESEARCH_EXTENSION.md`](docs/RESEARCH_EXTENSION.md),
 [`STRATEGY_ADVISOR.md`](docs/STRATEGY_ADVISOR.md),
+[`STRATEGY_BUILDER.md`](docs/STRATEGY_BUILDER.md),
 [`UI_INTEGRATION.md`](docs/UI_INTEGRATION.md),
 [`TEST_PROTOCOL.md`](docs/TEST_PROTOCOL.md).
