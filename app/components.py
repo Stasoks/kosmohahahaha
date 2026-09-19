@@ -162,7 +162,11 @@ def kpi_grid(
         return f"{sign}{value:.1f}{suffix}"
 
     is_base = scenario_id == "BASE"
-    service_label = "требование" if is_base else "ориентир устойчивости"
+    service_label = (
+        "В BASE обязательный минимум"
+        if is_base
+        else "В стрессовом сценарии ориентир устойчивости"
+    )
     status_text = "План исполним" if values["valid"] else "План требует изменений"
     if values["valid"]:
         st.success(
@@ -185,7 +189,7 @@ def kpi_grid(
         ),
         help=(
             f"Худший год по доле обслуженного общего спроса. "
-            f"Для BASE {service_label}: не ниже 97%."
+            f"{service_label}: не ниже 97%."
         ),
     )
     service[1].metric(
@@ -198,7 +202,7 @@ def kpi_grid(
         ),
         help=(
             f"Худший год по обслуживанию критических миссий. "
-            f"Для BASE {service_label}: не ниже 99%."
+            f"{service_label}: не ниже 99%."
         ),
     )
     service[2].metric(
