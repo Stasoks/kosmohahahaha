@@ -46,7 +46,13 @@ def render() -> None:
         if st.button("Подобрать вариант", type="primary", width="stretch"):
             try:
                 with st.spinner("Идёт поиск подходящего варианта…"):
-                    built = runtime.builder(int(max_candidates), int(beam_width), int(iterations), int(seed))
+                    built = runtime.builder(
+                        int(max_candidates),
+                        int(beam_width),
+                        int(iterations),
+                        int(seed),
+                        runtime.bridge.canonical_json(st.session_state.get("source_overrides", {})),
+                    )
                 st.session_state.builder_result = built
                 if built["solutions"]:
                     st.session_state.stress_plan = built["solutions"][0]["plan"]
@@ -62,7 +68,11 @@ def render() -> None:
 
     try:
         calculated_plan = st.session_state.calculated_plan
-        abc_payload = runtime.abc(calculated_plan, st.session_state.stress_plan)
+        abc_payload = runtime.abc(
+            calculated_plan,
+            st.session_state.stress_plan,
+            st.session_state.get("source_overrides", {}),
+        )
         st.session_state.abc_result = abc_payload
     except Exception as exc:
         render_error(exc, "Не удалось собрать A/B/C")
@@ -99,6 +109,26 @@ def render() -> None:
     _delta_cards(view["stress_effect"])
     _delta_cards(view["adaptation_effect"])
 
+    if "CUSTOM" in st.session_state.result:
+        st.subheader("Текущий план в пользовательском сценарии")
+        custom = st.session_state.result["CUSTOM"]
+        custom_name = st.session_state.result.get("custom_scenario", {}).get("name", "Пользовательский сценарий")
+        base_key = st.session_state.result.get("custom_scenario", {}).get("base_scenario", "BASE")
+        baseline = st.session_state.result[base_key]
+        from app.view_models import minimum_annual_metrics
+        before = minimum_annual_metrics(baseline)
+        after = minimum_annual_metrics(custom)
+        cols = st.columns(4)
+        cols[0].metric("Сценарий", custom_name)
+        cols[1].metric("Мин. сервис", f"{after['minimum_annual_total_service']:.1%}")
+        cols[2].metric("Дефицит", f"{after['total_shortage_t']:.2f} т")
+        cols[3].metric("Стоимость", f"{after['undiscounted_cost_mln']:.1f} млн")
+        st.caption(
+            f"Относительно основы: Δ сервиса {(after['minimum_annual_total_service']-before['minimum_annual_total_service'])*100:+.2f} п.п. · "
+            f"Δ дефицита {after['total_shortage_t']-before['total_shortage_t']:+.2f} т · "
+            f"Δ стоимости {after['undiscounted_cost_mln']-before['undiscounted_cost_mln']:+.1f} млн."
+        )
+
     chart_rows = copy.deepcopy(view["rows"])
     for item in chart_rows:
         item["service_pct"] = 100 * item["minimum_annual_total_service"]
@@ -123,7 +153,10 @@ def render() -> None:
 
     st.subheader("Сравнение общих альтернатив")
     try:
-        alternatives = runtime.alternatives(calculated_plan)
+        alternatives = runtime.alternatives(
+            calculated_plan,
+            st.session_state.get("source_overrides", {}),
+        )
         render_chart(charts.alternatives(alternatives["plans"]))
         alt = pd.DataFrame(alternatives["plans"])
         st.dataframe(
