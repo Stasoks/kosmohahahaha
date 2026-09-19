@@ -16,6 +16,7 @@ ANALYSIS_KEYS = (
     "sensitivity_result",
     "reverse_result",
     "builder_result",
+    "recommended_base_result",
     "abc_result",
     "alternative_result",
     "export_files",
