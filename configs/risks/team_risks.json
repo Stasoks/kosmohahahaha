@@ -33,10 +33,11 @@
       "combination_policy": "apply_after_base",
       "anticipated_consequence": "Reduced delivered lunar volume, lower inventory and potentially lower service.",
       "mitigation": {
-        "mitigation_id": "M-ISRU-DIVERSIFY",
-        "description": "Preserve Earth/Flex headroom; no automatic patch is asserted."
+        "mitigation_id": "M-ISRU-CONTINGENCY-PORTFOLIO",
+        "description": "Pre-approve the resilient contingency portfolio with Earth-New and a broader Earth-supplied mix. The mitigation is a complete saved TEAM_DECISION plan, not an automatic in-event reconfiguration; it is evaluated ex ante with the same risk applied.",
+        "plan_reference": "plans/resilient.json"
       },
-      "residual_consequence": "Must be recomputed after an operator-approved diversification patch.",
+      "residual_consequence": "Recomputed by the digital twin for the referenced contingency plan under the same Lunar-ISRU underdelivery event.",
       "stakeholder_ids": [
         "operator",
         "critical_consumers",
@@ -44,7 +45,8 @@
         "financing"
       ],
       "metadata": {
-        "status": "TEAM_ASSUMPTION"
+        "status": "TEAM_ASSUMPTION",
+        "mitigation_scope": "PRE_APPROVED_CONTINGENCY_PLAN"
       }
     },
     {
@@ -336,10 +338,11 @@
       "combination_policy": "apply_after_base",
       "anticipated_consequence": "Deliveries shift later; total physical volume is not fabricated or deleted.",
       "mitigation": {
-        "mitigation_id": "M-LOGISTICS-EARLY-ORDER",
-        "description": "Test earlier ordering as an explicit plan patch."
+        "mitigation_id": "M-LOGISTICS-DEPENDENCY-REDUCTION",
+        "description": "Pre-approve the resilient contingency portfolio, which avoids Earth-Flex orders during the 2037-2039 disruption window and shifts planned supply to other contracted channels. The alternative is selected before the disruption, not switched instantaneously after observation.",
+        "plan_reference": "plans/resilient.json"
       },
-      "residual_consequence": "Depends on inventory at the delayed arrival boundary.",
+      "residual_consequence": "Recomputed by the digital twin for the referenced contingency plan with the same three-month Earth-Flex lead-time shock.",
       "stakeholder_ids": [
         "operator",
         "critical_consumers",
@@ -347,7 +350,8 @@
         "fuel_suppliers"
       ],
       "metadata": {
-        "status": "TEAM_ASSUMPTION"
+        "status": "TEAM_ASSUMPTION",
+        "mitigation_scope": "PRE_APPROVED_CONTINGENCY_PLAN"
       }
     },
     {
