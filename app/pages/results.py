@@ -6,7 +6,7 @@ import streamlit as st
 from app import charts
 from app.components import kpi_grid, render_chart, violations
 from app.kernel_bridge import case_metadata
-from app.view_models import source_names
+from app.view_models import minimum_annual_metrics, source_names
 
 
 RUSSIAN_COLUMNS = {
@@ -87,8 +87,26 @@ def render() -> None:
             "CUSTOM": custom_label,
         }[value],
     ) or "BASE"
-    result = st.session_state.result[selected]
-    kpi_grid(result)
+    result_pair = st.session_state.result
+    result = result_pair[selected]
+    service_basis = selected
+    if selected == "CUSTOM":
+        service_basis = result_pair.get("custom_scenario", {}).get("base_scenario", "BASE")
+    baseline = result_pair["BASE"] if selected != "BASE" else None
+    kpi_grid(
+        result,
+        baseline=baseline,
+        scenario_id=service_basis,
+    )
+    if baseline is not None:
+        current = minimum_annual_metrics(result)
+        base = minimum_annual_metrics(baseline)
+        st.caption(
+            f"Сравнение с BASE: сервис "
+            f"{100*(current['minimum_annual_total_service']-base['minimum_annual_total_service']):+.1f} п.п. · "
+            f"дефицит {current['total_shortage_t']-base['total_shortage_t']:+.1f} т · "
+            f"стоимость {current['undiscounted_cost_mln']-base['undiscounted_cost_mln']:+.1f} млн у.е."
+        )
     metadata = case_metadata(source_overrides=st.session_state.get("source_overrides", {}))
     tabs = st.tabs(["Годовой баланс", "Помесячный баланс", "Источники", "Экономика", "Ограничения"])
     with tabs[0]:
@@ -96,10 +114,28 @@ def render() -> None:
         with left:
             render_chart(charts.demand_service(result))
         with right:
-            service_basis = selected
-            if selected == "CUSTOM":
-                service_basis = st.session_state.result.get("custom_scenario", {}).get("base_scenario", "BASE")
             render_chart(charts.service(result, service_basis))
+        annual_rows = result.get("annual", [])
+        failed_total = [
+            str(row["year"])
+            for row in annual_rows
+            if float(row["total_service_level"]) < 0.97 - 1e-9
+        ]
+        failed_critical = [
+            str(row["year"])
+            for row in annual_rows
+            if float(row["critical_service_level"]) < 0.99 - 1e-9
+        ]
+        if failed_total or failed_critical:
+            st.info(
+                "Как читать график сервиса: линии 97% и 99% показывают контрольные уровни. "
+                + (f"Общий сервис ниже 97%: {', '.join(failed_total)}. " if failed_total else "")
+                + (f"Критический ниже 99%: {', '.join(failed_critical)}." if failed_critical else "")
+            )
+        else:
+            st.info(
+                "Как читать график сервиса: обе линии обслуживания остаются не ниже контрольных уровней во все годы."
+            )
         _table(
             result["annual"],
             [
