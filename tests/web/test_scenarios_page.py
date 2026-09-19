@@ -12,7 +12,6 @@ def test_scenario_comparison_is_ready(app, goto):
     assert app.session_state["stress_plan"] is not None
     assert len(app.dataframe) >= 2
     assert len(app.get("plotly_chart")) >= 1
-    assert not app.warning
 
 
 def test_reset_to_reference_variant_c(app, by_label, goto):

@@ -17,15 +17,17 @@ def test_plan_json_download_is_available(app, goto):
     assert "Скачать текущий план JSON" in _download_labels(app)
 
 
-def test_preparing_csv_files_enables_downloads(app, by_label, goto):
+def test_preparing_exports_enables_downloads(app, by_label, goto):
     goto("Данные и экспорт")
     before = len(_download_labels(app))
 
-    by_label(app.button, "Подготовить CSV-файлы").click().run()
+    by_label(app.button, "Подготовить выгрузки").click().run()
 
     assert app.exception == []
     assert app.session_state["export_files"]
-    assert len(_download_labels(app)) > before
+    downloads = _download_labels(app)
+    assert len(downloads) > before
+    assert any(label.endswith(".csv") for label in downloads)
 
 
 def test_full_zip_bundle_is_valid(app, by_label, goto):

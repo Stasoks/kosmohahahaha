@@ -30,7 +30,7 @@ def test_can_switch_result_conditions(app, goto):
     selector = groups[0]
     assert len(list(selector.options)) == 2
 
-    selector.set_value("MANDATORY_STRESS").run()
+    selector.set_value(["MANDATORY_STRESS"]).run()
 
     assert app.exception == []
     assert [metric.label for metric in app.metric]

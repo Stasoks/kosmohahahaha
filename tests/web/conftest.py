@@ -19,6 +19,7 @@ APP = ROOT / "streamlit_app.py"
 
 PAGES = [
     "Обзор",
+    "Исходные условия",
     "Стратегия",
     "Результаты",
     "Сценарии",
@@ -26,6 +27,36 @@ PAGES = [
     "Исследования",
     "Данные и экспорт",
 ]
+
+
+def _patch_apptest_button_group() -> None:
+    """Work around an AppTest issue in Streamlit 1.50.
+
+    ``ButtonGroup.indices`` assumes the widget value is a list, but a
+    single-selection ``st.segmented_control`` stores a scalar. The harness then
+    iterates the string character by character and raises ``KeyError`` while
+    reading widget state on the second run. Coerce scalars to one-element lists.
+    """
+    try:
+        from streamlit.testing.v1.element_tree import ButtonGroup
+    except Exception:  # pragma: no cover - only relevant for the UI suite
+        return
+    if getattr(ButtonGroup, "_opencode_indices_patched", False):
+        return
+
+    def indices(self):
+        value = self.value
+        if value is None:
+            return []
+        if not isinstance(value, (list, tuple, set)):
+            value = [value]
+        return [self.options.index(self.format_func(item)) for item in value]
+
+    ButtonGroup.indices = property(indices)
+    ButtonGroup._opencode_indices_patched = True
+
+
+_patch_apptest_button_group()
 
 
 def _clear_caches() -> None:
