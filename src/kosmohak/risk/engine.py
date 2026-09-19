@@ -78,7 +78,9 @@ def _evaluate_with_baseline(
         baseline_result=baseline,
         risk_result=risk_result,
     )
-    if risk.mitigation and risk.mitigation.get("plan_patch"):
+    if risk.mitigation and (
+        risk.mitigation.get("plan_patch") or risk.mitigation.get("plan_reference")
+    ):
         evaluation.mitigation = evaluate_mitigation(
             plan,
             base_scenario,
@@ -240,6 +242,54 @@ def apply_plan_patch(
     return mitigated
 
 
+def _mitigated_plan_from_definition(
+    original_plan: OperatorPlan,
+    mitigation: dict[str, Any],
+    case_data: CaseData,
+    assumptions: ModelAssumptions,
+    *,
+    mitigation_id: str,
+) -> OperatorPlan:
+    """Build an explicit mitigated plan from a patch or a saved plan reference.
+
+    A plan_reference represents a complete pre-approved contingency architecture.
+    The referenced plan is validated against the same case and re-simulated in
+    both BASE and the risk environment.
+    """
+    patch = mitigation.get("plan_patch")
+    plan_reference = mitigation.get("plan_reference")
+    if bool(patch) == bool(plan_reference):
+        raise ValueError(
+            "Mitigation must define exactly one of plan_patch or plan_reference"
+        )
+    if patch:
+        return apply_plan_patch(
+            original_plan,
+            dict(patch),
+            case_data,
+            assumptions,
+            mitigation_id=mitigation_id,
+        )
+
+    reference_path = Path(str(plan_reference))
+    if not reference_path.is_absolute():
+        reference_path = case_data.root / reference_path
+    if not reference_path.is_file():
+        raise FileNotFoundError(
+            f"Mitigation plan_reference does not exist: {reference_path}"
+        )
+    referenced = PlanLoader.load(reference_path, case_data, assumptions)
+    raw = copy.deepcopy(referenced.raw)
+    raw["plan_id"] = f"{original_plan.plan_id}--mitigation-{mitigation_id}"
+    metadata = raw.setdefault("metadata", {})
+    metadata["mitigation_of"] = original_plan.plan_id
+    metadata["mitigation_plan_reference"] = str(plan_reference)
+    metadata["status"] = "TEAM_DECISION"
+    mitigated = OperatorPlan.from_dict(raw)
+    PlanLoader.validate(mitigated, case_data, assumptions)
+    return mitigated
+
+
 def evaluate_mitigation(
     original_plan: OperatorPlan,
     base_scenario: Scenario,
@@ -253,9 +303,9 @@ def evaluate_mitigation(
 ) -> MitigationEvaluation:
     config = _load_scoring(scoring, case_data)
     mitigation_id = str(mitigation.get("mitigation_id", f"{risk.risk_id}-M1"))
-    mitigated_plan = apply_plan_patch(
+    mitigated_plan = _mitigated_plan_from_definition(
         original_plan,
-        dict(mitigation["plan_patch"]),
+        mitigation,
         case_data,
         assumptions,
         mitigation_id=mitigation_id,
