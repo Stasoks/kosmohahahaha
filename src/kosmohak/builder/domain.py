@@ -8,10 +8,24 @@ from kosmohak.domain.result import SimulationResult
 
 
 SUPPORTED_OBJECTIVES = {"MIN_COST", "MAX_RESILIENCE"}
+SUPPORTED_PLANNING_MODES = {"BASE_PLAN", "STRESS_ADAPTATION"}
 
 
 @dataclass(frozen=True)
 class StrategyBuilderConfig:
+    """Configuration for constructing either the standard or stress-adapted plan.
+
+    BASE_PLAN:
+        BASE service requirements and every other hard constraint are mandatory.
+        Mandatory-stress service is reported as resilience information.
+
+    STRESS_ADAPTATION:
+        The plan is built for MANDATORY_STRESS. Hard stress constraints remain
+        mandatory, while the official 97%/99% service levels are resilience
+        benchmarks rather than feasibility constraints.
+    """
+
+    planning_mode: str = "BASE_PLAN"
     objective: str = "MIN_COST"
     stress_total_service_target: float | None = None
     stress_critical_service_target: float | None = None
@@ -25,8 +39,14 @@ class StrategyBuilderConfig:
     diversity_threshold: float = 0.08
 
     def __post_init__(self) -> None:
+        planning_mode = str(self.planning_mode).upper()
         objective = str(self.objective).upper()
+        object.__setattr__(self, "planning_mode", planning_mode)
         object.__setattr__(self, "objective", objective)
+        if planning_mode not in SUPPORTED_PLANNING_MODES:
+            raise ValueError(
+                f"Unsupported Strategy Builder planning_mode: {self.planning_mode!r}"
+            )
         if objective not in SUPPORTED_OBJECTIVES:
             raise ValueError(
                 f"Unsupported Strategy Builder objective: {self.objective!r}"
@@ -71,6 +91,8 @@ class StrategyBuilderSolution:
     stress_result: SimulationResult
     metrics: dict[str, Any]
     target_satisfaction: dict[str, Any]
+    benchmark_satisfaction: dict[str, Any]
+    feasibility: dict[str, Any]
     provenance: dict[str, Any]
     search_depth: int
     mutation_history: tuple[str, ...] = ()
@@ -82,6 +104,8 @@ class StrategyBuilderSolution:
             "stress_summary": self.stress_result.summary,
             "metrics": self.metrics,
             "target_satisfaction": self.target_satisfaction,
+            "benchmark_satisfaction": self.benchmark_satisfaction,
+            "feasibility": self.feasibility,
             "provenance": self.provenance,
             "search_depth": self.search_depth,
             "mutation_history": list(self.mutation_history),
