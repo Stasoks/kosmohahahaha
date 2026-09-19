@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import copy
+import json
+from pathlib import Path
 
 import pytest
 
-from app.research_plan import apply_research_decisions
+from app.research_plan import annual_order_total, apply_research_decisions
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _base_plan() -> dict:
@@ -133,3 +138,52 @@ def test_research_apply_updates_reservations_without_rebuilding_unrelated_rows()
     }
     assert reservations[("B", 2040)] == pytest.approx(75.0)
     assert reservations[("A", 2040)] == pytest.approx(50.0)
+
+def test_final_base_extension_with_zero_2041_keeps_official_schedule_exact() -> None:
+    raw = json.loads((ROOT / "plans" / "final_base.json").read_text(encoding="utf-8"))
+    schedules = raw["decisions"]["supply_orders"]
+    before = copy.deepcopy(schedules)
+    reservations = raw["decisions"]["capacity_reservations"]
+
+    order_rows = []
+    reserve_rows = []
+    for schedule in schedules:
+        source_id = str(schedule["source_id"])
+        order_rows.append(
+            {
+                "Использовать": True,
+                "Источник": source_id,
+                **{
+                    str(year): annual_order_total(schedule, year)
+                    for year in range(2035, 2041)
+                },
+                "2041": 0.0,
+            }
+        )
+        reserve_rows.append(
+            {
+                "Источник": source_id,
+                **{
+                    str(year): next(
+                        (
+                            float(item["reserved_capacity_t"])
+                            for item in reservations
+                            if str(item["source_id"]) == source_id
+                            and int(item["year"]) == year
+                        ),
+                        0.0,
+                    )
+                    for year in range(2035, 2041)
+                },
+                "2041": 0.0,
+            }
+        )
+
+    updated = apply_research_decisions(
+        raw,
+        order_rows,
+        reserve_rows,
+        range(2035, 2042),
+    )
+
+    assert updated["decisions"]["supply_orders"] == before
