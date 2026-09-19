@@ -214,21 +214,23 @@ arguments and optional `locks=` and `config=` keyword arguments.
 
 ## Strategy Builder
 
-Strategy Builder is separate from the existing Advisor. It creates new plans from
-CASE_INPUT plus operator search targets; it does not require an existing OperatorPlan.
-The UI should call only the service facade:
+Strategy Builder has two organizer-aligned workflows and remains separate from the
+existing Advisor.
+
+### 1. Build the standard plan
+
+The default mode is `BASE_PLAN`.
 
     from kosmohak.service import StrategyBuilderConfig, synthesize_strategy
 
-    built = synthesize_strategy(
+    base_build = synthesize_strategy(
         ctx.base_scenario,
         ctx.stress_scenario,
         ctx.case_data,
         ctx.assumptions,
         config=StrategyBuilderConfig(
+            planning_mode="BASE_PLAN",
             objective="MIN_COST",
-            stress_total_service_target=0.97,
-            stress_critical_service_target=0.99,
             max_candidates=3000,
             beam_width=20,
             max_iterations=8,
@@ -237,14 +239,65 @@ The UI should call only the service facade:
         ),
     )
 
-The stress-service targets above are operator preferences, not organizer hard
-constraints. Returned solutions are BASE-valid and have already been evaluated through
-the normal BASE and MANDATORY_STRESS digital-twin path. The search is bounded and does
-not claim global optimality or global infeasibility.
+Every returned BASE_PLAN is valid in BASE according to the ordinary digital-twin hard
+constraints. The official annual service thresholds (97% total, 99% critical) are
+therefore enforced by the same constraint checker used for manually created plans.
+
+The same generated plan is also evaluated in MANDATORY_STRESS. Stress service levels
+are displayed through `solution.benchmark_status`; a stress benchmark miss does not
+turn a valid standard plan into an invalid BASE plan.
+
+### 2. Build a stress adaptation
+
+When the operator wants to compare a changed response to the known mandatory stress,
+use:
+
+    stress_build = synthesize_strategy(
+        ctx.base_scenario,
+        ctx.stress_scenario,
+        ctx.case_data,
+        ctx.assumptions,
+        config=StrategyBuilderConfig(
+            planning_mode="STRESS_ADAPTATION",
+            objective="MIN_COST",
+            max_candidates=3000,
+            beam_width=20,
+            max_iterations=8,
+            max_results=3,
+            seed=17,
+        ),
+    )
+
+Returned stress adaptations are valid under MANDATORY_STRESS hard constraints. The
+97% total / 99% critical service levels are resilience benchmarks in this mode. With
+MIN_COST the backend prefers benchmark-satisfying plans when they exist, then minimizes
+stress-scenario cost. If the benchmarks cannot be reached in the bounded search space,
+the UI must show the numeric gap instead of labeling the plan invalid solely for that
+gap.
+
+A stress-adapted plan is allowed to differ from the BASE plan in orders, reservations,
+investments and other TEAM_DECISION fields. It is also allowed to fail when replayed
+under BASE; that replay is diagnostic, not the feasibility criterion for
+STRESS_ADAPTATION.
+
+### Recommended UI flow
+
+1. Generate/select a BASE_PLAN.
+2. Display BASE hard checks and annual service.
+3. Replay that same plan in MANDATORY_STRESS.
+4. Display stress benchmark status, shortage, costs and violations.
+5. Generate a STRESS_ADAPTATION.
+6. Compare the BASE plan and stress-adapted plan side by side.
+7. Make the changed decisions, extra cost and service effect explicit.
+
+Optional stress service targets remain operator preferences. They default to
+`stress_target_policy="SOFT"`. A user can explicitly set `"HARD"`, but the UI must
+still label that as an operator search requirement, not an organizer hard constraint.
 
 Each solution exposes its generated plan, BASE/STRESS results, objective metrics,
-target-satisfaction details, provenance, search depth, and mutation history. See
-STRATEGY_BUILDER.md for the search semantics and limitations.
+operator target satisfaction, official benchmark status, provenance, search depth and
+mutation history. See `STRATEGY_BUILDER.md` for the full search semantics and
+limitations.
 
 ## Research source and future horizon
 
