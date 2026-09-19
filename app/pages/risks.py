@@ -64,7 +64,10 @@ def _risk_tab() -> None:
     if st.button("Рассчитать портфель рисков", type="primary"):
         try:
             with st.spinner("Каждый риск рассчитывается отдельным прогоном цифрового двойника…"):
-                st.session_state.risk_result = runtime.risks(st.session_state.calculated_plan)
+                st.session_state.risk_result = runtime.risks(
+                    st.session_state.calculated_plan,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "Не удалось рассчитать портфель")
     data = st.session_state.get("risk_result")
