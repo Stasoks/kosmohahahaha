@@ -49,7 +49,7 @@ def _plans() -> None:
 
 
 def _case_data() -> None:
-    tables = case_tables()
+    tables = case_tables(source_overrides=st.session_state.get("source_overrides", {}))
     st.subheader("Спрос")
     demand_columns = {
         "year": "Год", "base_total_t": "Общий спрос, т", "base_critical_t": "Критический спрос, т",
@@ -88,7 +88,11 @@ def _exports() -> None:
     if st.button("Подготовить CSV-файлы", type="primary"):
         try:
             with st.spinner("Формируются таблицы обычного и стрессового расчётов…"):
-                st.session_state.export_files = runtime.csv_files(st.session_state.calculated_plan)
+                st.session_state.export_files = runtime.csv_files(
+                    st.session_state.calculated_plan,
+                    st.session_state.get("source_overrides", {}),
+                    st.session_state.get("custom_scenario"),
+                )
         except Exception as exc:
             render_error(exc, "CSV не подготовлены")
     files = st.session_state.get("export_files")
@@ -100,7 +104,10 @@ def _exports() -> None:
     if st.button("Подготовить полный ZIP", type="primary"):
         try:
             with st.spinner("Собираются план, результаты и риски…"):
-                st.session_state.bundle = runtime.bundle(st.session_state.calculated_plan)
+                st.session_state.bundle = runtime.bundle(
+                    st.session_state.calculated_plan,
+                    st.session_state.get("source_overrides", {}),
+                )
         except Exception as exc:
             render_error(exc, "ZIP не подготовлен")
     if st.session_state.get("bundle"):
