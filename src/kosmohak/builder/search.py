@@ -616,46 +616,33 @@ def _initial_stock_rightsize_repair(
     case_data: CaseData,
     assumptions: ModelAssumptions,
 ) -> tuple[dict[str, Any], str] | None:
-    """Reduce oversized opening stock when a target-near plan overflows BASE storage."""
-    has_overflow = any(
-        item.severity == "hard" and item.code == "STORAGE_CAPACITY_EXCEEDED"
+    """Remove only enough opening stock to clear BASE storage overflow."""
+    overflow_gaps = [
+        float(item.excess_or_gap or 0.0)
         for item in candidate.base_result.violations
-    )
+        if item.severity == "hard"
+        and item.code == "STORAGE_CAPACITY_EXCEEDED"
+        and item.excess_or_gap is not None
+    ]
     acquisition = candidate.plan.raw["decisions"].get("initial_stock_acquisition")
-    if not has_overflow or not acquisition:
+    if not overflow_gaps or not acquisition:
         return None
 
     raw = copy.deepcopy(candidate.plan.raw)
-    commissions = _commissions(raw, base_scenario, case_data, assumptions)
-    eligible_leads = []
-    for source_id, source in case_data.sources.items():
-        if source_id == "E":
-            continue
-        commission = commissions.get(source_id)
-        if commission is None or str(commission) > case_data.start_month:
-            continue
-        eligible_leads.append(assumptions.source_delivery_lead_months(source))
-    if not eligible_leads:
-        return None
-
-    bridge_months = max(1, min(eligible_leads))
-    first_year = case_data.official_years[0]
-    monthly_demand = case_data.demand[first_year].base_total_t / 12.0
-    reserve_days = float(case_data.constraints["RESERVE_45D"].value)
-    reserve_net = case_data.demand[first_year].base_total_t * reserve_days / 365.0
-    desired_net = max(monthly_demand * bridge_months, reserve_net)
     storage = case_data.storage["BASE"]
-    gross_needed = desired_net / max(1e-12, 1.0 - storage.loss_rate_on_throughput)
     current = float(acquisition["ordered_volume_t"])
-    if gross_needed >= current - 1e-8:
+    relief_net = max(overflow_gaps) + 0.05
+    relief_gross = relief_net / max(1e-12, 1.0 - storage.loss_rate_on_throughput)
+    target_gross = max(0.0, current - relief_gross)
+    if target_gross >= current - 1e-8:
         return None
 
     target = raw["decisions"]["initial_stock_acquisition"]
-    target["ordered_volume_t"] = gross_needed
-    target["reserved_capacity_t_per_year"] = gross_needed
+    target["ordered_volume_t"] = target_gross
+    target["reserved_capacity_t_per_year"] = target_gross
     return (
         raw,
-        f"initial_stock_rightsize:{current:.6f}->{gross_needed:.6f}",
+        f"initial_stock_overflow_relief:{current:.6f}->{target_gross:.6f}",
     )
 
 
