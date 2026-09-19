@@ -199,10 +199,12 @@ def _risk_tab() -> None:
         except Exception as exc:
             render_error(exc, "Не удалось рассчитать риск")
     detail = st.session_state.get("risk_detail")
+    detail_current = False
     if detail and detail.get("risk", {}).get("risk_id") == selected:
         if _stale(detail):
             st.info("Пересчитайте выбранный риск для текущего плана и среды.")
         else:
+            detail_current = True
             before = minimum_annual_metrics(detail["baseline"])
             after = minimum_annual_metrics(detail["risk_result"])
             metrics = [
@@ -267,7 +269,7 @@ def _risk_tab() -> None:
     else:
         st.info("Для этой меры количественный пересчёт не задан.")
 
-    if detail and detail.get("risk", {}).get("risk_id") == selected:
+    if detail_current:
         st.subheader("Кто несёт последствия выбранного риска")
         mitigation_value = st.session_state.get("mitigation_result")
         residual_result = None
